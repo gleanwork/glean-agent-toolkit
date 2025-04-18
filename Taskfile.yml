@@ -1,0 +1,252 @@
+# yaml-language-server: $schema=https://taskfile.dev/schema.json
+#
+# see https://taskfile.dev/usage/
+# brew install go-task
+#
+version: 3
+dotenv: [".env"]
+vars:
+  PYTHON: "uv run python"
+  PYTEST: "uv run pytest"
+  RUFF: "uv run ruff"
+  MYPY: "uv run mypy"
+  CODESPELL: "uv run codespell"
+  PTW: "uv run ptw"
+  TEST_DIR: "tests/"
+  PYTHON_FILES: "."
+  EXCLUDE_DIRS: "--exclude .venv/ --exclude **/site-packages/"
+  MYPY_CACHE: ".mypy_cache"
+
+tasks:
+  # Default task: Lists all available tasks
+  default:
+    silent: true
+    cmds:
+      - echo $'To list all tasks run:\n\n\t task --list-all\n'
+      - task --list --sort=none
+
+  # Setup task: Set up local environment (install dependencies, etc.)
+  setup:
+    desc: Set up local environment (install dependencies, etc.)
+    cmds:
+      - task: install:uv
+
+  # Install uv task: Install Python dependencies using uv
+  install:uv:
+    silent: true
+    sources:
+      - "pyproject.toml"
+    cmds:
+      - echo "Creating virtual environment and installing dependencies with uv..."
+      - "uv venv .venv"
+      - "uv pip install -e .[dev,test,lint,typing,codespell]"
+    status:
+      - test -d ".venv"
+
+  # Test and lint task: Run tests and linters
+  test:all:
+    desc: Run all tests and lint fixes
+    cmds:
+      - task: test
+      - task: lint:fix 
+
+  # Test task: Run unit tests
+  test:
+    aliases: [tests]
+    desc: Run unit tests
+    cmds:
+      - "{{.PYTEST}} -v --tb=auto -rA --durations=10 -p no:logging {{.TEST_DIR}}"
+
+  # Test watch task: Run tests in watch mode
+  test:watch:
+    desc: Run tests in watch mode
+    cmds:
+      - "{{.PTW}} --now . -- -vv --tb=auto -rA --durations=10 -p no:logging {{.TEST_DIR}}"
+
+  # Test coverage task: Run tests with coverage
+  test:cov:
+    desc: Run tests with coverage
+    cmds:
+      - "{{.PYTEST}} --cov=glean_agent_toolkit.toolkit --cov-report=term --cov-report=html -v {{.TEST_DIR}}"
+
+  # Run examples task
+  examples:
+    desc: Run examples
+    cmds:
+      - "{{.PYTHON}} examples/basic_usage.py"
+
+  # Run search example task
+  run:search-example:
+    desc: Run Glean search example
+    cmds:
+      - "{{.PYTHON}} examples/glean_search_tool.py"
+
+  # Lint task: Run all linters
+  lint:
+    desc: Run all linters
+    cmds:
+      - task: lint:ruff
+      - task: lint:format:check
+      - task: lint:mypy
+
+  # Lint diff task: Run linters on changed files
+  lint:diff:
+    desc: Run linters on changed files
+    vars:
+      PYTHON_FILES:
+        sh: git diff --name-only --diff-filter=d main | grep -E '\.py$$|\.ipynb$$'
+    cmds:
+      - task: lint:ruff
+      - task: lint:format:check
+      - task: lint:mypy
+
+  # Lint package task: Run linters on package files
+  lint:package:
+    desc: Run linters on package files
+    vars:
+      PYTHON_FILES: "glean_agent_toolkit/toolkit"
+    cmds:
+      - task: lint:ruff
+      - task: lint:format:check
+      - task: lint:mypy
+
+  # Lint tests task: Run linters on test files
+  lint:tests:
+    desc: Run linters on test files
+    vars:
+      PYTHON_FILES: "tests"
+      MYPY_CACHE: ".mypy_cache_test"
+    cmds:
+      - task: lint:ruff
+      - task: lint:format:check
+      - task: lint:mypy
+
+  # Lint Fix task: Run lint autofixers
+  lint:fix:
+    desc: Run the lint autofixers
+    cmds:
+      - task: lint:fix:ruff
+      - task: format
+
+  # Lint Fix diff task: Run lint autofixers on changed files
+  lint:fix:diff:
+    desc: Run lint autofixers on changed files
+    vars:
+      PYTHON_FILES:
+        sh: git diff --name-only --diff-filter=d main | grep -E '\.py$$|\.ipynb$$'
+    cmds:
+      - task: lint:fix:ruff
+      - task: format:diff
+
+  # Lint Fix package task: Run lint autofixers on package files
+  lint:fix:package:
+    desc: Run lint autofixers on package files
+    vars:
+      PYTHON_FILES: "glean_agent_toolkit/toolkit"
+    cmds:
+      - task: lint:fix:ruff
+      - task: format
+
+  # Lint Fix tests task: Run lint autofixers on test files
+  lint:fix:tests:
+    desc: Run lint autofixers on test files
+    vars:
+      PYTHON_FILES: "tests"
+    cmds:
+      - task: lint:fix:ruff
+      - task: format
+
+  # Lint Fix Ruff task: Run Ruff autofixer
+  lint:fix:ruff:
+    internal: true
+    cmds:
+      - '[ "{{.PYTHON_FILES}}" = "" ] || {{.RUFF}} check {{.PYTHON_FILES}} --fix {{.EXCLUDE_DIRS}}'
+
+  # Lint Ruff task: Run Ruff linter
+  lint:ruff:
+    internal: true
+    cmds:
+      - '[ "{{.PYTHON_FILES}}" = "" ] || {{.RUFF}} check {{.PYTHON_FILES}} {{.EXCLUDE_DIRS}}'
+
+  # Lint Format check task: Check code formatting
+  lint:format:check:
+    internal: true
+    cmds:
+      - '[ "{{.PYTHON_FILES}}" = "" ] || {{.RUFF}} format {{.PYTHON_FILES}} --diff'
+
+  # Lint Mypy task: Run mypy type checker
+  lint:mypy:
+    internal: true
+    cmds:
+      - '[ "{{.PYTHON_FILES}}" = "" ] || mkdir -p {{.MYPY_CACHE}} && {{.MYPY}} {{.PYTHON_FILES}} --cache-dir {{.MYPY_CACHE}} {{.EXCLUDE_DIRS}}'
+
+  # Format task: Run code formatters
+  format:
+    desc: Run code formatters
+    cmds:
+      - task: format:ruff
+      - task: format:imports
+
+  # Format diff task: Run formatters on changed files
+  format:diff:
+    desc: Run formatters on changed files
+    vars:
+      PYTHON_FILES:
+        sh: git diff --name-only --diff-filter=d main | grep -E '\.py$$|\.ipynb$$'
+    cmds:
+      - task: format:ruff
+      - task: format:imports
+
+  # Format Ruff task: Run Ruff formatter
+  format:ruff:
+    internal: true
+    cmds:
+      - '[ "{{.PYTHON_FILES}}" = "" ] || {{.RUFF}} format {{.PYTHON_FILES}}'
+
+  # Format Imports task: Fix imports
+  format:imports:
+    internal: true
+    cmds:
+      - '[ "{{.PYTHON_FILES}}" = "" ] || {{.RUFF}} check --select I --fix {{.PYTHON_FILES}}'
+
+  # Spell check task: Check spelling
+  spell:check:
+    desc: Check spelling
+    cmds:
+      - "{{.CODESPELL}} --toml pyproject.toml --skip=docs/"
+
+  # Spell fix task: Fix spelling
+  spell:fix:
+    desc: Fix spelling
+    cmds:
+      - "{{.CODESPELL}} --toml pyproject.toml -w --skip=docs/"
+
+  # Clean task: Clean build artifacts
+  clean:
+    desc: Clean build artifacts
+    cmds:
+      - rm -rf dist build **/*.egg-info .pytest_cache .coverage htmlcov .ruff_cache
+      - find . -name "*.pyc" -delete
+      - find . -name "__pycache__" -delete
+
+  # Build task: Build the package
+  build:
+    desc: Build the package
+    cmds:
+      - "{{.PYTHON}} -m build"
+
+  # Release task: Bump version and create a new tag (use DRY_RUN=true for preview)
+  release:
+    desc: Bump version and create a new tag (use DRY_RUN=true for preview)
+    vars:
+      DRY_RUN: '{{default "false" .DRY_RUN}}'
+      CZ: "uv run python -m commitizen"
+    cmds:
+      - |
+        if [ "{{.DRY_RUN}}" = "true" ]; then
+          {{.CZ}} bump --dry-run
+          {{.CZ}} changelog --dry-run
+        else
+          {{.CZ}} bump --yes
+          {{.CZ}} changelog
+        fi 
