@@ -7,7 +7,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from toolkit.registry import get_registry
+from glean_agent_toolkit.toolkit.registry import get_registry
 
 app = typer.Typer(help="Agent Toolkit CLI")
 console = Console()
@@ -41,7 +41,7 @@ def list_tools() -> None:
 @app.command("export-schema")
 def export_schema(
     name: str = typer.Argument(..., help="Name of the tool to export"),
-    output: str | None = typer.Option(None, help="Output file path (default: stdout)")
+    output: str | None = typer.Option(None, help="Output file path (default: stdout)"),
 ) -> None:
     """Export the JSON schema for a tool."""
     registry = get_registry()

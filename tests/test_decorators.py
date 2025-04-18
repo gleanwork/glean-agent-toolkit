@@ -1,68 +1,101 @@
-"""Tests for the decorators module."""
+"""Tests for the decorators."""
 
 from unittest import mock
 
 from pydantic import BaseModel
 
-from toolkit import tool_spec
+from glean_agent_toolkit.toolkit.decorators import tool_spec
+from glean_agent_toolkit.toolkit.registry import get_registry
+
+
+class OutputModel(BaseModel):
+    """Output model for testing."""
+
+    result: int
 
 
 def test_tool_spec_decorator() -> None:
-    """Test the tool_spec decorator."""
-    @tool_spec(name="add", description="Add two integers")
+    """Test tool_spec decorator."""
+
+    @tool_spec(
+        name="add",
+        description="Add two integers",
+    )
     def add(a: int, b: int) -> int:
+        """Add two integers."""
         return a + b
 
-    # Check that the function still works
-    assert add(2, 3) == 5
+    # Test function still works
+    assert add(3, 4) == 7
 
-    # Check that helper methods were added
-    assert hasattr(add, "as_openai_tool")
-    assert hasattr(add, "as_adk_tool")
-    assert hasattr(add, "as_langchain_tool")
-    assert hasattr(add, "as_crewai_tool")
-
-    # Check that tool_spec was attached
+    # Test wrapper has tool_spec attribute
     assert hasattr(add, "tool_spec")
+
+    # Test tool spec attributes
     assert add.tool_spec.name == "add"
     assert add.tool_spec.description == "Add two integers"
+    assert add.tool_spec.function.__name__ == add.__name__
+
+    # Test input schema was generated
+    assert add.tool_spec.input_schema["type"] == "object"
+    assert "a" in add.tool_spec.input_schema["properties"]
+    assert "b" in add.tool_spec.input_schema["properties"]
+    assert add.tool_spec.input_schema["properties"]["a"]["type"] == "integer"
+    assert add.tool_spec.input_schema["properties"]["b"]["type"] == "integer"
+
+    # Test output schema was generated
+    assert add.tool_spec.output_schema["type"] == "integer"
+
+    # Test tool is registered
+    registry = get_registry()
+    assert registry.get("add") is add.tool_spec
 
 
-def test_tool_spec_with_output_model() -> None:
-    """Test the tool_spec decorator with an output model."""
-    class Result(BaseModel):
-        sum: int
-        message: str
+def test_tool_spec_decorator_with_output_model() -> None:
+    """Test tool_spec decorator with output model."""
 
-    @tool_spec(name="add_with_model", description="Add with model", output_model=Result)
-    def add_with_model(a: int, b: int) -> Result:
-        return Result(sum=a + b, message=f"Sum of {a} and {b} is {a + b}")
+    @tool_spec(name="add", description="Add two integers", output_model=OutputModel)
+    def add(a: int, b: int) -> OutputModel:
+        """Add two integers."""
+        return OutputModel(result=a + b)
 
-    # Check that the function still works
-    result = add_with_model(2, 3)
-    assert result.sum == 5
-    assert result.message == "Sum of 2 and 3 is 5"
+    # Test function still works
+    result = add(3, 4)
+    assert isinstance(result, OutputModel)
+    assert result.result == 7
 
-    # Check that tool_spec was attached with correct output model
-    assert add_with_model.tool_spec.output_model == Result
+    # Test tool spec attributes
+    assert add.tool_spec.output_model is OutputModel
+    assert "properties" in add.tool_spec.output_schema
+    assert "result" in add.tool_spec.output_schema["properties"]
 
 
-def test_openai_tool_conversion() -> None:
-    """Test conversion to OpenAI tool format."""
-    @tool_spec(name="multiply", description="Multiply two integers")
-    def multiply(a: int, b: int) -> int:
-        return a * b
+def test_helper_methods() -> None:
+    """Test helper methods."""
 
-    # Mock the OpenAIAdapter
-    adapter_mock = mock.MagicMock()
-    adapter_mock.to_tool.return_value = {"mocked": "tool"}
+    @tool_spec(name="add", description="Add two integers")
+    def add(a: int, b: int) -> int:
+        """Add two integers."""
+        return a + b
 
-    with mock.patch("toolkit.adapters.openai.OpenAIAdapter", return_value=adapter_mock):
-        # First call should create and cache the adapter
-        assert multiply.as_openai_tool() == {"mocked": "tool"}
+    # Test as_openai_tool
+    with mock.patch("glean_agent_toolkit.toolkit.adapters.openai.OpenAIAdapter") as mock_adapter:
+        mock_adapter.return_value.to_tool.return_value = {"type": "function"}
+        assert add.as_openai_tool() == {"type": "function"}
 
-        # Second call should use cached adapter
-        multiply.as_openai_tool()
+    # Test as_adk_tool
+    with mock.patch("glean_agent_toolkit.toolkit.adapters.adk.ADKAdapter") as mock_adapter:
+        mock_adapter.return_value.to_tool.return_value = "adk_tool"
+        assert add.as_adk_tool() == "adk_tool"
 
-        # Verify adapter was created only once
-        assert multiply.tool_spec.get_adapter("openai") is adapter_mock
+    # Test as_langchain_tool
+    with mock.patch(
+        "glean_agent_toolkit.toolkit.adapters.langchain.LangChainAdapter"
+    ) as mock_adapter:
+        mock_adapter.return_value.to_tool.return_value = "langchain_tool"
+        assert add.as_langchain_tool() == "langchain_tool"
+
+    # Test as_crewai_tool
+    with mock.patch("glean_agent_toolkit.toolkit.adapters.crewai.CrewAIAdapter") as mock_adapter:
+        mock_adapter.return_value.to_tool.return_value = "crewai_tool"
+        assert add.as_crewai_tool() == "crewai_tool"

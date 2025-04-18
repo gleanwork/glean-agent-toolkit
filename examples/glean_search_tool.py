@@ -5,7 +5,7 @@ import json
 
 from pydantic import BaseModel
 
-from toolkit import tool_spec
+from glean_agent_toolkit.toolkit import tool_spec
 
 
 class SearchResult(BaseModel):
@@ -39,12 +39,12 @@ def glean_search(
     datasource_filter: list[str] | None = None,
 ) -> SearchResponse:
     """Search Glean for documents matching a query.
-    
+
     Args:
         query: The search query
         max_results: Maximum number of results to return (default: 5)
         datasource_filter: Optional list of datasources to filter by
-        
+
     Returns:
         A SearchResponse object containing the search results
     """
@@ -56,7 +56,8 @@ def glean_search(
         SearchResult(
             title="Glean Architecture Overview",
             url="https://docs.glean.com/architecture",
-            snippet="Comprehensive architecture diagram and explanation of Glean's core components...",
+            snippet="Comprehensive architecture diagram and explanation of Glean's "
+            "core components...",
             datasource="Confluence",
             score=0.95,
         ),
@@ -91,7 +92,7 @@ def glean_search(
     )
 
 
-def main():
+def main() -> None:
     """Run the example."""
     # Test the search function
     response = glean_search("agent toolkit", max_results=2)

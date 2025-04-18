@@ -1,76 +1,119 @@
-"""Tests for the registry module."""
+"""Tests for the registry."""
+
+from glean_agent_toolkit.toolkit.registry import Registry, get_registry
+from glean_agent_toolkit.toolkit.spec import ToolSpec
 
 
-from toolkit.registry import Registry, get_registry
-from toolkit.spec import ToolSpec
-
-
-def test_registry_singleton() -> None:
-    """Test that get_registry returns a singleton instance."""
-    registry1 = get_registry()
-    registry2 = get_registry()
-    assert registry1 is registry2
+def test_registry_init() -> None:
+    """Test registry initialization."""
+    registry = Registry()
+    assert registry._tools == {}
 
 
 def test_registry_register() -> None:
-    """Test registering a tool specification."""
+    """Test registry register method."""
     registry = Registry()
 
-    # Create a mock tool spec
-    def dummy_func() -> None:
-        pass
+    def add(a: int, b: int) -> int:
+        return a + b
 
     tool_spec = ToolSpec(
-        name="test_tool",
-        description="Test tool",
-        function=dummy_func,
-        input_schema={"type": "object"},
-        output_schema={"type": "object"},
+        name="add",
+        description="Add two integers",
+        function=add,
+        input_schema={
+            "type": "object",
+            "properties": {
+                "a": {"type": "integer"},
+                "b": {"type": "integer"},
+            },
+            "required": ["a", "b"],
+        },
+        output_schema={"type": "integer"},
     )
 
-    # Register the tool
     registry.register(tool_spec)
-
-    # Check that it was registered
-    assert registry.get("test_tool") is tool_spec
+    assert registry._tools == {"add": tool_spec}
 
 
-def test_registry_get_nonexistent() -> None:
-    """Test getting a non-existent tool."""
+def test_registry_get() -> None:
+    """Test registry get method."""
     registry = Registry()
-    assert registry.get("nonexistent") is None
+
+    def add(a: int, b: int) -> int:
+        return a + b
+
+    tool_spec = ToolSpec(
+        name="add",
+        description="Add two integers",
+        function=add,
+        input_schema={
+            "type": "object",
+            "properties": {
+                "a": {"type": "integer"},
+                "b": {"type": "integer"},
+            },
+            "required": ["a", "b"],
+        },
+        output_schema={"type": "integer"},
+    )
+
+    registry.register(tool_spec)
+    assert registry.get("add") is tool_spec
+    assert registry.get("non_existent") is None
 
 
 def test_registry_list() -> None:
-    """Test listing registered tools."""
+    """Test registry list method."""
     registry = Registry()
 
-    # Create mock tool specs
-    def dummy_func() -> None:
-        pass
+    def add(a: int, b: int) -> int:
+        return a + b
 
-    tool1 = ToolSpec(
-        name="tool1",
-        description="Tool 1",
-        function=dummy_func,
-        input_schema={"type": "object"},
-        output_schema={"type": "object"},
+    def multiply(a: int, b: int) -> int:
+        return a * b
+
+    add_spec = ToolSpec(
+        name="add",
+        description="Add two integers",
+        function=add,
+        input_schema={
+            "type": "object",
+            "properties": {
+                "a": {"type": "integer"},
+                "b": {"type": "integer"},
+            },
+            "required": ["a", "b"],
+        },
+        output_schema={"type": "integer"},
     )
 
-    tool2 = ToolSpec(
-        name="tool2",
-        description="Tool 2",
-        function=dummy_func,
-        input_schema={"type": "object"},
-        output_schema={"type": "object"},
+    multiply_spec = ToolSpec(
+        name="multiply",
+        description="Multiply two integers",
+        function=multiply,
+        input_schema={
+            "type": "object",
+            "properties": {
+                "a": {"type": "integer"},
+                "b": {"type": "integer"},
+            },
+            "required": ["a", "b"],
+        },
+        output_schema={"type": "integer"},
     )
 
-    # Register the tools
-    registry.register(tool1)
-    registry.register(tool2)
+    registry.register(add_spec)
+    registry.register(multiply_spec)
 
-    # Check that list returns all registered tools
     tools = registry.list()
     assert len(tools) == 2
-    assert tool1 in tools
-    assert tool2 in tools
+    assert add_spec in tools
+    assert multiply_spec in tools
+
+
+def test_get_registry() -> None:
+    """Test get_registry function."""
+    registry1 = get_registry()
+    registry2 = get_registry()
+    assert registry1 is registry2

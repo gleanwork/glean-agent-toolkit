@@ -3,14 +3,73 @@
 import functools
 import inspect
 from collections.abc import Callable
-from typing import Any, TypeVar, cast, get_type_hints
+from typing import Any, Protocol, TypedDict, TypeVar, cast
 
-from pydantic import BaseModel, TypeAdapter
+from pydantic import BaseModel
 
-from toolkit.registry import get_registry
-from toolkit.spec import ToolSpec
+from glean_agent_toolkit.toolkit.registry import get_registry
+from glean_agent_toolkit.toolkit.spec import ToolSpec
 
-T = TypeVar("T", bound=Callable)
+
+class InputSchema(TypedDict):
+    """JSON Schema for tool input."""
+
+    type: str
+    properties: dict[str, Any]
+    required: list[str]
+
+
+T = TypeVar("T", bound=Callable[..., Any])
+
+
+class ToolSpecFunction(Protocol):
+    """Protocol for functions decorated with tool_spec."""
+
+    tool_spec: ToolSpec
+
+    def as_openai_tool(self) -> dict[str, Any] | Any:
+        """Convert to OpenAI tool format.
+
+        Returns:
+            OpenAI tool specification
+        """
+        ...
+
+    def as_adk_tool(self) -> Any:
+        """Convert to Google ADK tool format.
+
+        Returns:
+            Google ADK tool
+        """
+        ...
+
+    def as_langchain_tool(self) -> Any:
+        """Convert to LangChain tool format.
+
+        Returns:
+            LangChain tool
+        """
+        ...
+
+    def as_crewai_tool(self) -> Any:
+        """Convert to CrewAI tool format.
+
+        Returns:
+            CrewAI tool
+        """
+        ...
+
+    def __call__(self, *args: Any, **kwargs: Any) -> Any:
+        """Call the function.
+
+        Args:
+            *args: Positional arguments
+            **kwargs: Keyword arguments
+
+        Returns:
+            Function result
+        """
+        ...
 
 
 def tool_spec(
@@ -18,77 +77,122 @@ def tool_spec(
     description: str,
     output_model: type[BaseModel] | None = None,
     version: str | None = None,
-) -> Callable[[T], T]:
-    """Decorator to register a function as a tool.
+) -> Callable[[T], Any]:
+    """Decorator for registering a function as a tool.
 
     Args:
-        name: The name of the tool
-        description: A description of what the tool does
-        output_model: Optional pydantic model for the output
+        name: Name of the tool
+        description: Description of the tool
+        output_model: Optional Pydantic model for the output
         version: Optional version string
 
     Returns:
-        A decorator function
+        Decorated function with tool spec attached
     """
 
-    def decorator(func: T) -> T:
-        """Wrap a function with tool specification metadata.
+    def decorator(func: T) -> Any:
+        """Decorator function.
 
         Args:
-            func: The function to wrap
+            func: Function to decorate
 
         Returns:
-            The wrapped function
+            Decorated function
         """
+        # Extract parameter types from function signature
         sig = inspect.signature(func)
-        hints = get_type_hints(func)
-
-        # Extract return type annotation
-        return_type = hints.get("return")
-        if output_model is not None:
-            # Use provided output model
-            out_type = output_model
-        elif return_type is not None:
-            # Use return type annotation
-            out_type = return_type
-        else:
-            # Default to Any
-            out_type = Any
-
-        # Generate JSON schema for input parameters
         params = {}
+        out_type = None
+
         for param_name, param in sig.parameters.items():
-            if param.annotation is not param.empty:
+            if param.annotation != inspect.Parameter.empty:
                 params[param_name] = param.annotation
 
-        input_schema = {
+        # Extract return type
+        if sig.return_annotation != inspect.Signature.empty:
+            out_type = sig.return_annotation
+
+        # Generate input schema
+        input_schema: InputSchema = {
             "type": "object",
             "properties": {},
             "required": [],
         }
 
+        # Use a mutable list for required fields
+        required_fields: list[str] = []
+
         for param_name, param in sig.parameters.items():
             if param.default is param.empty:
-                input_schema["required"].append(param_name)
+                required_fields.append(param_name)
 
-        # Use TypeAdapter to generate schemas
+        # Assign the list to the schema
+        input_schema["required"] = required_fields
+
+        # Use Pydantic to generate schemas
         if params:
-            param_model = TypeAdapter(dict[str, Any]).create_type_adapter(params)
-            input_schema["properties"] = param_model.json_schema()["properties"]
+            # Create a simple schema for each parameter
+            for param_name, param_type in params.items():
+                # Map Python types to JSON schema types
+                if isinstance(param_type, type) and issubclass(param_type, str):
+                    input_schema["properties"][param_name] = {"type": "string"}
+                elif isinstance(param_type, type) and issubclass(param_type, int):
+                    input_schema["properties"][param_name] = {"type": "integer"}
+                elif isinstance(param_type, type) and issubclass(param_type, float):
+                    input_schema["properties"][param_name] = {"type": "number"}
+                elif isinstance(param_type, type) and issubclass(param_type, bool):
+                    input_schema["properties"][param_name] = {"type": "boolean"}
+                elif param_type is list or param_type is list[str]:
+                    input_schema["properties"][param_name] = {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    }
+                elif param_type is list[int]:
+                    input_schema["properties"][param_name] = {
+                        "type": "array",
+                        "items": {"type": "integer"},
+                    }
+                else:
+                    # Default to string for complex types
+                    input_schema["properties"][param_name] = {"type": "string"}
 
         # Generate output schema
-        output_adapter = TypeAdapter(out_type)
-        output_schema = output_adapter.json_schema()
+        output_schema: dict[str, Any] = {"type": "object"}
+        if out_type is not None and hasattr(out_type, "model_json_schema"):
+            # If it's a Pydantic model, use its schema
+            output_schema = out_type.model_json_schema()
+        elif out_type is int:
+            output_schema = {"type": "integer"}
+        elif out_type is float:
+            output_schema = {"type": "number"}
+        elif out_type is bool:
+            output_schema = {"type": "boolean"}
+        elif out_type is str:
+            output_schema = {"type": "string"}
+        elif out_type is list or out_type is list[str]:
+            output_schema = {
+                "type": "array",
+                "items": {"type": "string"},
+            }
+        elif out_type is list[int]:
+            output_schema = {
+                "type": "array",
+                "items": {"type": "integer"},
+            }
 
         # Create tool spec
         tool_spec_obj = ToolSpec(
             name=name,
             description=description,
             function=func,
-            input_schema=input_schema,
+            input_schema=cast(dict[str, Any], input_schema),
             output_schema=output_schema,
             version=version,
-            output_model=output_model if isinstance(output_model, type) and issubclass(output_model, BaseModel) else None,
+            output_model=(
+                output_model
+                if isinstance(output_model, type) and issubclass(output_model, BaseModel)
+                else None
+            ),
         )
 
         # Register the tool
@@ -108,13 +212,13 @@ def tool_spec(
             return func(*args, **kwargs)
 
         # Add helper methods
-        def as_openai_tool() -> dict[str, Any]:
+        def as_openai_tool() -> dict[str, Any] | Any:
             """Convert to OpenAI tool format.
 
             Returns:
                 OpenAI tool specification
             """
-            from toolkit.adapters.openai import OpenAIAdapter
+            from glean_agent_toolkit.toolkit.adapters.openai import OpenAIAdapter
 
             adapter = tool_spec_obj.get_adapter("openai")
             if adapter is None:
@@ -129,7 +233,7 @@ def tool_spec(
             Returns:
                 Google ADK tool
             """
-            from toolkit.adapters.adk import ADKAdapter
+            from glean_agent_toolkit.toolkit.adapters.adk import ADKAdapter
 
             adapter = tool_spec_obj.get_adapter("adk")
             if adapter is None:
@@ -144,7 +248,7 @@ def tool_spec(
             Returns:
                 LangChain tool
             """
-            from toolkit.adapters.langchain import LangChainAdapter
+            from glean_agent_toolkit.toolkit.adapters.langchain import LangChainAdapter
 
             adapter = tool_spec_obj.get_adapter("langchain")
             if adapter is None:
@@ -159,7 +263,7 @@ def tool_spec(
             Returns:
                 CrewAI tool
             """
-            from toolkit.adapters.crewai import CrewAIAdapter
+            from glean_agent_toolkit.toolkit.adapters.crewai import CrewAIAdapter
 
             adapter = tool_spec_obj.get_adapter("crewai")
             if adapter is None:
@@ -175,6 +279,6 @@ def tool_spec(
         wrapper.as_crewai_tool = as_crewai_tool  # type: ignore
         wrapper.tool_spec = tool_spec_obj  # type: ignore
 
-        return cast(T, wrapper)
+        return wrapper  # Return with proper type
 
     return decorator

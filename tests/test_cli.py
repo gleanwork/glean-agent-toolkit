@@ -6,8 +6,8 @@ from unittest import mock
 import pytest
 from typer.testing import CliRunner
 
-from toolkit.cli import app
-from toolkit.spec import ToolSpec
+from glean_agent_toolkit.toolkit.cli import app
+from glean_agent_toolkit.toolkit.spec import ToolSpec
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def runner() -> CliRunner:
 
 def test_list_tools(runner: CliRunner, mock_registry: mock.MagicMock) -> None:
     """Test listing tools."""
-    with mock.patch("toolkit.cli.get_registry", return_value=mock_registry):
+    with mock.patch("glean_agent_toolkit.toolkit.cli.get_registry", return_value=mock_registry):
         result = runner.invoke(app, ["list"])
 
         assert result.exit_code == 0
@@ -67,7 +67,7 @@ def test_list_empty(runner: CliRunner) -> None:
     empty_registry = mock.MagicMock()
     empty_registry.list.return_value = []
 
-    with mock.patch("toolkit.cli.get_registry", return_value=empty_registry):
+    with mock.patch("glean_agent_toolkit.toolkit.cli.get_registry", return_value=empty_registry):
         result = runner.invoke(app, ["list"])
 
         assert result.exit_code == 0
@@ -76,7 +76,7 @@ def test_list_empty(runner: CliRunner) -> None:
 
 def test_export_schema(runner: CliRunner, mock_registry: mock.MagicMock) -> None:
     """Test exporting a schema."""
-    with mock.patch("toolkit.cli.get_registry", return_value=mock_registry):
+    with mock.patch("glean_agent_toolkit.toolkit.cli.get_registry", return_value=mock_registry):
         result = runner.invoke(app, ["export-schema", "tool1"])
 
         assert result.exit_code == 0
@@ -89,7 +89,7 @@ def test_export_schema(runner: CliRunner, mock_registry: mock.MagicMock) -> None
 
 def test_export_schema_not_found(runner: CliRunner, mock_registry: mock.MagicMock) -> None:
     """Test exporting a schema for a non-existent tool."""
-    with mock.patch("toolkit.cli.get_registry", return_value=mock_registry):
+    with mock.patch("glean_agent_toolkit.toolkit.cli.get_registry", return_value=mock_registry):
         result = runner.invoke(app, ["export-schema", "nonexistent"])
 
         assert result.exit_code == 1

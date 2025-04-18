@@ -72,7 +72,7 @@ The project uses [go-task](https://taskfile.dev/) to manage development tasks. H
 
 ## Project Structure
 
-```
+```tree
 glean-agent-toolkit/
 ├─ glean_agent_toolkit/
 │  └─ toolkit/         # Main package

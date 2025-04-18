@@ -1,40 +1,70 @@
-"""Adapter for Google ADK tools."""
+"""Adapter for Google Agent Development Kit (ADK)."""
 
+from collections.abc import Callable
 from typing import Any
 
+from glean_agent_toolkit.toolkit.adapters.base import BaseAdapter
+from glean_agent_toolkit.toolkit.spec import ToolSpec
+
+# Define this at module level for consistency
+HAS_ADK = False
+google = None  # type: ignore
+RestApiTool = None  # type: ignore
+
 try:
-    import google.generativeai as genai
+    import google.adk
+    from google.adk.tools import RestApiTool
+
+    HAS_ADK = True
 except ImportError:
-    genai = None  # type: ignore
+    pass  # Variables remain None
 
 
-class ADKAdapter:
+class ADKAdapter(BaseAdapter["RestApiTool"]):
     """Adapter for Google ADK tools."""
 
-    def __init__(self, tool_spec: Any) -> None:
+    def __init__(self, tool_spec: ToolSpec) -> None:
         """Initialize the adapter.
 
         Args:
             tool_spec: The tool specification
         """
-        if genai is None:
+        super().__init__(tool_spec)
+        if not HAS_ADK:
             raise ImportError(
-                "Google Generative AI package is required for ADK adapter. "
-                "Install it with `pip install agent_toolkit[adk]`."
+                "Google Agent Development Kit (ADK) is required for ADK adapter. "
+                "Install it with `pip install agent_toolkit[adk]` or `pip install google-adk`."
             )
-        self.tool_spec = tool_spec
 
-    def to_tool(self) -> Any:
+    def to_tool(self) -> "RestApiTool":
         """Convert to Google ADK tool format.
 
         Returns:
-            Google ADK RestApiTool
+            An ADK RestApiTool instance
         """
-        from google.generativeai.types import RestApiTool
-
+        # The RestApiTool is the most similar to our tool spec format
+        # It lets us define a function with a JSON schema
         return RestApiTool(
-            tool_name=self.tool_spec.name,
+            name=self.tool_spec.name,
             description=self.tool_spec.description,
             schema=self.tool_spec.input_schema,
-            function=self.tool_spec.function,
+            function=self._create_wrapped_function(),
         )
+
+    def _create_wrapped_function(self) -> Callable[..., Any]:
+        """Create a function wrapper suitable for ADK.
+
+        Returns:
+            A wrapped function compatible with ADK
+        """
+        original_func = self.tool_spec.function
+
+        def wrapped_func(**kwargs: Any) -> Any:
+            """Wrapper function for ADK compatibility."""
+            return original_func(**kwargs)
+
+        # Copy metadata
+        wrapped_func.__name__ = original_func.__name__
+        wrapped_func.__doc__ = original_func.__doc__
+
+        return wrapped_func

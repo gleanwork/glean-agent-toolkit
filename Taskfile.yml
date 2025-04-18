@@ -15,6 +15,7 @@ vars:
   TEST_DIR: "tests/"
   PYTHON_FILES: "."
   EXCLUDE_DIRS: "--exclude .venv/ --exclude **/site-packages/"
+  MYPY_EXCLUDE: "--exclude=.venv --exclude=site-packages"
   MYPY_CACHE: ".mypy_cache"
 
 tasks:
@@ -178,7 +179,7 @@ tasks:
   lint:mypy:
     internal: true
     cmds:
-      - '[ "{{.PYTHON_FILES}}" = "" ] || mkdir -p {{.MYPY_CACHE}} && {{.MYPY}} {{.PYTHON_FILES}} --cache-dir {{.MYPY_CACHE}} {{.EXCLUDE_DIRS}}'
+      - '[ "{{.PYTHON_FILES}}" = "" ] || mkdir -p {{.MYPY_CACHE}} && {{.MYPY}} {{.PYTHON_FILES}} --cache-dir {{.MYPY_CACHE}} {{.MYPY_EXCLUDE}}'
 
   # Format task: Run code formatters
   format:

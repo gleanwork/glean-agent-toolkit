@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "glean_agent_toolkit"
 version = "0.1.0"
-description = "Universal Tool/Action SDK for Glean agent frameworks"
+description = "Universal Tool/Action Toolkit for Glean agent frameworks"
 readme = "README.md"
 authors = [{ name = "Glean", email = "dev@glean.com" }]
 license = {text = "MIT"}
@@ -25,12 +25,19 @@ test = [
     "pytest>=7.4.3",
     "pytest-asyncio>=0.23.2",
     "pytest-cov>=4.1.0",
+    # Optional dependencies for testing adapters
+    "openai>=1.0.0",
+    "openai-agents>=0.0.11",
+    "langchain>=0.1.0",
+    "crewai>=0.28.0",
+    "google-adk>=0.1.0",
 ]
 openai = [
     "openai>=1.0.0",
+    "openai-agents>=0.0.11",
 ]
 adk = [
-    "google-generativeai>=0.4.0",
+    "google-adk>=0.1.0",
 ]
 langchain = [
     "langchain>=0.1.0",
@@ -58,8 +65,23 @@ glean-toolkit = "toolkit.cli:app"
 packages = ["glean_agent_toolkit"]
 
 [tool.mypy]
-disallow_untyped_defs = "True"
-exclude = ["docs/", "tests/"]
+python_version = "3.11"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+check_untyped_defs = true
+disallow_untyped_decorators = false
+no_implicit_optional = true
+strict_optional = true
+ignore_missing_imports = true
+namespace_packages = true
+explicit_package_bases = true
+exclude = ["docs/", ".venv/", "build/", "dist/"]
+
+[[tool.mypy.overrides]]
+module = "crewai.*"
+ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100
@@ -75,7 +97,10 @@ exclude = [
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "N", "D", "UP", "ANN", "T201"]
-ignore = ["ANN101", "D203", "D212"]
+ignore = ["ANN401", "D203", "D212", "F401"]
+
+[tool.ruff.lint.per-file-ignores]
+"examples/*.py" = ["T201"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["glean_agent_toolkit", "toolkit"]

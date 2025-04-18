@@ -3,18 +3,18 @@
 
 from pydantic import BaseModel
 
-from toolkit import tool_spec
+from glean_agent_toolkit.toolkit import tool_spec
 
 
 # Simple tool example
 @tool_spec(name="add", description="Add two integers")
 def add(a: int, b: int) -> int:
     """Add two integers and return the result.
-    
+
     Args:
         a: First integer
         b: Second integer
-        
+
     Returns:
         The sum of a and b
     """
@@ -37,11 +37,11 @@ class MultiplyResult(BaseModel):
 )
 def multiply(a: int, b: int) -> MultiplyResult:
     """Multiply two integers and return the result with an explanation.
-    
+
     Args:
         a: First integer
         b: Second integer
-        
+
     Returns:
         A MultiplyResult containing the product and an explanation
     """
@@ -52,7 +52,7 @@ def multiply(a: int, b: int) -> MultiplyResult:
     )
 
 
-def main():
+def main() -> None:
     """Run the example."""
     # Test the add function
     result = add(3, 5)
@@ -71,7 +71,7 @@ def main():
     print(MultiplyResult.model_json_schema())
 
     # Print all registered tools
-    from toolkit import get_registry
+    from glean_agent_toolkit.toolkit import get_registry
 
     registry = get_registry()
     print("\nRegistered Tools:")
