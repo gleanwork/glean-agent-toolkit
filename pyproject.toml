@@ -56,13 +56,13 @@ typing = [
 ]
 
 [project.scripts]
-glean-toolkit = "toolkit.cli:app"
+glean-toolkit = "glean.toolkit.cli:app"
 
 [project.urls]
 "Source Code" = "https://github.com/gleanwork/glean-agent-toolkit"
 
 [tool.hatch.build.targets.wheel]
-packages = ["glean_agent_toolkit"]
+packages = ["glean"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -103,7 +103,7 @@ ignore = ["ANN401", "D203", "D212", "F401"]
 "examples/*.py" = ["T201"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["glean_agent_toolkit", "toolkit"]
+known-first-party = ["glean"]
 
 [tool.ruff.lint.pydocstyle]
 convention = "google"

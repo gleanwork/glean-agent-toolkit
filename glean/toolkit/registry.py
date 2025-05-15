@@ -1,6 +1,6 @@
 """Tool registry for managing registered tools."""
 
-from glean_agent_toolkit.toolkit.spec import ToolSpec
+from glean.toolkit.spec import ToolSpec
 
 
 class Registry:

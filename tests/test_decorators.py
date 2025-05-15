@@ -4,8 +4,8 @@ from unittest import mock
 
 from pydantic import BaseModel
 
-from glean_agent_toolkit.toolkit.decorators import tool_spec
-from glean_agent_toolkit.toolkit.registry import get_registry
+from glean.toolkit.decorators import tool_spec
+from glean.toolkit.registry import get_registry
 
 
 class OutputModel(BaseModel):
@@ -79,23 +79,23 @@ def test_helper_methods() -> None:
         return a + b
 
     # Test as_openai_tool
-    with mock.patch("glean_agent_toolkit.toolkit.adapters.openai.OpenAIAdapter") as mock_adapter:
+    with mock.patch("glean.toolkit.adapters.openai.OpenAIAdapter") as mock_adapter:
         mock_adapter.return_value.to_tool.return_value = {"type": "function"}
         assert add.as_openai_tool() == {"type": "function"}
 
     # Test as_adk_tool
-    with mock.patch("glean_agent_toolkit.toolkit.adapters.adk.ADKAdapter") as mock_adapter:
+    with mock.patch("glean.toolkit.adapters.adk.ADKAdapter") as mock_adapter:
         mock_adapter.return_value.to_tool.return_value = "adk_tool"
         assert add.as_adk_tool() == "adk_tool"
 
     # Test as_langchain_tool
     with mock.patch(
-        "glean_agent_toolkit.toolkit.adapters.langchain.LangChainAdapter"
+        "glean.toolkit.adapters.langchain.LangChainAdapter"
     ) as mock_adapter:
         mock_adapter.return_value.to_tool.return_value = "langchain_tool"
         assert add.as_langchain_tool() == "langchain_tool"
 
     # Test as_crewai_tool
-    with mock.patch("glean_agent_toolkit.toolkit.adapters.crewai.CrewAIAdapter") as mock_adapter:
+    with mock.patch("glean.toolkit.adapters.crewai.CrewAIAdapter") as mock_adapter:
         mock_adapter.return_value.to_tool.return_value = "crewai_tool"
         assert add.as_crewai_tool() == "crewai_tool"

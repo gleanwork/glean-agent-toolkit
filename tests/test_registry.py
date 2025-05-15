@@ -1,7 +1,7 @@
 """Tests for the registry."""
 
-from glean_agent_toolkit.toolkit.registry import Registry, get_registry
-from glean_agent_toolkit.toolkit.spec import ToolSpec
+from glean.toolkit.registry import Registry, get_registry
+from glean.toolkit.spec import ToolSpec
 
 
 def test_registry_init() -> None:

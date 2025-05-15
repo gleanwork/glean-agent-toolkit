@@ -7,8 +7,8 @@ from typing import Any, Protocol, TypedDict, TypeVar, cast
 
 from pydantic import BaseModel
 
-from glean_agent_toolkit.toolkit.registry import get_registry
-from glean_agent_toolkit.toolkit.spec import ToolSpec
+from glean.toolkit.registry import get_registry
+from glean.toolkit.spec import ToolSpec
 
 
 class InputSchema(TypedDict):
@@ -218,7 +218,7 @@ def tool_spec(
             Returns:
                 OpenAI tool specification
             """
-            from glean_agent_toolkit.toolkit.adapters.openai import OpenAIAdapter
+            from glean.toolkit.adapters.openai import OpenAIAdapter
 
             adapter = tool_spec_obj.get_adapter("openai")
             if adapter is None:
@@ -233,7 +233,7 @@ def tool_spec(
             Returns:
                 Google ADK tool
             """
-            from glean_agent_toolkit.toolkit.adapters.adk import ADKAdapter
+            from glean.toolkit.adapters.adk import ADKAdapter
 
             adapter = tool_spec_obj.get_adapter("adk")
             if adapter is None:
@@ -248,7 +248,7 @@ def tool_spec(
             Returns:
                 LangChain tool
             """
-            from glean_agent_toolkit.toolkit.adapters.langchain import LangChainAdapter
+            from glean.toolkit.adapters.langchain import LangChainAdapter
 
             adapter = tool_spec_obj.get_adapter("langchain")
             if adapter is None:
@@ -263,7 +263,7 @@ def tool_spec(
             Returns:
                 CrewAI tool
             """
-            from glean_agent_toolkit.toolkit.adapters.crewai import CrewAIAdapter
+            from glean.toolkit.adapters.crewai import CrewAIAdapter
 
             adapter = tool_spec_obj.get_adapter("crewai")
             if adapter is None:

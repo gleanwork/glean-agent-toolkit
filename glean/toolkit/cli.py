@@ -7,7 +7,7 @@ import typer
 from rich.console import Console
 from rich.table import Table
 
-from glean_agent_toolkit.toolkit.registry import get_registry
+from glean.toolkit.registry import get_registry
 
 app = typer.Typer(help="Agent Toolkit CLI")
 console = Console()

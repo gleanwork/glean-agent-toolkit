@@ -3,7 +3,7 @@
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from glean_agent_toolkit.toolkit.spec import ToolSpec
+from glean.toolkit.spec import ToolSpec
 
 # Type variable for the return type of to_tool
 T = TypeVar("T")

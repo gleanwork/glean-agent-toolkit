@@ -68,7 +68,7 @@ tasks:
   test:cov:
     desc: Run tests with coverage
     cmds:
-      - "{{.PYTEST}} --cov=glean_agent_toolkit.toolkit --cov-report=term --cov-report=html -v {{.TEST_DIR}}"
+      - "{{.PYTEST}} --cov=glean.toolkit --cov-report=term --cov-report=html -v {{.TEST_DIR}}"
 
   # Run examples task
   examples:
@@ -105,7 +105,7 @@ tasks:
   lint:package:
     desc: Run linters on package files
     vars:
-      PYTHON_FILES: "glean_agent_toolkit/toolkit"
+      PYTHON_FILES: "glean/toolkit"
     cmds:
       - task: lint:ruff
       - task: lint:format:check
@@ -143,7 +143,7 @@ tasks:
   lint:fix:package:
     desc: Run lint autofixers on package files
     vars:
-      PYTHON_FILES: "glean_agent_toolkit/toolkit"
+      PYTHON_FILES: "glean/toolkit"
     cmds:
       - task: lint:fix:ruff
       - task: format

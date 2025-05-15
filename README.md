@@ -20,7 +20,7 @@ pip install glean-agent-toolkit[crewai]
 ## Usage
 
 ```python
-from toolkit import tool_spec
+from glean.toolkit import tool_spec
 
 @tool_spec(name="add", description="Add two integers")
 def add(a: int, b: int) -> int:
@@ -44,7 +44,7 @@ crewai_tool = add.as_crewai_tool()
 ### OpenAI
 
 ```python
-from glean_agent_toolkit.toolkit import tool_spec
+from glean.toolkit import tool_spec
 import openai
 
 # Define your tool
@@ -72,7 +72,7 @@ response = client.chat.completions.create(
 ### Google ADK
 
 ```python
-from glean_agent_toolkit.toolkit import tool_spec
+from glean.toolkit import tool_spec
 from google.adk import Agent
 
 # Define your tool
@@ -95,7 +95,7 @@ response = agent.generate_content("Find documents about Agent Toolkit")
 ### LangChain
 
 ```python
-from glean_agent_toolkit.toolkit import tool_spec
+from glean.toolkit import tool_spec
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain_openai import ChatOpenAI
 
@@ -121,7 +121,7 @@ result = agent_executor.invoke({"input": "Search for Agent Toolkit documents"})
 ### CrewAI
 
 ```python
-from glean_agent_toolkit.toolkit import tool_spec
+from glean.toolkit import tool_spec
 from crewai import Agent, Task, Crew
 
 # Define your tool
@@ -158,7 +158,7 @@ You can specify a custom output model:
 
 ```python
 from pydantic import BaseModel
-from toolkit import tool_spec
+from glean.toolkit import tool_spec
 
 class Response(BaseModel):
     result: int

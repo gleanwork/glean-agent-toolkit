@@ -29,7 +29,7 @@ pip install glean-agent-toolkit[crewai]
 ## Basic Usage
 
 ```python
-from toolkit import tool_spec
+from glean.toolkit import tool_spec
 
 @tool_spec(name="add", description="Add two integers")
 def add(a: int, b: int) -> int:
@@ -54,7 +54,7 @@ crewai_tool = add.as_crewai_tool()
 
 ```python
 from pydantic import BaseModel
-from toolkit import tool_spec
+from glean.toolkit import tool_spec
 
 class Response(BaseModel):
     result: int

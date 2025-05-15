@@ -4,8 +4,8 @@ import json
 from collections.abc import Callable
 from typing import Any, TypedDict, Union
 
-from glean_agent_toolkit.toolkit.adapters.base import BaseAdapter
-from glean_agent_toolkit.toolkit.spec import ToolSpec
+from glean.toolkit.adapters.base import BaseAdapter
+from glean.toolkit.spec import ToolSpec
 
 # Define this at module level for consistency
 HAS_OPENAI = False
