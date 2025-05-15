@@ -14,16 +14,16 @@ It provides a uniform interface for defining tools once and using them across di
 ## Installation
 
 ```bash
-pip install glean_agent_toolkit
+pip install glean-agent-toolkit
 ```
 
 With specific adapters:
 
 ```bash
-pip install glean_agent_toolkit[openai]
-pip install glean_agent_toolkit[adk]
-pip install glean_agent_toolkit[langchain]
-pip install glean_agent_toolkit[crewai]
+pip install glean-agent-toolkit[openai]
+pip install glean-agent-toolkit[adk]
+pip install glean-agent-toolkit[langchain]
+pip install glean-agent-toolkit[crewai]
 ```
 
 ## Basic Usage
@@ -61,7 +61,7 @@ class Response(BaseModel):
     explanation: str
 
 @tool_spec(
-    name="multiply", 
+    name="multiply",
     description="Multiply two integers",
     output_model=Response
 )
@@ -119,4 +119,4 @@ class ToolSpec:
     output_schema: Dict[str, Any]
     version: Optional[str] = None
     output_model: Optional[Type[BaseModel]] = None
-``` 
+```

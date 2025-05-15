@@ -3,7 +3,7 @@ requires = ["hatchling>=1.18.0"]
 build-backend = "hatchling.build"
 
 [project]
-name = "glean_agent_toolkit"
+name = "glean-agent-toolkit"
 version = "0.1.0"
 description = "Universal Tool/Action Toolkit for Glean agent frameworks"
 readme = "README.md"

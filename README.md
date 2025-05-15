@@ -5,16 +5,16 @@ A universal toolkit for creating agent tools that work with multiple agent frame
 ## Installation
 
 ```bash
-pip install glean_agent_toolkit
+pip install glean-agent-toolkit
 ```
 
 With specific adapters:
 
 ```bash
-pip install glean_agent_toolkit[openai]
-pip install glean_agent_toolkit[adk]
-pip install glean_agent_toolkit[langchain]
-pip install glean_agent_toolkit[crewai]
+pip install glean-agent-toolkit[openai]
+pip install glean-agent-toolkit[adk]
+pip install glean-agent-toolkit[langchain]
+pip install glean-agent-toolkit[crewai]
 ```
 
 ## Usage
