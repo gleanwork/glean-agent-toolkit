@@ -89,9 +89,7 @@ def test_helper_methods() -> None:
         assert add.as_adk_tool() == "adk_tool"
 
     # Test as_langchain_tool
-    with mock.patch(
-        "glean.toolkit.adapters.langchain.LangChainAdapter"
-    ) as mock_adapter:
+    with mock.patch("glean.toolkit.adapters.langchain.LangChainAdapter") as mock_adapter:
         mock_adapter.return_value.to_tool.return_value = "langchain_tool"
         assert add.as_langchain_tool() == "langchain_tool"
 
