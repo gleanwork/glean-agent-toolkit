@@ -1,28 +1,66 @@
 """Adapter for LangChain tools."""
 
 from datetime import date, datetime
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel
 
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# Define this at module level for consistency
-HAS_LANGCHAIN = False
-langchain = None  # type: ignore
-Tool = None  # type: ignore
-create_model = None  # type: ignore
-Field = None  # type: ignore
+# ---------------------------------------------------------------------------
+# Optional dependency handling
+# ---------------------------------------------------------------------------
+
+if TYPE_CHECKING:
+    from langchain.tools import Tool as LangchainTool  # pragma: no cover
+    from pydantic import Field as PydanticField  # pragma: no cover
+    from pydantic import create_model as pydantic_create_model
+
+HAS_LANGCHAIN: bool
+
+# Initialize as variables
+Tool: Any = object
+Field: Any = object
+create_model: Any = object
+
+
+class _FallbackLangchainTool:
+    """Fallback for langchain.tools.Tool."""
+
+    name: str
+    description: str
+    func: Any
+    args_schema: Any
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: D107
+        pass  # Stub constructor
+
+
+def _fallback_pydantic_field(*args: Any, **kwargs: Any) -> Any:  # noqa: N802
+    """Fallback for pydantic.Field."""
+    return None
+
+
+def _fallback_pydantic_create_model(*args: Any, **kwargs: Any) -> Any:
+    """Fallback for pydantic.create_model."""
+    return None
+
 
 try:
-    import langchain
-    from langchain.tools import Tool
-    from pydantic import Field, create_model
+    from langchain.tools import Tool as _ActualLangchainToolImport  # type: ignore
+    from pydantic import Field as _ActualPydanticFieldImport  # type: ignore
+    from pydantic import create_model as _actual_pydantic_create_model_import
 
+    Tool = _ActualLangchainToolImport
+    Field = _ActualPydanticFieldImport
+    create_model = _actual_pydantic_create_model_import
     HAS_LANGCHAIN = True
-except ImportError:
-    pass  # Variables remain None
+except ImportError:  # pragma: no cover
+    Tool = _FallbackLangchainTool  # type: ignore[misc,assignment]
+    Field = _fallback_pydantic_field
+    create_model = _fallback_pydantic_create_model
+    HAS_LANGCHAIN = False
 
 
 class LangChainAdapter(BaseAdapter[Tool]):

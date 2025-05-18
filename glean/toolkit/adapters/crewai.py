@@ -1,28 +1,61 @@
 """Adapter for CrewAI tools."""
 
 from collections.abc import Callable
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel
 
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# Define this at module level for consistency
-HAS_CREWAI = False
-crewai = None  # type: ignore
-BaseTool = None  # type: ignore
-create_model = None  # type: ignore
-Field = None  # type: ignore
+# ---------------------------------------------------------------------------
+# Optional dependency handling
+# ---------------------------------------------------------------------------
+
+if TYPE_CHECKING:
+    from crewai.tools import BaseTool  # pragma: no cover
+    from pydantic import Field, create_model  # pragma: no cover
+
+HAS_CREWAI: bool
+
+
+class _FallbackCrewBaseTool:
+    """Fallback for crewai.tools.BaseTool."""
+
+    name: str
+    description: str
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: D107
+        pass
+
+
+def _fallback_field(*args: Any, **kwargs: Any) -> Any:  # noqa: N802
+    """Fallback for pydantic.Field."""
+    return None
+
+
+def _fallback_create_model(*args: Any, **kwargs: Any) -> Any:
+    """Fallback for pydantic.create_model."""
+    return None
+
 
 try:
-    import crewai
-    from crewai.tools import BaseTool
-    from pydantic import Field, create_model
+    from crewai.tools import BaseTool as _ActualCrewBaseTool  # type: ignore
+    from pydantic import Field as _ActualField  # type: ignore
+    from pydantic import create_model as _actual_create_model
 
+    BaseTool = _ActualCrewBaseTool
+    Field = _ActualField
+    create_model = _actual_create_model
     HAS_CREWAI = True
-except ImportError:
-    pass  # Variables remain None
+except ImportError:  # pragma: no cover
+    BaseTool = _FallbackCrewBaseTool  # type: ignore[misc,assignment]
+    Field = _fallback_field  # type: ignore[assignment]
+    create_model = _fallback_create_model  # type: ignore[assignment]
+    HAS_CREWAI = False
+
+# Public alias
+BaseTool = _ActualCrewBaseTool  # type: ignore[assignment]
 
 
 # Define the tool class at the module level

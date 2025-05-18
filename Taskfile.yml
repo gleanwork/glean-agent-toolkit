@@ -50,6 +50,7 @@ tasks:
     cmds:
       - task: test
       - task: lint:fix 
+      - task: lint:mypy
 
   # Test task: Run unit tests
   test:

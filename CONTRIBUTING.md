@@ -1,34 +1,32 @@
-# Contributing to glean_agent_toolkit
+# Contributing to Glean Agent Toolkit
 
-This document provides guidelines and instructions for setting up your development environment and contributing to `glean_agent_toolkit`.
+This guide explains how to set up a local environment and submit changes to **Glean Agent Toolkit** (`glean-agent-toolkit`).
 
-## Development Environment
+## Development environment
 
-This project uses [uv](https://github.com/astral-sh/uv) for dependency management and [go-task](https://taskfile.dev/) for task running.
+The repository relies on [uv](https://github.com/astral-sh/uv) and [go-task](https://taskfile.dev/) for reproducible workflows.
 
 ### Prerequisites
 
-1. Install uv:
+1. uv
 
     ```bash
     pip install uv
     ```
 
-2. Install go-task:
+2. go-task
 
     ```bash
     brew install go-task
     ```
 
-### Setup Development Environment
+### One-time setup
 
-1. Set up the development environment:
+```bash
+task setup
+```
 
-    ```bash
-    task setup
-    ```
-
-This will create a virtual environment and install all dependencies. The virtual environment will be activated automatically by uv.
+The command creates `.venv/` and installs all dev/test dependencies via uv.
 
 ## Development Tasks
 
@@ -43,20 +41,17 @@ The project uses [go-task](https://taskfile.dev/) to manage development tasks. H
 | `task test:cov` | Run tests with coverage |
 | `task test:all` | Run all tests and lint fixes |
 
-### Linting and Formatting
+### Linting and formatting
 
 | Task | Description |
 |------|-------------|
-| `task lint` | Run all linters |
-| `task lint:diff` | Run linters on changed files |
-| `task lint:package` | Run linters on package files |
-| `task lint:tests` | Run linters on test files |
-| `task lint:fix` | Run lint autofixers |
-| `task lint:fix:diff` | Run lint autofixers on changed files |
-| `task lint:fix:package` | Run lint autofixers on package files |
-| `task lint:fix:tests` | Run lint autofixers on test files |
-| `task format` | Run code formatters |
-| `task format:diff` | Run formatters on changed files |
+| `task lint` | Run Ruff, mypy and formatting checks |
+| `task lint:diff` | Same as above but only on changed files |
+| `task lint:package` | Lint only `glean/toolkit` |
+| `task lint:tests` | Lint only `tests` |
+| `task lint:fix` | Autofix style issues |
+| `task format` | Apply Ruff formatter |
+| `task format:diff` | Format only changed files |
 
 ### Examples and Utilities
 
@@ -70,21 +65,23 @@ The project uses [go-task](https://taskfile.dev/) to manage development tasks. H
 | `task build` | Build the package |
 | `task release` | Create a new release (version bump + changelog) |
 
-## Project Structure
+## Project structure
 
-```tree
+```text
 glean-agent-toolkit/
-├─ glean_agent_toolkit/
-│  └─ toolkit/         # Main package
+├─ glean/
+│  ├─ __init__.py        # exposes `glean.toolkit`
+│  └─ toolkit/
 │     ├─ __init__.py
+│     ├─ decorators.py
 │     ├─ registry.py
-│     ├─ spec.py       # ToolSpec dataclass
-│     ├─ decorators.py # @tool_spec
-│     ├─ adapters/     # Framework-specific adapters
-│     └─ cli.py        # CLI implementation
-├─ tests/              # Test suite
-├─ examples/           # Usage examples
-└─ docs/               # Documentation
+│     ├─ spec.py
+│     ├─ adapters/
+│     ├─ tools/
+│     └─ cli.py
+├─ tests/
+├─ examples/
+└─ docs/
 ```
 
 ## Pull Request Process

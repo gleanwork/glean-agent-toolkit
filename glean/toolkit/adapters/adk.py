@@ -1,23 +1,41 @@
 """Adapter for Google Agent Development Kit (ADK)."""
 
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# Define this at module level for consistency
-HAS_ADK = False
-google = None  # type: ignore
-RestApiTool = None  # type: ignore
+# ---------------------------------------------------------------------------
+# Optional dependency handling
+# ---------------------------------------------------------------------------
+
+if TYPE_CHECKING:
+    from google.adk.tools import RestApiTool  # pragma: no cover
+
+HAS_ADK: bool
+
+
+class _FallbackAdkTool:
+    """Fallback for google.adk.tools.RestApiTool."""
+
+    name: str
+    description: str
+    function: Any
+    schema: Any
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: D107
+        pass
+
 
 try:
-    import google.adk
-    from google.adk.tools import RestApiTool
+    from google.adk.tools import RestApiTool as _ActualAdkTool  # type: ignore
 
+    RestApiTool = _ActualAdkTool
     HAS_ADK = True
-except ImportError:
-    pass  # Variables remain None
+except ImportError:  # pragma: no cover
+    RestApiTool = _FallbackAdkTool  # type: ignore[misc,assignment]
+    HAS_ADK = False
 
 
 class ADKAdapter(BaseAdapter["RestApiTool"]):

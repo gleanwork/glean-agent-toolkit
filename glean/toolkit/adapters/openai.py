@@ -2,23 +2,45 @@
 
 import json
 from collections.abc import Callable
-from typing import Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypedDict, Union
 
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# Define this at module level for consistency
-HAS_OPENAI = False
-openai = None  # type: ignore
-FunctionTool = None  # type: ignore
+# ---------------------------------------------------------------------------
+# Optional dependency handling
+# ---------------------------------------------------------------------------
+
+if TYPE_CHECKING:
+    from agents.tool import FunctionTool as AgentsFunctionTool  # pragma: no cover
+
+HAS_OPENAI: bool
+
+# Initialize as a variable
+FunctionTool: Any = object
+
+
+class _FallbackOpenAIFunctionTool:
+    """Fallback for agents.tool.FunctionTool."""
+
+    name: str
+    description: str
+    params_json_schema: Any
+    on_invoke_tool: Any
+
+    def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: D107
+        pass  # Stub constructor
+
 
 try:
-    import openai
-    from agents.tool import FunctionTool
+    import openai  # noqa: F401 # type: ignore
+    from agents.tool import FunctionTool as _ActualAgentsFunctionTool  # type: ignore
 
+    FunctionTool = _ActualAgentsFunctionTool
     HAS_OPENAI = True
-except ImportError:
-    pass  # Variables remain None
+except ImportError:  # pragma: no cover
+    FunctionTool = _FallbackOpenAIFunctionTool  # type: ignore[misc,assignment]
+    HAS_OPENAI = False
 
 
 class OpenAIFunctionDef(TypedDict):
@@ -61,7 +83,7 @@ class OpenAIAdapter(BaseAdapter[Union[dict[str, Any], "FunctionTool"]]):
         Returns:
             OpenAI tool specification or Agents SDK FunctionTool
         """
-        if FunctionTool is not None:
+        if HAS_OPENAI and FunctionTool is not _FallbackOpenAIFunctionTool:
             # Use OpenAI Agents SDK FunctionTool
             return self.to_agents_tool()
         else:
