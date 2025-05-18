@@ -9,14 +9,12 @@ vars:
   PYTHON: "uv run python"
   PYTEST: "uv run pytest"
   RUFF: "uv run ruff"
-  MYPY: "uv run mypy"
+  PYRIGHT: "uv run pyright"
   CODESPELL: "uv run codespell"
   PTW: "uv run ptw"
   TEST_DIR: "tests/"
   PYTHON_FILES: "."
   EXCLUDE_DIRS: "--exclude .venv/ --exclude **/site-packages/"
-  MYPY_EXCLUDE: "--exclude=.venv --exclude=site-packages"
-  MYPY_CACHE: ".mypy_cache"
 
 tasks:
   # Default task: Lists all available tasks
@@ -50,7 +48,7 @@ tasks:
     cmds:
       - task: test
       - task: lint:fix 
-      - task: lint:mypy
+      - task: lint:pyright
 
   # Test task: Run unit tests
   test:
@@ -89,7 +87,7 @@ tasks:
     cmds:
       - task: lint:ruff
       - task: lint:format:check
-      - task: lint:mypy
+      - task: lint:pyright
 
   # Lint diff task: Run linters on changed files
   lint:diff:
@@ -100,7 +98,7 @@ tasks:
     cmds:
       - task: lint:ruff
       - task: lint:format:check
-      - task: lint:mypy
+      - task: lint:pyright
 
   # Lint package task: Run linters on package files
   lint:package:
@@ -110,18 +108,17 @@ tasks:
     cmds:
       - task: lint:ruff
       - task: lint:format:check
-      - task: lint:mypy
+      - task: lint:pyright
 
   # Lint tests task: Run linters on test files
   lint:tests:
     desc: Run linters on test files
     vars:
       PYTHON_FILES: "tests"
-      MYPY_CACHE: ".mypy_cache_test"
     cmds:
       - task: lint:ruff
       - task: lint:format:check
-      - task: lint:mypy
+      - task: lint:pyright
 
   # Lint Fix task: Run lint autofixers
   lint:fix:
@@ -176,21 +173,21 @@ tasks:
     cmds:
       - '[ "{{.PYTHON_FILES}}" = "" ] || {{.RUFF}} format {{.PYTHON_FILES}} --diff'
 
-  # Lint Mypy task: Run mypy type checker
-  lint:mypy:
+  # Lint Pyright task: Run Pyright type checker
+  lint:pyright:
     internal: true
-    env:
-      PYTHONPATH: "{{.TaskDir}}/src"
     cmds:
       - |
-        TARGET_FILES="{{.PYTHON_FILES}}"
-        if [ "$TARGET_FILES" = "." ]; then
-          TARGET_FILES="src tests examples"
-        fi
-        if [ -z "$TARGET_FILES" ]; then
-          echo "No Python files specified for MyPy."
+        # Pyright typically infers from pyproject.toml if no args are given,
+        # or checks specified files/dirs.
+        # If PYTHON_FILES is ".", Pyright uses its config (include/exclude).
+        # Otherwise, it checks the specified PYTHON_FILES.
+        if [ "{{.PYTHON_FILES}}" = "." ]; then
+          echo "Running: {{.PYRIGHT}}" # Pyright will use pyproject.toml config
+          {{.PYRIGHT}}
         else
-          mkdir -p {{.MYPY_CACHE}} && {{.MYPY}} $TARGET_FILES --cache-dir {{.MYPY_CACHE}} {{.MYPY_EXCLUDE}}
+          echo "Running: {{.PYRIGHT}} {{.PYTHON_FILES}}"
+          {{.PYRIGHT}} {{.PYTHON_FILES}}
         fi
 
   # Format task: Run code formatters

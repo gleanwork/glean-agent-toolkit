@@ -2,11 +2,9 @@
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, TypeVar
+from typing import Any
 
 from pydantic import BaseModel
-
-AdapterT = TypeVar("AdapterT")
 
 
 @dataclass
@@ -32,7 +30,7 @@ class ToolSpec:
     output_model: type[BaseModel] | None = None
     _adapters: dict[str, Any] = field(default_factory=dict)
 
-    def get_adapter(self, name: str) -> AdapterT | None:
+    def get_adapter(self, name: str) -> Any | None:
         """Get a cached adapter instance.
 
         Args:
@@ -43,7 +41,7 @@ class ToolSpec:
         """
         return self._adapters.get(name)
 
-    def set_adapter(self, name: str, adapter: AdapterT) -> None:
+    def set_adapter(self, name: str, adapter: Any) -> None:
         """Set an adapter instance.
 
         Args:

@@ -2,10 +2,12 @@
 """Example of a Glean search tool using the Glean Agent Toolkit."""
 
 import json
+import asyncio
+import os
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from glean_agent_toolkit.toolkit import tool_spec
+from glean.toolkit import GleanToolkit, ToolDescription, tool
 
 
 class SearchResult(BaseModel):
@@ -27,7 +29,14 @@ class SearchResponse(BaseModel):
     execution_time_ms: float
 
 
-@tool_spec(
+# Define a Pydantic model for the tool's arguments
+class GleanSearchArgs(BaseModel):
+    query: str
+    max_results: int = 5
+    datasource_filter: list[str] | None = None
+
+
+@tool(
     name="glean_search",
     description="Search Glean for documents matching a query",
     output_model=SearchResponse,

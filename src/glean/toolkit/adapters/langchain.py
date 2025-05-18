@@ -58,7 +58,7 @@ except ImportError:  # pragma: no cover
     HAS_LANGCHAIN = False
 
 
-class LangChainAdapter(BaseAdapter[Tool]):
+class LangChainAdapter(BaseAdapter[Any]):
     """Adapter for LangChain tools."""
 
     def __init__(self, tool_spec: ToolSpec) -> None:
@@ -74,7 +74,7 @@ class LangChainAdapter(BaseAdapter[Tool]):
                 "Install it with `pip install agent_toolkit[langchain]`."
             )
 
-    def to_tool(self) -> Tool:
+    def to_tool(self) -> Any:
         """Convert to LangChain tool format.
 
         Returns:
@@ -93,8 +93,10 @@ class LangChainAdapter(BaseAdapter[Tool]):
         Returns:
             A Pydantic model class or None if no properties
         """
-        props = self.tool_spec.input_schema.get("properties", {})
-        required = self.tool_spec.input_schema.get("required", [])
+        json_schema = self.tool_spec.input_schema
+
+        props = json_schema.get("properties", {})
+        required = json_schema.get("required", [])
 
         if not props:
             return None

@@ -53,7 +53,7 @@ class OpenAIToolDef(TypedDict):
     function: OpenAIFunctionDef
 
 
-class OpenAIAdapter(BaseAdapter[Union[dict[str, Any], "FunctionTool"]]):
+class OpenAIAdapter(BaseAdapter[Any]):
     """Adapter for OpenAI tools."""
 
     def __init__(self, tool_spec: ToolSpec) -> None:
@@ -69,7 +69,7 @@ class OpenAIAdapter(BaseAdapter[Union[dict[str, Any], "FunctionTool"]]):
                 "Install it with `pip install agent_toolkit[openai]`."
             )
 
-    def to_tool(self) -> Union[dict[str, Any], "FunctionTool"]:
+    def to_tool(self) -> Any:
         """Convert to OpenAI tool format.
 
         This method tries to use the OpenAI Agents SDK if available,
@@ -89,16 +89,22 @@ class OpenAIAdapter(BaseAdapter[Union[dict[str, Any], "FunctionTool"]]):
         Returns:
             OpenAI function calling specification
         """
+        params_schema = (
+            self.tool_spec.input_schema
+            if self.tool_spec.input_schema
+            else {"type": "object", "properties": {}}
+        )
+
         return {
             "type": "function",
             "function": {
                 "name": self.tool_spec.name,
                 "description": self.tool_spec.description,
-                "parameters": self.tool_spec.input_schema,
+                "parameters": params_schema,
             },
         }
 
-    def to_agents_tool(self) -> "FunctionTool":
+    def to_agents_tool(self) -> Any:
         """Convert to OpenAI Agents SDK FunctionTool.
 
         Returns:
@@ -115,10 +121,16 @@ class OpenAIAdapter(BaseAdapter[Union[dict[str, Any], "FunctionTool"]]):
             except Exception as e:
                 return f"Error executing tool: {str(e)}"
 
+        params_json_schema_dict = (
+            self.tool_spec.input_schema
+            if self.tool_spec.input_schema
+            else {"type": "object", "properties": {}}
+        )
+
         return FunctionTool(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
-            params_json_schema=self.tool_spec.input_schema,
+            params_json_schema=params_json_schema_dict,
             on_invoke_tool=on_invoke_tool,
             strict_json_schema=True,
         )

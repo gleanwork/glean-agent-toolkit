@@ -19,7 +19,7 @@ class InputSchema(TypedDict):
     required: list[str]
 
 
-T = TypeVar("T", bound=Callable[..., Any])
+CallableT = Callable[..., Any]
 
 
 class ToolSpecFunction(Protocol):
@@ -71,13 +71,17 @@ class ToolSpecFunction(Protocol):
         """
         ...
 
+    # Needed for compatibility with introspection and tests that access
+    # ``__name__`` on the wrapped callable (see tests/test_decorators.py).
+    __name__: str
+
 
 def tool_spec(
     name: str,
     description: str,
     output_model: type[BaseModel] | None = None,
     version: str | None = None,
-) -> Callable[[T], Any]:
+) -> Callable[[CallableT], ToolSpecFunction]:
     """Decorator for registering a function as a tool.
 
     Args:
@@ -90,7 +94,7 @@ def tool_spec(
         Decorated function with tool spec attached
     """
 
-    def decorator(func: T) -> Any:
+    def decorator(func: CallableT) -> ToolSpecFunction:
         """Decorator function.
 
         Args:
@@ -264,6 +268,6 @@ def tool_spec(
         wrapper.as_crewai_tool = as_crewai_tool  # type: ignore
         wrapper.tool_spec = tool_spec_obj  # type: ignore
 
-        return wrapper
+        return cast(ToolSpecFunction, wrapper)
 
     return decorator

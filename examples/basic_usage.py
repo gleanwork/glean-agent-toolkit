@@ -3,7 +3,7 @@
 
 from pydantic import BaseModel
 
-from glean_agent_toolkit.toolkit import tool_spec
+from glean.toolkit import tool_spec
 
 
 # Simple tool example
@@ -71,7 +71,7 @@ def main() -> None:
     print(MultiplyResult.model_json_schema())
 
     # Print all registered tools
-    from glean_agent_toolkit.toolkit import get_registry
+    from glean.toolkit import get_registry
 
     registry = get_registry()
     print("\nRegistered Tools:")

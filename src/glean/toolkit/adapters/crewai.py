@@ -54,16 +54,20 @@ except ImportError:  # pragma: no cover
     create_model = _fallback_create_model  # type: ignore[assignment]
     HAS_CREWAI = False
 
-# Public alias
-BaseTool = _ActualCrewBaseTool  # type: ignore[assignment]
-
 
 # Define the tool class at the module level
-class GleanCrewAITool(BaseTool):
+class GleanCrewAITool(BaseTool):  # type: ignore[misc]
     """CrewAI tool implementation for Glean tools."""
 
+    name: str  # CrewAI BaseTool requires name and description
+    description: str  # CrewAI BaseTool requires name and description
+    # Reuse BaseTool's built-in placeholder default for ``args_schema`` so that
+    # CrewAI can lazily infer a schema when one isn't supplied. We intentionally
+    # *do not* override the attribute here to avoid accidentally setting it to
+    # ``None`` and breaking CrewAI's internal description generation logic.
+
     # Custom field to store the function
-    _function: Callable[..., Any] = None  # type: ignore
+    _function: Callable[..., Any]
 
     def __init__(
         self,
@@ -83,9 +87,13 @@ class GleanCrewAITool(BaseTool):
         # Pass the required fields to the parent constructor
         super().__init__(name=name, description=description)
 
-        # Set our custom fields
+        # Store the wrapped callable
         self._function = function
-        self.args_schema = args_schema
+
+        # Only override ``args_schema`` when we actually created one; otherwise
+        # leave the placeholder so CrewAI can lazily generate a schema.
+        if args_schema is not None:
+            self.args_schema = args_schema
 
         # Store a ref to the original tool spec for testing (not a field in the model)
         object.__setattr__(self, "_tool_spec_ref", None)
@@ -102,7 +110,7 @@ class GleanCrewAITool(BaseTool):
         return self._function(**kwargs)
 
 
-class CrewAIAdapter(BaseAdapter[BaseTool]):
+class CrewAIAdapter(BaseAdapter[Any]):
     """Adapter for CrewAI tools."""
 
     def __init__(self, tool_spec: ToolSpec) -> None:
@@ -119,18 +127,20 @@ class CrewAIAdapter(BaseAdapter[BaseTool]):
                 "Note: CrewAI requires Python 3.10 or higher."
             )
 
-    def to_tool(self) -> BaseTool:
+    def to_tool(self) -> Any:
         """Convert to CrewAI tool format.
 
         Returns:
             A CrewAI BaseTool instance
         """
         # Create and configure the tool
+        created_args_schema = self._create_args_schema()
+
         tool = GleanCrewAITool(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
             function=self.tool_spec.function,
-            args_schema=self._create_args_schema(),
+            args_schema=created_args_schema,
         )
 
         # Store the tool_spec reference for testing
@@ -144,33 +154,28 @@ class CrewAIAdapter(BaseAdapter[BaseTool]):
         Returns:
             A Pydantic model class or None if no properties
         """
-        # Extract properties from the input schema
-        props = self.tool_spec.input_schema.get("properties", {})
-        required = self.tool_spec.input_schema.get("required", [])
+        json_schema = self.tool_spec.input_schema
+
+        props = json_schema.get("properties", {})
+        required = json_schema.get("required", [])
 
         if not props:
             return None
 
-        # Create field definitions with proper type annotation
-        # for mypy compatibility
         field_defs: dict[str, tuple[type, Any]] = {}
-
         for name, schema in props.items():
-            # Map JSON schema types to Python types
             field_type = self._get_field_type(schema)
             is_required = name in required
-
-            # Get field description if available
             description = schema.get("description", "")
-
-            # Create appropriate field with type information
             if is_required:
                 field_defs[name] = (field_type, Field(..., description=description))
             else:
                 field_defs[name] = (field_type, Field(None, description=description))
 
-        # Create the model - use type ignore since mypy has trouble with the dynamic usage
-        model = create_model(f"{self.tool_spec.name}Schema", **field_defs)  # type: ignore
+        model_name = f"{self.tool_spec.name}ArgsSchema"
+        model = create_model(model_name, **field_defs)  # type: ignore
+
+        # Return the dynamically created model.
         return cast(type[BaseModel], model)
 
     def _get_field_type(self, schema: dict[str, Any]) -> type:
