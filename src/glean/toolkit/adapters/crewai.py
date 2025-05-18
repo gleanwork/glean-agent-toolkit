@@ -1,7 +1,7 @@
 """Adapter for CrewAI tools."""
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Union, cast
 
 from pydantic import BaseModel
 
@@ -13,8 +13,13 @@ from glean.toolkit.spec import ToolSpec
 # ---------------------------------------------------------------------------
 
 if TYPE_CHECKING:
-    from crewai.tools import BaseTool  # pragma: no cover
-    from pydantic import Field, create_model  # pragma: no cover
+    from crewai.tools import BaseTool as CrewBaseTool
+else:
+    CrewBaseTool = Any  # type: ignore  # noqa: N816
+
+# Pydantic helpers (import unconditionally)
+from pydantic import Field as PydanticField  # type: ignore
+from pydantic import create_model as pydantic_create_model
 
 HAS_CREWAI: bool
 
@@ -27,6 +32,10 @@ class _FallbackCrewBaseTool:
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: D107
         pass
+
+    # Minimal stub so static type checking finds the attribute
+    def _run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: D401
+        ...
 
 
 def _fallback_field(*args: Any, **kwargs: Any) -> Any:  # noqa: N802
@@ -49,7 +58,7 @@ try:
     create_model = _actual_create_model
     HAS_CREWAI = True
 except ImportError:  # pragma: no cover
-    BaseTool = _FallbackCrewBaseTool  # type: ignore[misc,assignment]
+    BaseTool = _FallbackCrewBaseTool  # type: ignore[assignment]
     Field = _fallback_field  # type: ignore[assignment]
     create_model = _fallback_create_model  # type: ignore[assignment]
     HAS_CREWAI = False
@@ -110,7 +119,10 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
         return self._function(**kwargs)
 
 
-class CrewAIAdapter(BaseAdapter[Any]):
+CrewAIToolType = CrewBaseTool | BaseTool  # type: ignore[valid-type]
+
+
+class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
     """Adapter for CrewAI tools."""
 
     def __init__(self, tool_spec: ToolSpec) -> None:
@@ -127,7 +139,7 @@ class CrewAIAdapter(BaseAdapter[Any]):
                 "Note: CrewAI requires Python 3.10 or higher."
             )
 
-    def to_tool(self) -> Any:
+    def to_tool(self) -> CrewAIToolType:
         """Convert to CrewAI tool format.
 
         Returns:
@@ -168,12 +180,12 @@ class CrewAIAdapter(BaseAdapter[Any]):
             is_required = name in required
             description = schema.get("description", "")
             if is_required:
-                field_defs[name] = (field_type, Field(..., description=description))
+                field_defs[name] = (field_type, PydanticField(..., description=description))
             else:
-                field_defs[name] = (field_type, Field(None, description=description))
+                field_defs[name] = (field_type, PydanticField(None, description=description))
 
         model_name = f"{self.tool_spec.name}ArgsSchema"
-        model = create_model(model_name, **field_defs)  # type: ignore
+        model = pydantic_create_model(model_name, **field_defs)  # type: ignore
 
         # Return the dynamically created model.
         return cast(type[BaseModel], model)

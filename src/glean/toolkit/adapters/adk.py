@@ -1,16 +1,18 @@
 """Adapter for Google Agent Development Kit (ADK)."""
 
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, TypeAlias
 
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
+# Optional dependency handling
 if TYPE_CHECKING:
-    from google.adk.tools import FunctionTool as AdkFunctionTool  # pragma: no cover
+    from google.adk.tools import FunctionTool as _RealAdkFunctionTool
+else:
+    _RealAdkFunctionTool = Any  # type: ignore
 
 HAS_ADK: bool
-AdkFunctionTool: Any  # Forward declaration for type hint
 
 
 class _FallbackAdkFunctionTool:
@@ -36,16 +38,18 @@ class _FallbackAdkFunctionTool:
 
 
 try:
-    from google.adk.tools import FunctionTool as _ActualAdkFunctionTool  # Changed import
+    from google.adk.tools import FunctionTool as _RuntimeAdkFunctionTool
 
-    AdkFunctionTool = _ActualAdkFunctionTool  # Assign to the forward-declared variable
     HAS_ADK = True
 except ImportError:  # pragma: no cover
-    AdkFunctionTool = _FallbackAdkFunctionTool  # type: ignore[misc,assignment]
+    _RuntimeAdkFunctionTool = _FallbackAdkFunctionTool  # type: ignore
     HAS_ADK = False
 
+# Single alias used for typing and at runtime
+AdkFunctionTool: TypeAlias = _RealAdkFunctionTool | _FallbackAdkFunctionTool
 
-class ADKAdapter(BaseAdapter[Any]):
+
+class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
     """Adapter for Google ADK tools."""
 
     def __init__(self, tool_spec: ToolSpec) -> None:
@@ -61,7 +65,7 @@ class ADKAdapter(BaseAdapter[Any]):
                 "Install it with `pip install agent_toolkit[adk]` or `pip install google-adk`."
             )
 
-    def to_tool(self) -> Any:
+    def to_tool(self) -> "AdkFunctionTool":
         """Convert to Google ADK FunctionTool format.
 
         Returns:
@@ -74,19 +78,13 @@ class ADKAdapter(BaseAdapter[Any]):
         if not func.__doc__:
             func.__doc__ = self.tool_spec.description
 
-        # The real ADK ``FunctionTool`` only accepts the callable. Parameter
-        # schema is inferred automatically from the signature. We still attach
-        # the original JSON schema to the returned instance so downstream code
-        # ‑ and our unit tests ‑ can access it in a uniform fashion.
-        tool = AdkFunctionTool(func=func)
+        # Instantiate ADK FunctionTool (real or fallback). Parameter schema is
+        # inferred automatically by ADK; we still attach the original JSON
+        # schema so downstream code can access it consistently.
 
-        # Attach the JSON schema for convenience/testing parity.
+        tool = _RuntimeAdkFunctionTool(func=func)  # type: ignore[arg-type]
+
+        # Attach JSON schema for parity with other adapters
         setattr(tool, "schema", self.tool_spec.input_schema)
 
         return tool
-
-    # _create_wrapped_function is no longer strictly needed if FunctionTool takes the original func
-    # However, ADK's FunctionTool might expect a specific signature or handling of ToolContext.
-    # For now, let's assume the direct function is okay. If ADK requires a specific wrapper
-    # (e.g., to inject ToolContext or handle specific return types), this might need adjustment.
-    # The original _create_wrapped_function just returned the function itself after wrapping.

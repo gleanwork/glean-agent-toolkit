@@ -1,23 +1,27 @@
 """Adapter for LangChain tools."""
 
 from datetime import date, datetime
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, TypeAlias, Union, cast
 
 from pydantic import BaseModel
 
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
+# Optional dependency handling
 if TYPE_CHECKING:
     from langchain.tools import Tool as LangchainTool  # pragma: no cover
-    from pydantic import Field as PydanticField  # pragma: no cover
-    from pydantic import create_model as pydantic_create_model
+else:
+    LangchainTool = Any  # type: ignore  # noqa: N816
 
-HAS_LANGCHAIN: bool
+# Pydantic helpers (runtime alias regardless of TYPE_CHECKING)
+from pydantic import Field as PydanticField  # type: ignore
+from pydantic import create_model as pydantic_create_model
 
-Tool: Any = object
+# Runtime placeholders (will be overwritten if import succeeds)
+ToolClass: Any = object
 Field: Any = object
-create_model: Any = object
+create_model = pydantic_create_model  # assigned below
 
 
 class _FallbackLangchainTool:
@@ -47,18 +51,25 @@ try:
     from pydantic import Field as _ActualPydanticFieldImport  # type: ignore
     from pydantic import create_model as _actual_pydantic_create_model_import
 
-    Tool = _ActualLangchainToolImport
+    ToolClass = _ActualLangchainToolImport
     Field = _ActualPydanticFieldImport
     create_model = _actual_pydantic_create_model_import
     HAS_LANGCHAIN = True
 except ImportError:  # pragma: no cover
-    Tool = _FallbackLangchainTool  # type: ignore[misc,assignment]
+    ToolClass = _FallbackLangchainTool  # type: ignore[assignment]
     Field = _fallback_pydantic_field
     create_model = _fallback_pydantic_create_model
     HAS_LANGCHAIN = False
 
 
-class LangChainAdapter(BaseAdapter[Any]):
+# Unified alias for typing-time only; Any at runtime to avoid `TypeError`.
+if TYPE_CHECKING:
+    LangChainToolType: TypeAlias = "LangchainTool"
+else:
+    from typing import Any as LangChainToolType  # type: ignore
+
+
+class LangChainAdapter(BaseAdapter[LangChainToolType]):
     """Adapter for LangChain tools."""
 
     def __init__(self, tool_spec: ToolSpec) -> None:
@@ -80,7 +91,7 @@ class LangChainAdapter(BaseAdapter[Any]):
         Returns:
             LangChain Tool instance
         """
-        return Tool(
+        return ToolClass(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
             func=self.tool_spec.function,

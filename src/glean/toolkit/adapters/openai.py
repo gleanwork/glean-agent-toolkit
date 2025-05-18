@@ -2,17 +2,22 @@
 
 import json
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
-    from agents.tool import FunctionTool as AgentsFunctionTool  # pragma: no cover
+    from agents.tool import FunctionTool as _RealOpenAIFunctionTool
+else:
+    _RealOpenAIFunctionTool = Any  # type: ignore
 
 HAS_OPENAI: bool
 
-FunctionTool: Any = object
+
+# ---------------------------------------------------------------------------
+# Optional dependency handling
+# ---------------------------------------------------------------------------
 
 
 class _FallbackOpenAIFunctionTool:
@@ -29,13 +34,21 @@ class _FallbackOpenAIFunctionTool:
 
 try:
     import openai  # noqa: F401 # type: ignore
-    from agents.tool import FunctionTool as _ActualAgentsFunctionTool  # type: ignore
+    from agents.tool import FunctionTool as _RuntimeFunctionTool  # type: ignore
 
-    FunctionTool = _ActualAgentsFunctionTool
+    _RuntimeOpenAIFunctionTool = _RuntimeFunctionTool  # type: ignore
     HAS_OPENAI = True
 except ImportError:  # pragma: no cover
-    FunctionTool = _FallbackOpenAIFunctionTool  # type: ignore[misc,assignment]
+    _RuntimeOpenAIFunctionTool = _FallbackOpenAIFunctionTool  # type: ignore
     HAS_OPENAI = False
+
+
+# Single alias for typing only
+OpenAIFunctionTool: TypeAlias = _RealOpenAIFunctionTool | _FallbackOpenAIFunctionTool
+
+
+# Public type exported for callers and generics
+OpenAIToolType = dict[str, Any] | OpenAIFunctionTool
 
 
 class OpenAIFunctionDef(TypedDict):
@@ -53,7 +66,7 @@ class OpenAIToolDef(TypedDict):
     function: OpenAIFunctionDef
 
 
-class OpenAIAdapter(BaseAdapter[Any]):
+class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
     """Adapter for OpenAI tools."""
 
     def __init__(self, tool_spec: ToolSpec) -> None:
@@ -78,7 +91,7 @@ class OpenAIAdapter(BaseAdapter[Any]):
         Returns:
             OpenAI tool specification or Agents SDK FunctionTool
         """
-        if HAS_OPENAI and FunctionTool is not _FallbackOpenAIFunctionTool:
+        if HAS_OPENAI and _RuntimeOpenAIFunctionTool is not _FallbackOpenAIFunctionTool:
             return self.to_agents_tool()
         else:
             return self.to_standard_tool()
@@ -104,7 +117,7 @@ class OpenAIAdapter(BaseAdapter[Any]):
             },
         }
 
-    def to_agents_tool(self) -> Any:
+    def to_agents_tool(self) -> OpenAIFunctionTool:
         """Convert to OpenAI Agents SDK FunctionTool.
 
         Returns:
@@ -127,7 +140,7 @@ class OpenAIAdapter(BaseAdapter[Any]):
             else {"type": "object", "properties": {}}
         )
 
-        return FunctionTool(
+        return _RuntimeOpenAIFunctionTool(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
             params_json_schema=params_json_schema_dict,
