@@ -99,7 +99,6 @@ def tool_spec(
         Returns:
             Decorated function
         """
-        # Extract parameter types from function signature
         sig = inspect.signature(func)
         params = {}
         out_type = None
@@ -108,32 +107,25 @@ def tool_spec(
             if param.annotation != inspect.Parameter.empty:
                 params[param_name] = param.annotation
 
-        # Extract return type
         if sig.return_annotation != inspect.Signature.empty:
             out_type = sig.return_annotation
 
-        # Generate input schema
         input_schema: InputSchema = {
             "type": "object",
             "properties": {},
             "required": [],
         }
 
-        # Use a mutable list for required fields
         required_fields: list[str] = []
 
         for param_name, param in sig.parameters.items():
             if param.default is param.empty:
                 required_fields.append(param_name)
 
-        # Assign the list to the schema
         input_schema["required"] = required_fields
 
-        # Use Pydantic to generate schemas
         if params:
-            # Create a simple schema for each parameter
             for param_name, param_type in params.items():
-                # Map Python types to JSON schema types
                 if isinstance(param_type, type) and issubclass(param_type, str):
                     input_schema["properties"][param_name] = {"type": "string"}
                 elif isinstance(param_type, type) and issubclass(param_type, int):
@@ -153,13 +145,10 @@ def tool_spec(
                         "items": {"type": "integer"},
                     }
                 else:
-                    # Default to string for complex types
                     input_schema["properties"][param_name] = {"type": "string"}
 
-        # Generate output schema
         output_schema: dict[str, Any] = {"type": "object"}
         if out_type is not None and hasattr(out_type, "model_json_schema"):
-            # If it's a Pydantic model, use its schema
             output_schema = out_type.model_json_schema()
         elif out_type is int:
             output_schema = {"type": "integer"}
@@ -180,7 +169,6 @@ def tool_spec(
                 "items": {"type": "integer"},
             }
 
-        # Create tool spec
         tool_spec_obj = ToolSpec(
             name=name,
             description=description,
@@ -195,7 +183,6 @@ def tool_spec(
             ),
         )
 
-        # Register the tool
         get_registry().register(tool_spec_obj)
 
         @functools.wraps(func)
@@ -211,7 +198,6 @@ def tool_spec(
             """
             return func(*args, **kwargs)
 
-        # Add helper methods
         def as_openai_tool() -> dict[str, Any] | Any:
             """Convert to OpenAI tool format.
 
@@ -272,13 +258,12 @@ def tool_spec(
 
             return adapter.to_tool()
 
-        # Attach helper methods to the wrapper
         wrapper.as_openai_tool = as_openai_tool  # type: ignore
         wrapper.as_adk_tool = as_adk_tool  # type: ignore
         wrapper.as_langchain_tool = as_langchain_tool  # type: ignore
         wrapper.as_crewai_tool = as_crewai_tool  # type: ignore
         wrapper.tool_spec = tool_spec_obj  # type: ignore
 
-        return wrapper  # Return with proper type
+        return wrapper
 
     return decorator

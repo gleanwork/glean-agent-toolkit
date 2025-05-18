@@ -7,16 +7,11 @@ from typing import TYPE_CHECKING, Any, TypedDict, Union
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# ---------------------------------------------------------------------------
-# Optional dependency handling
-# ---------------------------------------------------------------------------
-
 if TYPE_CHECKING:
     from agents.tool import FunctionTool as AgentsFunctionTool  # pragma: no cover
 
 HAS_OPENAI: bool
 
-# Initialize as a variable
 FunctionTool: Any = object
 
 
@@ -29,7 +24,7 @@ class _FallbackOpenAIFunctionTool:
     on_invoke_tool: Any
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: D107
-        pass  # Stub constructor
+        pass
 
 
 try:
@@ -84,10 +79,8 @@ class OpenAIAdapter(BaseAdapter[Union[dict[str, Any], "FunctionTool"]]):
             OpenAI tool specification or Agents SDK FunctionTool
         """
         if HAS_OPENAI and FunctionTool is not _FallbackOpenAIFunctionTool:
-            # Use OpenAI Agents SDK FunctionTool
             return self.to_agents_tool()
         else:
-            # Fallback to standard OpenAI function calling
             return self.to_standard_tool()
 
     def to_standard_tool(self) -> OpenAIToolDef:
@@ -113,7 +106,6 @@ class OpenAIAdapter(BaseAdapter[Union[dict[str, Any], "FunctionTool"]]):
         """
         original_func = self.tool_spec.function
 
-        # Create the on_invoke_tool function
         async def on_invoke_tool(ctx: Any, input_str: str) -> Any:
             """Function that invokes the tool with parameters."""
             try:
@@ -123,7 +115,6 @@ class OpenAIAdapter(BaseAdapter[Union[dict[str, Any], "FunctionTool"]]):
             except Exception as e:
                 return f"Error executing tool: {str(e)}"
 
-        # Create the FunctionTool
         return FunctionTool(
             name=self.tool_spec.name,
             description=self.tool_spec.description,

@@ -6,10 +6,6 @@ from typing import TYPE_CHECKING, Any
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# ---------------------------------------------------------------------------
-# Optional dependency handling
-# ---------------------------------------------------------------------------
-
 if TYPE_CHECKING:
     from google.adk.tools import RestApiTool  # pragma: no cover
 
@@ -60,8 +56,6 @@ class ADKAdapter(BaseAdapter["RestApiTool"]):
         Returns:
             An ADK RestApiTool instance
         """
-        # The RestApiTool is the most similar to our tool spec format
-        # It lets us define a function with a JSON schema
         return RestApiTool(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
@@ -81,7 +75,6 @@ class ADKAdapter(BaseAdapter["RestApiTool"]):
             """Wrapper function for ADK compatibility."""
             return original_func(**kwargs)
 
-        # Copy metadata
         wrapped_func.__name__ = original_func.__name__
         wrapped_func.__doc__ = original_func.__doc__
 

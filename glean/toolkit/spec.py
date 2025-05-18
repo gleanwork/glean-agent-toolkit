@@ -6,7 +6,6 @@ from typing import Any, TypeVar
 
 from pydantic import BaseModel
 
-# Type variable for adapter instances
 AdapterT = TypeVar("AdapterT")
 
 

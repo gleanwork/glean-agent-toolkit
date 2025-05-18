@@ -5,7 +5,6 @@ from typing import Generic, TypeVar
 
 from glean.toolkit.spec import ToolSpec
 
-# Type variable for the return type of to_tool
 T = TypeVar("T")
 
 

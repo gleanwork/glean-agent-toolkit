@@ -38,7 +38,6 @@ class Registry:
         return list(self._tools.values())
 
 
-# Module-level singleton instance
 _REGISTRY = Registry()
 
 
