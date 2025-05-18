@@ -69,7 +69,7 @@ tasks:
   test:cov:
     desc: Run tests with coverage
     cmds:
-      - "{{.PYTEST}} --cov=glean.toolkit --cov-report=term --cov-report=html -v {{.TEST_DIR}}"
+      - "{{.PYTEST}} --cov=glean --cov-report=term --cov-report=html -v {{.TEST_DIR}}"
 
   # Run examples task
   examples:
@@ -106,7 +106,7 @@ tasks:
   lint:package:
     desc: Run linters on package files
     vars:
-      PYTHON_FILES: "glean/toolkit"
+      PYTHON_FILES: "src/glean/toolkit"
     cmds:
       - task: lint:ruff
       - task: lint:format:check
@@ -144,7 +144,7 @@ tasks:
   lint:fix:package:
     desc: Run lint autofixers on package files
     vars:
-      PYTHON_FILES: "glean/toolkit"
+      PYTHON_FILES: "src/glean/toolkit"
     cmds:
       - task: lint:fix:ruff
       - task: format
@@ -179,8 +179,19 @@ tasks:
   # Lint Mypy task: Run mypy type checker
   lint:mypy:
     internal: true
+    env:
+      PYTHONPATH: "{{.TaskDir}}/src"
     cmds:
-      - '[ "{{.PYTHON_FILES}}" = "" ] || mkdir -p {{.MYPY_CACHE}} && {{.MYPY}} {{.PYTHON_FILES}} --cache-dir {{.MYPY_CACHE}} {{.MYPY_EXCLUDE}}'
+      - |
+        TARGET_FILES="{{.PYTHON_FILES}}"
+        if [ "$TARGET_FILES" = "." ]; then
+          TARGET_FILES="src tests examples"
+        fi
+        if [ -z "$TARGET_FILES" ]; then
+          echo "No Python files specified for MyPy."
+        else
+          mkdir -p {{.MYPY_CACHE}} && {{.MYPY}} $TARGET_FILES --cache-dir {{.MYPY_CACHE}} {{.MYPY_EXCLUDE}}
+        fi
 
   # Format task: Run code formatters
   format:

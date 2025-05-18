@@ -62,7 +62,7 @@ glean-toolkit = "glean.toolkit.cli:app"
 "Source Code" = "https://github.com/gleanwork/glean-agent-toolkit"
 
 [tool.hatch.build.targets.wheel]
-packages = ["glean"]
+packages = ["src/glean"]
 
 [tool.mypy]
 python_version = "3.11"
@@ -84,6 +84,7 @@ module = "crewai.*"
 ignore_missing_imports = true
 
 [tool.ruff]
+src = ["src"]
 line-length = 100
 target-version = "py310"
 exclude = [
