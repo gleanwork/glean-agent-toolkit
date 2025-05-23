@@ -1,0 +1,13 @@
+{
+  "include": ["src", "tests", "examples"],
+  "executionEnvironments": [
+    {
+      "root": "."
+    }
+  ],
+  "extraPaths": ["src"],
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true
+}

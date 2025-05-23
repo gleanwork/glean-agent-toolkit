@@ -235,7 +235,7 @@ tasks:
   clean:
     desc: Clean build artifacts
     cmds:
-      - rm -rf dist build **/*.egg-info .pytest_cache .coverage htmlcov .ruff_cache
+      - rm -rf dist .venv build **/*.egg-info .pytest_cache .coverage htmlcov .ruff_cache
       - find . -name "*.pyc" -delete
       - find . -name "__pycache__" -delete
 

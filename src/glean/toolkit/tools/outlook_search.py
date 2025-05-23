@@ -1,16 +1,18 @@
-"""Outlook Search stub tool."""
+"""Outlook Search tool."""
 
 from __future__ import annotations
 
 from typing import Any
 
+from glean import models
 from glean.toolkit.decorators import tool_spec
+from glean.toolkit.tools._common import run_tool
 
 
 @tool_spec(
     name="outlook_search",
-    description="Search Outlook mail messages accessible to the agent.",
+    description="Search for emails in Outlook mailbox.",
 )
-def outlook_search(query: str, max_results: int | None = 20) -> dict[str, Any]:
-    """Stub implementation."""
-    raise NotImplementedError("Outlook Search tool backend not yet integrated.")
+def outlook_search(parameters: dict[str, models.ToolsCallParameter]) -> dict[str, Any]:
+    """Search Outlook messages based on the query."""
+    return run_tool("Outlook Search", parameters)

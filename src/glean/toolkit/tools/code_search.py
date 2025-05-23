@@ -1,10 +1,12 @@
-"""Code Search stub tool."""
+"""Code Search tool."""
 
 from __future__ import annotations
 
 from typing import Any
 
+from glean import models
 from glean.toolkit.decorators import tool_spec
+from glean.toolkit.tools._common import run_tool
 
 
 @tool_spec(
@@ -12,9 +14,7 @@ from glean.toolkit.decorators import tool_spec
     description="Search the company source-code index.",
 )
 def code_search(
-    query: str,
-    repo: str | None = None,
-    max_results: int | None = 10,
+    parameters: dict[str, models.ToolsCallParameter],
 ) -> dict[str, Any]:
-    """Stub implementation."""
-    raise NotImplementedError("Code Search tool backend not yet integrated.")
+    """Search code repositories based on the query."""
+    return run_tool("Code Search", parameters)

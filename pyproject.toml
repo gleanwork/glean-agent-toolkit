@@ -14,7 +14,8 @@ dependencies = [
     "pydantic>=2.7",
     "typer>=0.12.0",
     "rich>=13.0.0",
-    "shellingham>=1.5.0"
+    "shellingham>=1.5.0",
+    "glean-api-client>=0.5.2",
 ]
 
 [project.optional-dependencies]
@@ -68,9 +69,13 @@ packages = ["src/glean"]
 include = ["src", "tests"]
 exclude = ["**/__pycache__", ".venv/"]
 venvPath = "."
-pythonVersion = "3.11"
+pythonVersion = "3.13"
 reportMissingImports = "warning"
 reportUnusedVariable = "warning"
+
+executionEnvironments = [
+  { root = "src" }
+]
 
 [tool.ruff]
 src = ["src"]

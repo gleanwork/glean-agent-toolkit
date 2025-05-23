@@ -948,6 +948,7 @@ name = "glean-agent-toolkit"
 version = "0.1.0"
 source = { editable = "." }
 dependencies = [
+    { name = "glean-api-client" },
     { name = "pydantic" },
     { name = "rich" },
     { name = "shellingham" },
@@ -997,6 +998,7 @@ requires-dist = [
     { name = "commitizen", marker = "extra == 'dev'", specifier = ">=4.4.1" },
     { name = "crewai", marker = "extra == 'crewai'", specifier = ">=0.28.0" },
     { name = "crewai", marker = "extra == 'test'", specifier = ">=0.28.0" },
+    { name = "glean-api-client", specifier = ">=0.5.2" },
     { name = "google-adk", marker = "extra == 'adk'", specifier = ">=0.1.0" },
     { name = "google-adk", marker = "extra == 'test'", specifier = ">=0.1.0" },
     { name = "langchain", marker = "extra == 'langchain'", specifier = ">=0.1.0" },
@@ -1016,6 +1018,19 @@ requires-dist = [
     { name = "typer", specifier = ">=0.12.0" },
 ]
 provides-extras = ["dev", "test", "openai", "adk", "langchain", "crewai", "codespell", "lint", "typing"]
+
+[[package]]
+name = "glean-api-client"
+version = "0.5.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "httpx" },
+    { name = "pydantic" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/22/f7/670e051f150525c23586ede7244f42594d84fe109a3a328c5b630f7be990/glean_api_client-0.5.2.tar.gz", hash = "sha256:103d647d2602d25369ca4790ef1918a37fbbef748cbe8ce9dd20b3feeffab6ac", size = 216990 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b4/4d/37813067610c207f2172d3d851c810b7355afdced3cb064483e48312c4e4/glean_api_client-0.5.2-py3-none-any.whl", hash = "sha256:e36f075cfc7dd0a0403a830c289345b41b15dffe96ea85719d66402d4dcf7fa0", size = 445861 },
+]
 
 [[package]]
 name = "google-adk"
