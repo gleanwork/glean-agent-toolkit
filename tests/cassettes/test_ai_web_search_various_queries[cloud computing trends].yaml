@@ -1,0 +1,96 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"cloud
+      computing trends"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '101'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"aiWebSearch\":{\"response\":\"Okay! Based
+        on the search results, here are some of the top cloud computing trends to
+        watch:\\n\\n*   **AI-Powered Cloud:** AI is becoming a core component of cloud
+        operations, optimizing resource allocation, improving security, and enhancing
+        efficiency.\\n*   **Edge-to-Cloud AI Integration:** Seamless integration between
+        edge and cloud computing is emerging, with AI workloads dynamically shifting
+        between the two to leverage their unique strengths.\\n*   **Hybrid and Multi-Cloud
+        Strategies:** Businesses are increasingly adopting hybrid and multi-cloud
+        strategies to maximize flexibility and build resilience.\\n*   **Serverless
+        Computing:** Serverless computing is becoming more widely adopted, allowing
+        developers to build and deploy applications without managing underlying servers.\\n*   **Quantum
+        Computing as a Service:** Quantum computing is becoming more accessible through
+        cloud platforms, potentially revolutionizing how information is processed.\\n*   **DevEdgeOps:**
+        Adopting DevOps practices for the edge computing era to streamline development
+        and deployment processes.\\n*   **Sustainability:** A greater emphasis is
+        being placed on sustainability in cloud computing, with organizations prioritizing
+        energy-efficient practices and technologies.\\n*   **Cloud-Native Development:**
+        Enhanced cloud-native development focuses on building and running applications
+        specifically designed for cloud environments, utilizing technologies like
+        containers and microservices.\\n*   **Advanced Security:** Cloud security
+        is becoming more intelligent, automated, and reliable, driven by advances
+        in AI, machine learning, and quantum computing.\\n*   **Cloud Agnostic:**
+        Shift towards building systems that can move between cloud providers, often
+        using technologies like containers and Kubernetes.\\n\",\"groundingChunks\":[{\"sourceFile\":{\"id\":\"9780bb2b88364511ba094ad854293f68\",\"url\":\"https://www.visma.com/resources/content/cloud-computing-trends-that-will-reshape-business-in-2025\",\"name\":\"visma.com\"},\"citableContent\":[\"*   **AI-Powered
+        Cloud:** AI is becoming a core component of cloud operations, optimizing resource
+        allocation, improving security, and enhancing efficiency.\",\"*   **Hybrid
+        and Multi-Cloud Strategies:** Businesses are increasingly adopting hybrid
+        and multi-cloud strategies to maximize flexibility and build resilience.\",\"*   **Quantum
+        Computing as a Service:** Quantum computing is becoming more accessible through
+        cloud platforms, potentially revolutionizing how information is processed.\",\"*   **Sustainability:**
+        A greater emphasis is being placed on sustainability in cloud computing, with
+        organizations prioritizing energy-efficient practices and technologies.\"],\"textRanges\":[{\"startIndex\":250,\"endIndex\":250},{\"startIndex\":606,\"endIndex\":606},{\"startIndex\":949,\"endIndex\":949},{\"startIndex\":1248,\"endIndex\":1248}]},{\"sourceFile\":{\"id\":\"7570e9951d21422ba5007c69c68cf7d9\",\"url\":\"https://www.cncf.io/blog/2024/12/03/top-6-cloud-computing-trends-for-2025/\",\"name\":\"cncf.io\"},\"citableContent\":[\"*   **Edge-to-Cloud
+        AI Integration:** Seamless integration between edge and cloud computing is
+        emerging, with AI workloads dynamically shifting between the two to leverage
+        their unique strengths.\"],\"textRanges\":[{\"startIndex\":446,\"endIndex\":446}]},{\"sourceFile\":{\"id\":\"d30802829a844cbb9e853fca03205abd\",\"url\":\"https://www.youtube.com/watch?v=b3k45SnSBBw\",\"name\":\"youtube.com\"},\"citableContent\":[\"*   **Serverless
+        Computing:** Serverless computing is becoming more widely adopted, allowing
+        developers to build and deploy applications without managing underlying servers.\",\"*   **Cloud
+        Agnostic:** Shift towards building systems that can move between cloud providers,
+        often using technologies like containers and Kubernetes.\"],\"textRanges\":[{\"startIndex\":780,\"endIndex\":780},{\"startIndex\":1780,\"endIndex\":1780}]},{\"sourceFile\":{\"id\":\"da66134135e246c8a71a3c73837dcf97\",\"url\":\"https://www.tatacommunications.com/knowledge-base/cloud-computing-future-trends-predictions/\",\"name\":\"tatacommunications.com\"},\"citableContent\":[\"*   **Sustainability:**
+        A greater emphasis is being placed on sustainability in cloud computing, with
+        organizations prioritizing energy-efficient practices and technologies.\",\"*   **Cloud-Native
+        Development:** Enhanced cloud-native development focuses on building and running
+        applications specifically designed for cloud environments, utilizing technologies
+        like containers and microservices.\"],\"textRanges\":[{\"startIndex\":1248,\"endIndex\":1248},{\"startIndex\":1465,\"endIndex\":1465}]},{\"sourceFile\":{\"id\":\"a5c5d81282654d14ad037b9a11ad6d58\",\"url\":\"https://www.cloudpanel.io/blog/future-of-cloud-computing/\",\"name\":\"cloudpanel.io\"},\"citableContent\":[\"*   **Advanced
+        Security:** Cloud security is becoming more intelligent, automated, and reliable,
+        driven by advances in AI, machine learning, and quantum computing.\"],\"textRanges\":[{\"startIndex\":1629,\"endIndex\":1629}]}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:25 GMT
+      Set-Cookie:
+      - GCLB=CMGR76_QqtK_BBAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

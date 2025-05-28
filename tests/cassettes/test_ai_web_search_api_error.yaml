@@ -1,0 +1,53 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"invalid
+      query that causes error"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '110'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"aiWebSearch\":{\"response\":\"I am sorry,
+        I cannot fulfill this request. I am unable to respond due to the nature of
+        the prompt. Can I help with something else?\\n\"}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Length:
+      - '199'
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:18 GMT
+      Set-Cookie:
+      - GCLB=CODr-pmJ9_zbSxAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

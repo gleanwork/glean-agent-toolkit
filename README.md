@@ -4,7 +4,7 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 ## Key Features
 
-* **Pre-built Glean Tools:** Instantly add capabilities like enterprise search, employee lookup, calendar search, and more to your agents.
+* **Production-Ready Glean Tools:** Instantly add capabilities like enterprise search, employee lookup, calendar search, Gmail search, and more to your agents.
 * **Framework Adapters:** Seamlessly convert Glean tools into formats compatible with major agent SDKs.
 * **Custom Tool Creation:** Define your own tools once using the `@tool_spec` decorator and use them across any supported framework.
 
@@ -33,304 +33,328 @@ pip install glean-agent-toolkit[all]
 
 Note: The `[openai]` extra installs the standard `openai` Python library, used for direct API interactions like Chat Completions or the Assistants API. The example below for the "OpenAI Agents SDK" uses a separate library, `openai-agents`, which you'll need to install independently: `pip install openai-agents`.
 
-## Glean's LLM-ready Tools
+## Prerequisites
 
-The toolkit comes with a suite of pre-defined tools that connect to various Glean functionalities. You can import these tools from `glean.toolkit.tools` and adapt them for your chosen agent framework.
+Before using any Glean tools, you'll need:
 
-**Available Built-in Tools (Stubs):**
+1. **Glean API credentials**: Obtain these from your Glean administrator
+2. **Environment variables**:
+   ```bash
+   export GLEAN_API_TOKEN="your-api-token"
+   export GLEAN_INSTANCE="your-instance-name"
+   ```
 
-* `glean_search`: Search Glean for relevant documents.
-* `web_browser`: Fetch content from a public URL.
-* `gemini_web_search`: Query Google Gemini for web information.
-* `meeting_lookup`: Retrieve meeting details from calendar services.
-* `expert_search`: Find internal experts on a given subject.
-* `employee_search`: Search for employees by name, team, or expertise.
-* `code_search`: Search company source code.
-* `gmail_search`: Search Gmail messages.
-* `outlook_search`: Search Outlook mail messages.
+## Available Tools
 
-### Example: Using `glean_search`
+The toolkit comes with a suite of production-ready tools that connect to various Glean functionalities:
 
-Below are examples of how to use the `glean_search` tool with different agent frameworks.
+* **`glean_search`**: Search your company's knowledge base for relevant documents and information
+* **`web_search`**: Search the public web for up-to-date external information
+* **`ai_web_search`**: Query Google Gemini for AI-powered web information
+* **`calendar_search`**: Find meetings and calendar events
+* **`employee_search`**: Search for employees by name, team, department, or expertise
+* **`code_search`**: Search your company's source code repositories
+* **`gmail_search`**: Search Gmail messages and conversations
+* **`outlook_search`**: Search Outlook mail and calendar items
+
+## Quick Start Examples
+
+### Using `glean_search` with Different Frameworks
 
 #### OpenAI Agents SDK
 
-The OpenAI Agents SDK (`openai-agents`) is a lightweight, Python-first library for building agentic applications. You'll need to install it separately: `pip install openai-agents`
-
-Ensure your `OPENAI_API_KEY` environment variable is set to use this SDK.
-
 ```python
-from glean.toolkit.tools import glean_search
-from agents import Agent, Runner # From the openai-agents SDK
 import os
+from glean.toolkit.tools import glean_search
+from agents import Agent, Runner
 
-# Ensure OPENAI_API_KEY is set for the Agent to make LLM calls
-if not os.getenv("OPENAI_API_KEY"):
-    print("Error: The OPENAI_API_KEY environment variable is not set.")
-    # In a real application, you might exit or raise an error here.
-    # For this example, we'll print a message and proceed,
-    # but the Agent will likely fail to initialize or run.
-    
-# 'glean_search' is a ToolSpec instance from glean-agent-toolkit.
-# 'glean_search.func' is the underlying Python function.
-# 'glean_search.name' is the tool name defined in @tool_spec.
-# 'glean_search.description' is the tool description from @tool_spec.
+# Ensure environment variables are set
+assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
+assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
+assert os.getenv("OPENAI_API_KEY"), "OPENAI_API_KEY must be set"
 
-# The 'openai-agents' SDK typically expects a raw Python function for its tools.
-# It will use the function's __name__, __doc__ (docstring), and signature
-# to define the tool for the LLM.
-agent_tool_function = glean_search.func
+# Create an agent with the Glean search tool
+agent = Agent(
+    name="KnowledgeAssistant",
+    instructions="You help users find information from the company knowledge base using Glean search.",
+    tools=[glean_search.func]  # Use the underlying function
+)
 
-# Note: For the LLM to see the intended tool name (e.g., "glean_search") and description,
-# ensure that agent_tool_function.__name__ and agent_tool_function.__doc__
-# are aligned with what's defined in the @tool_spec for 'glean_search'.
-# For built-in tools from `glean.toolkit.tools`, this alignment is generally expected.
-# If they differ significantly (e.g., if @tool_spec's 'name' overrides a different function name),
-# the LLM might see the original function's metadata.
-
-print(f"Preparing agent with tool: {getattr(agent_tool_function, '__name__', 'unknown_function_name')}")
-
-try:
-    agent = Agent(
-        name="GleanSearchAgent", # An arbitrary name for this agent instance, useful for tracing
-        instructions="You are a helpful assistant. Use the provided search tool to find documents based on the user's query.",
-        tools=[agent_tool_function]
-        # The 'tools' parameter expects a list of callable Python functions.
-        # The SDK automatically generates the necessary schema for the LLM.
-    )
-
-    user_query = "Search Glean for 'Q3 sales report'"
-    print(f"Running agent with query: \"{user_query}\"")
-
-    # Runner.run_sync executes the agent loop.
-    # If the LLM decides to use 'agent_tool_function', the SDK will attempt to call it.
-    # Since glean_search.func is a stub, it's expected to raise NotImplementedError.
-    result = Runner.run_sync(agent, user_query)
-
-    if result.is_success():
-        print("\nAgent run successful.")
-        print(f"Final output: {result.final_output}")
-    else:
-        print("\nAgent run failed.")
-        print(f"Failure reason: {result.failure_reason}")
-        if result.error:
-            # If the tool raised NotImplementedError, it should be caught by the runner
-            # and reflected in result.error.
-            if isinstance(result.error, NotImplementedError):
-                print(f"Tool '{glean_search.name}' is a stub and not implemented: {result.error}")
-            else:
-                # Display other errors that might have occurred during the run.
-                print(f"Error details: {result.error}")
-        
-        # For debugging, you might want to inspect the history of events:
-        # print("\nAgent history:")
-        # for event in result.history:
-        #     print(f"- {event.type}: {getattr(event, 'content', '')}")
-
-
-except openai.APIError as e: # More specific catch for OpenAI API key issues
-    print(f"OpenAI API Error: {e}. Please check your OPENAI_API_KEY and API access.")
-except Exception as e:
-    # Catch any other unexpected errors during agent setup or run execution.
-    print(f"An unexpected error occurred: {e}")
-
+# Run a search query
+result = Runner.run_sync(agent, "Find our Q4 planning documents")
+print(f"Search results: {result.final_output}")
 ```
 
 #### LangChain
 
 ```python
+import os
 from glean.toolkit.tools import glean_search
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_react_agent
-from langchain_core.prompts import ChatPromptTemplate # Or your preferred prompt
+from langchain_core.prompts import ChatPromptTemplate
 
-# Adapt for LangChain
-langchain_glean_search_tool = glean_search.as_langchain_tool()
+# Ensure environment variables are set
+assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
+assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
 
-llm = ChatOpenAI(model="gpt-4-turbo", temperature=0)
-tools = [langchain_glean_search_tool]
+# Convert to LangChain tool format
+langchain_tool = glean_search.as_langchain_tool()
 
-# A simple ReAct prompt (replace with your actual prompt)
-prompt_template = """Answer the following questions as best you can. You have access to the following tools:
+llm = ChatOpenAI(model="gpt-4", temperature=0)
+tools = [langchain_tool]
 
+prompt_template = """You are a helpful assistant with access to company knowledge.
+Use the glean_search tool to find relevant information when users ask questions.
+
+Tools available:
 {tools}
 
-Use the following format:
-
-Question: the input question you must answer
-Thought: you should always think about what to do
-Action: the action to take, should be one of [{tool_names}]
-Action Input: the input to the action
-Observation: the result of the action
-... (this Thought/Action/Action Input/Observation can repeat N times)
-Thought: I now know the final answer
-Final Answer: the final answer to the original input question
-
-Begin!
+Use this format:
+Question: {input}
+Thought: I should search for information about this topic
+Action: {tool_names}
+Action Input: your search query
+Observation: the search results
+Thought: I can now provide a helpful response
+Final Answer: your response based on the search results
 
 Question: {input}
-Thought:{agent_scratchpad}"""
+{agent_scratchpad}"""
 
 prompt = ChatPromptTemplate.from_template(prompt_template)
+agent = create_react_agent(llm, tools, prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
 
-
-try:
-    agent = create_react_agent(llm, tools, prompt)
-    agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-    result = agent_executor.invoke({"input": "Search Glean for 'Q3 sales report'"})
-    print(result)
-except NotImplementedError as e:
-    print(f"Tool '{glean_search.name}' is a stub: {e}")
-except Exception as e:
-    print(f"An error occurred: {e}")
-
+# Search for company information
+result = agent_executor.invoke({"input": "What is our vacation policy?"})
+print(result["output"])
 ```
 
 #### CrewAI
 
 ```python
+import os
 from glean.toolkit.tools import glean_search
 from crewai import Agent, Task, Crew
 
-# Adapt for CrewAI
-crewai_glean_search_tool = glean_search.as_crewai_tool()
+# Ensure environment variables are set
+assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
+assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
 
+# Convert to CrewAI tool format
+crewai_tool = glean_search.as_crewai_tool()
+
+# Create a research agent
 researcher = Agent(
-    role="Corporate Researcher",
-    goal="Find internal company documents based on queries",
-    backstory="An AI assistant skilled in navigating Glean to find relevant documents.",
-    tools=[crewai_glean_search_tool],
-    verbose=True,
+    role="Corporate Knowledge Researcher",
+    goal="Find and summarize relevant company information",
+    backstory="You are an expert at navigating company knowledge bases to find accurate, up-to-date information.",
+    tools=[crewai_tool],
+    verbose=True
 )
 
-search_task = Task(
-    description="Search Glean for the 'Q3 sales report'.",
-    expected_output="A summary of the findings or an indication if the report was found.",
-    agent=researcher,
+# Create a research task
+research_task = Task(
+    description="Find information about our company's remote work policy and summarize the key points.",
+    expected_output="A clear summary of the remote work policy including eligibility, expectations, and guidelines.",
+    agent=researcher
 )
 
-company_crew = Crew(agents=[researcher], tasks=[search_task])
-
-try:
-    result = company_crew.kickoff()
-    print(result)
-except NotImplementedError as e:
-    print(f"Tool '{glean_search.name}' is a stub: {e}")
-except Exception as e:
-    print(f"An error occurred: {e}")
+# Execute the research
+crew = Crew(agents=[researcher], tasks=[research_task])
+result = crew.kickoff()
+print(result)
 ```
 
-#### Google ADK (Agent Development Kit)
+### Real-World Use Cases
+
+#### Employee Directory Search
 
 ```python
-from glean.toolkit.tools import glean_search
-# Assuming Google ADK's Agent and other necessary imports are available
-# from google.adk import Agent 
+from glean.toolkit.tools import employee_search
 
-# Adapt for ADK
-adk_glean_search_tool = glean_search.as_adk_tool()
+# Find engineering team members
+engineering_team = employee_search.as_langchain_tool()
 
-# Example (conceptual, actual ADK usage may vary):
-# try:
-#     agent = Agent(tools=[adk_glean_search_tool])
-#     response = agent.generate_content("Search Glean for 'Q3 sales report'")
-#     print(response)
-# except ImportError:
-#     print("Google ADK not installed or Agent class not found.")
-# except NotImplementedError as e:
-#     print(f"Tool '{glean_search.name}' is a stub: {e}")
-# except Exception as e:
-#     print(f"An error occurred: {e}")
+# Example usage in an agent:
+# "Who are the senior engineers in the backend team?"
+# "Find Sarah Johnson's contact information"
+# "List all product managers in the San Francisco office"
+```
 
-print("Note: Google ADK example is conceptual as ADK usage can vary.")
-print(f"To use ADK, ensure it's installed and integrate '{adk_glean_search_tool.name}' as per ADK documentation.")
+#### Code Discovery
 
+```python
+from glean.toolkit.tools import code_search
+
+# Search company codebases
+code_tool = code_search.as_langchain_tool()
+
+# Example queries:
+# "Find authentication middleware implementations"
+# "Show me recent changes to the payment processing module"
+# "Locate configuration files for the staging environment"
+```
+
+#### Email and Calendar Integration
+
+```python
+from glean.toolkit.tools import gmail_search, calendar_search
+
+# Search emails and meetings
+gmail_tool = gmail_search.as_langchain_tool()
+calendar_tool = calendar_search.as_langchain_tool()
+
+# Example queries:
+# "Find emails about the product launch from last month"
+# "Show me my meetings with the design team this week"
+# "Search for messages containing budget discussions"
+```
+
+#### Web Research with Context
+
+```python
+from glean.toolkit.tools import web_search, ai_web_search
+
+# External information gathering
+web_tool = web_search.as_langchain_tool()
+ai_web_tool = ai_web_search.as_langchain_tool()
+
+# Example queries:
+# "Latest industry trends in machine learning"
+# "Current market analysis for SaaS companies"
+# "Recent news about our competitors"
 ```
 
 ## Creating Custom Tools with `@tool_spec`
 
-If you have your own functions that you'd like to use as tools across different agent frameworks, the `glean.toolkit.tool_spec` decorator provides a simple way to define them once.
+Define your own tools that work across all supported frameworks:
 
 ```python
 from glean.toolkit import tool_spec
 from pydantic import BaseModel
+import requests
 
-# 1. Define your function
-def get_weather(city: str, unit: str = "celsius") -> str:
-    # Replace with actual weather fetching logic
-    if city == "London":
-        return f"The weather in London is 15 degrees {unit} and cloudy."
-    return f"Weather data for {city} not found."
-
-# 2. Define an optional output model (for more complex responses)
 class WeatherResponse(BaseModel):
-    temperature: int
-    unit: str
-    description: str
+    temperature: float
+    condition: str
+    humidity: int
     city: str
 
-def get_structured_weather(city: str, unit: str = "celsius") -> WeatherResponse:
-    # Replace with actual weather fetching logic
-    if city == "London":
-        return WeatherResponse(temperature=15, unit=unit, description="cloudy", city=city)
-    raise ValueError(f"Weather data for {city} not found.")
-
-# 3. Decorate your function with @tool_spec
-@tool_spec(name="get_current_weather", description="Fetches the current weather for a given city.")
-def decorated_get_weather(city: str, unit: str = "celsius") -> str:
-    return get_weather(city, unit)
-
 @tool_spec(
-    name="get_structured_weather_forecast",
-    description="Fetches a structured weather forecast for a city.",
-    output_model=WeatherResponse # Specify your Pydantic model here
+    name="get_current_weather",
+    description="Get current weather information for a specified city",
+    output_model=WeatherResponse
 )
-def decorated_get_structured_weather(city: str, unit: str = "celsius") -> WeatherResponse:
-    return get_structured_weather(city, unit)
+def get_weather(city: str, units: str = "celsius") -> WeatherResponse:
+    """Fetch current weather for a city."""
+    # Replace with actual weather API call
+    api_key = os.getenv("WEATHER_API_KEY")
+    response = requests.get(
+        f"https://api.weather.com/v1/current?key={api_key}&q={city}&units={units}"
+    )
+    data = response.json()
+    
+    return WeatherResponse(
+        temperature=data["temp"],
+        condition=data["condition"],
+        humidity=data["humidity"],
+        city=city
+    )
 
-# 4. Adapt and use your custom tool like the built-in ones
-# openai_weather_tool = decorated_get_weather.as_openai_tool()
-# langchain_weather_tool = decorated_get_structured_weather.as_langchain_tool()
-# ...and so on for other frameworks.
+# Use across frameworks
+openai_weather = get_weather.as_openai_tool()
+langchain_weather = get_weather.as_langchain_tool()
+crewai_weather = get_weather.as_crewai_tool()
 ```
-The `@tool_spec` decorator inspects your function's signature, docstring, and type hints (including an optional Pydantic model for the return type via `output_model`) to create a standardized specification. This specification is then used by the `as_<framework>_tool()` methods to convert it into the format expected by each agent SDK.
 
-### Why Use `@tool_spec` for Custom Tools?
+## Error Handling and Best Practices
 
-You might notice that some agent SDKs, like the `openai-agents` SDK, can directly consume Python functions and attempt to derive tool schemas from their names, docstrings, and type hints. So, why use `@tool_spec`?
+### Environment Setup Validation
 
-The `glean-agent-toolkit` and its `@tool_spec` decorator offer several advantages, particularly in a multi-framework environment or when aiming for more explicit and robust tool definitions:
+```python
+import os
+from glean.toolkit.tools import glean_search
 
-1.  **Define Once, Use Anywhere**: This is the core benefit. Decorate your Python function with `@tool_spec` once.
-    *   The toolkit then allows you to adapt this single definition for various agent frameworks (LangChain, CrewAI, OpenAI Assistants API, etc.) using methods like `your_tool.as_langchain_tool()`.
-    *   Even for SDKs like `openai-agents` that consume raw functions, using `your_tool.func` ensures you're providing a function whose name, docstring, and signature have been thoughtfully defined and are consistent with the metadata you provided to `@tool_spec`.
+def validate_glean_setup():
+    """Validate that Glean credentials are properly configured."""
+    required_vars = ["GLEAN_API_TOKEN", "GLEAN_INSTANCE"]
+    missing_vars = [var for var in required_vars if not os.getenv(var)]
+    
+    if missing_vars:
+        raise ValueError(f"Missing required environment variables: {missing_vars}")
+    
+    # Test connection with a simple search
+    try:
+        from glean.api_client import models
+        test_params = {
+            "query": models.ToolsCallParameter(name="query", value="test")
+        }
+        result = glean_search(test_params)
+        if "error" in result:
+            raise ValueError(f"Glean API error: {result['error']}")
+        print("✅ Glean connection validated successfully")
+    except Exception as e:
+        raise ValueError(f"Failed to connect to Glean: {e}")
 
-2.  **Explicit and Standardized Specification**: `@tool_spec` allows for a more deliberate and detailed definition of your tool's interface than relying purely on function metadata:
-    *   **Clear Naming and Description**: You explicitly set the `name` and `description` the LLM will see, which can be more detailed or user-friendly than a raw function name or a potentially long docstring.
-    *   **Pydantic for Complex Data**: Crucially, you can define complex input and output structures using Pydantic models (`output_model` argument in `@tool_spec`). This provides strong typing, validation, and clear schema generation for the LLM, which is often more robust than relying on type hint inference alone for complex objects.
+# Run before using tools
+validate_glean_setup()
+```
 
-3.  **Ecosystem Benefits**:
-    *   **Consistency with Pre-built Tools**: If you use the toolkit's pre-built Glean tools, defining your custom tools with `@tool_spec` maintains a consistent approach.
-    *   **CLI Integration**: Tools defined with `@tool_spec` can be discovered and inspected by the `glean-toolkit` CLI (e.g., `glean-toolkit list`, `glean-toolkit export-schema`).
-    *   **Maintainability**: Adapters can be updated within the toolkit to accommodate changes in framework APIs, often without requiring changes to your `@tool_spec` definitions.
+### Rate Limiting and Retries
 
-In essence, while you *can* use raw functions with certain SDKs, `@tool_spec` promotes a more structured, reusable, and explicit way of defining tools, making your agent development more robust and scalable across different platforms. It acts as a central source of truth for your tool's contract.
+```python
+import time
+from typing import Any, Dict
 
-## CLI
+def safe_tool_call(tool_func, params: Dict[str, Any], max_retries: int = 3) -> Dict[str, Any]:
+    """Safely call a Glean tool with retry logic."""
+    for attempt in range(max_retries):
+        try:
+            result = tool_func(params)
+            if "error" not in result:
+                return result
+            
+            # Check if it's a rate limit error
+            if "rate limit" in result.get("error", "").lower():
+                wait_time = 2 ** attempt  # Exponential backoff
+                print(f"Rate limited, waiting {wait_time} seconds...")
+                time.sleep(wait_time)
+                continue
+            
+            # Non-retryable error
+            return result
+            
+        except Exception as e:
+            if attempt == max_retries - 1:
+                return {"error": str(e), "result": None}
+            time.sleep(1)
+    
+    return {"error": "Max retries exceeded", "result": None}
+```
 
-The toolkit includes a CLI for listing and exporting tool schemas (both built-in and any custom tools you register by importing them):
+## Security Considerations
 
-```bash
-# List all registered tools
-glean-toolkit list
+* **API Keys**: Never commit API tokens to version control. Use environment variables or secure secret management.
+* **Access Control**: Glean tools respect user permissions. Users can only access data they're authorized to see.
+* **Data Privacy**: Search results may contain sensitive company information. Ensure proper handling in your applications.
+* **Rate Limits**: Implement appropriate retry logic and respect API rate limits to avoid service disruption.
 
-# Export JSON schema for a specific tool's input
-glean-toolkit export-schema get_current_weather
+### Debug Mode
+
+Enable detailed logging for troubleshooting:
+
+```python
+import logging
+logging.basicConfig(level=logging.DEBUG)
+
+# Tool calls will now show detailed request/response information
 ```
 
 ## Contributing
 
-Interested in contributing? Check out our [Contributing Guide](CONTRIBUTING.MD) for instructions on setting up the development environment and submitting changes.
+Interested in contributing? Check out our [Contributing Guide](CONTRIBUTING.md) for instructions on setting up the development environment and submitting changes.
 
 ## License
 

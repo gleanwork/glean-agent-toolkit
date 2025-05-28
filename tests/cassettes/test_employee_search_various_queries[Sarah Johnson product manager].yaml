@@ -1,0 +1,84 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"Sarah
+      Johnson product manager"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '106'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"blogs_5371868727879051360\\\",\\\"trackingToken\\\":\\\"SEARCH_5F0gTVryga1NHjUH,Cl0KF1NFQVJDSF81RjBnVFZyeWdhMU5IalVIGhlibG9nc181MzcxODY4NzI3ODc5MDUxMzYwIgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlQ=\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"25
+        AI prompts for product managers\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/25-ai-prompts-for-product-managers\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"25
+        AI prompts for product managers\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        25 AI prompts for product managers\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"The
+        blog presents 25 AI-powered prompts designed for product managers to enhance
+        productivity by automating tasks such as summarizing feedback, drafting documents,
+        and analyzing\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"blogs_11724606145070641740\\\",\\\"trackingToken\\\":\\\"SEARCH_5F0gTVryga1NHjUH,CmIKF1NFQVJDSF81RjBnVFZyeWdhMU5IalVIEAEaGmJsb2dzXzExNzI0NjA2MTQ1MDcwNjQxNzQwIgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAQ==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Work
+        AI blog - AI agents, assistant, and search resources\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        25 AI prompts for product managers\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Boost
+        productivity with 25 AI-powered prompts designed for product managers. \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Product
+        Manager\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Product
+        \ WORK AI PLATFORMPlatform Overview              Glean AssistantYour personal
+        AI assistantUniversal\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_2716070020631476805\\\",\\\"trackingToken\\\":\\\"SEARCH_5F0gTVryga1NHjUH,CmEKF1NFQVJDSF81RjBnVFZyeWdhMU5IalVIEAIaGWdsZWFuXzI3MTYwNzAwMjA2MzE0NzY4MDUiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAC\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"About
+        Glean | Work AI for all\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/about\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"2009,
+        Matt was Vice President of Product Management for Symantec / VERITAS\u2019
+        largest product line, NetBackup and Enterprise Vault, and served as a founding
+        team member at Centrata, a leading provider of IT service management software.Matt
+        holds a Bachelor\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_18099722574291206476\\\",\\\"trackingToken\\\":\\\"SEARCH_5F0gTVryga1NHjUH,CmIKF1NFQVJDSF81RjBnVFZyeWdhMU5IalVIEAMaGmdsZWFuXzE4MDk5NzIyNTc0MjkxMjA2NDc2IgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAw==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Thai
+        Tran | Glean\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/jp/authors/thai-tran\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Thai
+        Tran is the Product Manager, AI at Glean. \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"They
+        have an extensive background in product management with previous roles at
+        Meta, Meta and Yahoo, where he led product teams for Oculus, Ray-Ban smart
+        glasses, YouTube, Google\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"blogs_15215565225393408107\\\",\\\"trackingToken\\\":\\\"SEARCH_5F0gTVryga1NHjUH,CmIKF1NFQVJDSF81RjBnVFZyeWdhMU5IalVIEAQaGmJsb2dzXzE1MjE1NTY1MjI1MzkzNDA4MTA3IgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABA==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Glean
+        named 2025 Google Cloud Technology Partner of the Year for Marketplace-Business
+        Applications\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/google-cloud-parter-award-2025\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"April
+        10 at 4:30 PM - Cloud Talk Theater 1: \\\\\\\"Building an AI-Centric Organization:
+        Aledade's Practical Playbook\\\\\\\" with Gabriel Phoenix (Aledade) and John
+        Teuber (Glean)\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"April
+        8 at 1:00 PM - Partner Summit Panel: \u201CTransforming technology partnerships:
+        An AI-\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_11748238649543238074\\\",\\\"trackingToken\\\":\\\"SEARCH_5F0gTVryga1NHjUH,CmIKF1NFQVJDSF81RjBnVFZyeWdhMU5IalVIEAUaGmdsZWFuXzExNzQ4MjM4NjQ5NTQzMjM4MDc0IgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABQ==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Glean:GO
+        2025 | The Conference for Putting AI to Work\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/jp/events/glean-go-2025\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Example
+        use cases: Review real-world examples of Glean agents in action across various
+        industries.1:00 pm \u2014 1:45 pmAgents for Sales: How Real Sales Teams Leverage
+        AI Agents to Drive RevenueAdminPower UserExecNew UserHarold Wood,\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:00 GMT
+      Set-Cookie:
+      - GCLB=CNWM2Or0---bzgEQAw; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

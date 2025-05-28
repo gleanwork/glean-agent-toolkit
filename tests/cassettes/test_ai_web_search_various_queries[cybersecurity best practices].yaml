@@ -1,0 +1,85 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"cybersecurity
+      best practices"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '107'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"aiWebSearch\":{\"response\":\"Here are
+        some cybersecurity best practices for businesses and individuals:\\n\\n*   **Implement
+        a people-first cybersecurity strategy:** Equip employees with the education
+        they need to be able to recognize potential threats.\\n*   **Use strong passwords:**
+        Use a combination of uppercase and lowercase letters, special characters,
+        and numbers to create a strong password.\\n*   **Use a Password Manager:**
+        Employees can securely share, store, and manage passwords from anywhere.\\n*   **Multi-Factor
+        Authentication (MFA):** Add a second layer of defense in case passwords are
+        compromised.\\n*   **Keep software up-to-date:** Install security updates
+        to mitigate vulnerabilities.\\n*   **Conduct regular cybersecurity audits:**
+        Identify potential weaknesses in your systems and policies.\\n*   **Control
+        access to sensitive information:** Restrict access to only what''s essential
+        to reduce risk.\\n*   **Monitoring & Detecting Cyber Threats in Real Time:**
+        Use security information and response solutions to monitor endpoints in real
+        time and keep an eye on suspicious activities.\\n*   **Encrypt Sensitive Data:**
+        Use AES-256 encryption for files and database storage and enable full-disk
+        encryption on all company devices.\\n*   **Use a VPN:** Encrypt your connection
+        and protect your private information, even from your internet service provider.\\n*   **Avoid
+        opening suspicious emails:** Be wary of phishing attempts and other social
+        engineering attacks.\\n*   **Regularly train employees:** Keep your team up-to-date
+        by sharing any security incidents or changes to your cybersecurity protocols.\\n\",\"groundingChunks\":[{\"sourceFile\":{\"id\":\"55e8062aecba4992a86fb6f8dacf14a3\",\"url\":\"https://www.coursera.org/articles/cybersecurity-best-practices\",\"name\":\"coursera.org\"},\"citableContent\":[\"*   **Implement
+        a people-first cybersecurity strategy:** Equip employees with the education
+        they need to be able to recognize potential threats.\",\"*   **Use strong
+        passwords:** Use a combination of uppercase and lowercase letters, special
+        characters, and numbers to create a strong password.\"],\"textRanges\":[{\"startIndex\":220,\"endIndex\":220},{\"startIndex\":365,\"endIndex\":365}]},{\"sourceFile\":{\"id\":\"5b79672635b54521b3c0ddd4965e7b6e\",\"url\":\"https://teampassword.com/blog/cybersecurity-best-practices-for-employees\",\"name\":\"teampassword.com\"},\"citableContent\":[\"*   **Use
+        a Password Manager:** Employees can securely share, store, and manage passwords
+        from anywhere.\"],\"textRanges\":[{\"startIndex\":470,\"endIndex\":470}]},{\"sourceFile\":{\"id\":\"df82044275c34b109215090180756430\",\"url\":\"https://www.fruitiongroup.com/resources/blog/10-cybersecurity-best-practices-for-us-businesses---individuals/\",\"name\":\"fruitiongroup.com\"},\"citableContent\":[\"*   **Multi-Factor
+        Authentication (MFA):** Add a second layer of defense in case passwords are
+        compromised.\",\"*   **Monitoring & Detecting Cyber Threats in Real Time:**
+        Use security information and response solutions to monitor endpoints in real
+        time and keep an eye on suspicious activities.\",\"*   **Encrypt Sensitive
+        Data:** Use AES-256 encryption for files and database storage and enable full-disk
+        encryption on all company devices.\"],\"textRanges\":[{\"startIndex\":578,\"endIndex\":578},{\"startIndex\":1061,\"endIndex\":1061},{\"startIndex\":1203,\"endIndex\":1203}]},{\"sourceFile\":{\"id\":\"50318ca6de264251acd12b778bf18447\",\"url\":\"https://www.titanfile.com/blog/cyber-security-tips-best-practices/\",\"name\":\"titanfile.com\"},\"citableContent\":[\"*   **Use
+        a VPN:** Encrypt your connection and protect your private information, even
+        from your internet service provider.\"],\"textRanges\":[{\"startIndex\":1326,\"endIndex\":1326}]}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:28 GMT
+      Set-Cookie:
+      - GCLB=CMGAqoKSpsXCMBAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

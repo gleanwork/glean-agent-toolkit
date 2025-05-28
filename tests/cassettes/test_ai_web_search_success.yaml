@@ -1,0 +1,154 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"latest
+      developments in artificial intelligence"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '125'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"aiWebSearch\\\":{\\\"response\\\":\\\"Here
+        are some of the latest developments in artificial intelligence as of June
+        5, 2025:\\\\n\\\\n**Generative AI and Large Language Models (LLMs):**\\\\n\\\\n*
+        \  **Advancements in LLMs:** There's remarkable progress in generative AI,
+        particularly with advanced LLMs. Meta recently released Llama 4, including
+        models like Scout and Maverick, designed to handle contentious questions more
+        effectively with reduced political bias. These models can process diverse
+        data types like text, video, images, and audio.\\\\n*   **Ember Framework:**
+        Nvidia, Google, and Foundry introduced Ember, an open-source framework that
+        facilitates interactions among different AI models with varying reasoning
+        strengths and response times, aiming to optimize performance by breaking down
+        complex prompts into smaller tasks routed to the most suitable AI agents.\\\\n*
+        \  **Empowering Creativity:** AI holds great potential to enable new forms
+        of creativity, democratize creative output, and help people express their
+        artistic visions. Google introduced updates across their generative media
+        tools, covering images, music, and video. ImageFX, a new generative AI tool
+        that creates images from text prompts, and MusicFX, a tool for creating up-to-70-second
+        audio clips also based on text prompts. They also shared an early preview
+        of MusicFX DJ, a tool that helps bring the joy of live music creation to more
+        people.\\\\n\\\\n**AI in Engineering and Automation:**\\\\n\\\\n*   **Revolutionizing
+        Engineering:** AI has revolutionized the entire field of engineering. Platforms
+        like Altair's HyperWorks\xAE use geometric deep learning to deliver simulation
+        results up to 1,000 times faster than previous methods.\\\\n*   **Manufacturing
+        Optimization:** AI optimizes production lines and reduces costs in manufacturing.
+        The World Economic Forum's Global Lighthouse Network highlights AI's role
+        in transforming the manufacturing industry through applications ranging from
+        predictive maintenance to quality control.\\\\n*   **Machine Learning in Automation:**
+        ML is revolutionizing industries by making systems more intelligent and flexible.
+        Companies can transition from traditional robotic process automation to agentic
+        AI, which combines traditional robotic process automation to agentic AI.\\\\n*
+        \  **AI-Driven Tools:** AI and ML advancements are transforming engineering
+        by automating complex tasks and enhancing decision-making processes for professionals,
+        allowing design engineers to optimize time-sensitive solutions more rapidly.
+        AI also allows for more robust predictive maintenance by analyzing data to
+        foresee equipment failures, thereby reducing downtime and operational costs.\\\\n\\\\n**Agentic
+        AI:**\\\\n\\\\n*   **Autonomous Systems:** The use of autonomous systems to
+        make decisions for users is one of the most notable new developments in the
+        AI field. These AI agents are made to take on jobs proactively, enhancing
+        output and decision-making across a range of sectors, including banking and
+        healthcare. Agentic AI can lower the cognitive burden on human operators and
+        streamline workflows by acting autonomously and anticipating user needs.\\\\n\\\\n**Other
+        Key Trends:**\\\\n\\\\n*   **Multi-Modal AI:** Combining text, image, and
+        speech processing.\\\\n*   **Explainable AI:** For transparency in decision-making.\\\\n*
+        \  **Enhanced Computer Vision:** Improved capabilities in understanding and
+        interpreting images.\\\\n*   **Digital Twins:** Gaining prominence for simulating
+        real-world objects digitally.\\\\n*   **Ethical AI:** Development and deployment
+        of AI systems that adhere to ethical principles and societal values.\\\\n*
+        \  **AI Democratization:** Making AI tools and technologies more accessible
+        to a wider range of users and developers.\\\\n\\\\n**AI in Specific Industries:**\\\\n\\\\n*
+        \  **Healthcare:** AI helps identify diseases more quickly and accurately,
+        speeds up and streamlines drug discovery, and even monitors patients through
+        virtual nursing assistants.\\\\n*   **Business Automation:** Increased automation
+        for many businesses. With the rise of chatbots and digital assistants, companies
+        can rely on AI to handle simple conversations with customers and answer basic
+        queries from employees.\\\\n\\\",\\\"groundingChunks\\\":[{\\\"sourceFile\\\":{\\\"id\\\":\\\"5a0e39b2ab294b45a0ccda56e7b08617\\\",\\\"url\\\":\\\"https://builtin.com/artificial-intelligence/artificial-intelligence-future\\\",\\\"name\\\":\\\"builtin.com\\\"},\\\"citableContent\\\":[\\\"These
+        models can process diverse data types like text, video, images, and audio.\\\",\\\"*
+        \  **Healthcare:** AI helps identify diseases more quickly and accurately,
+        speeds up and streamlines drug discovery, and even monitors patients through
+        virtual nursing assistants.\\\",\\\"*   **Business Automation:** Increased
+        automation for many businesses.\\\",\\\"With the rise of chatbots and digital
+        assistants, companies can rely on AI to handle simple conversations with customers
+        and answer basic queries from employees.\\\"],\\\"textRanges\\\":[{\\\"startIndex\\\":492,\\\"endIndex\\\":492},{\\\"startIndex\\\":3850,\\\"endIndex\\\":3850},{\\\"startIndex\\\":3921,\\\"endIndex\\\":3921},{\\\"startIndex\\\":4083,\\\"endIndex\\\":4083}]},{\\\"sourceFile\\\":{\\\"id\\\":\\\"7408691bd2a54c6d8749ca94119cc334\\\",\\\"url\\\":\\\"https://blog.google/technology/ai/2024-ai-extraordinary-progress-advancement/\\\",\\\"name\\\":\\\"blog.google\\\"},\\\"citableContent\\\":[\\\"*
+        \  **Empowering Creativity:** AI holds great potential to enable new forms
+        of creativity, democratize creative output, and help people express their
+        artistic visions.\\\",\\\"Google introduced updates across their generative
+        media tools, covering images, music, and video.\\\",\\\"ImageFX, a new generative
+        AI tool that creates images from text prompts, and MusicFX, a tool for creating
+        up-to-70-second audio clips also based on text prompts.\\\",\\\"They also
+        shared an early preview of MusicFX DJ, a tool that helps bring the joy of
+        live music creation to more people.\\\"],\\\"textRanges\\\":[{\\\"startIndex\\\":987,\\\"endIndex\\\":987},{\\\"startIndex\\\":1085,\\\"endIndex\\\":1085},{\\\"startIndex\\\":1247,\\\"endIndex\\\":1247},{\\\"startIndex\\\":1367,\\\"endIndex\\\":1367}]},{\\\"sourceFile\\\":{\\\"id\\\":\\\"7103d206374446c29ddb324ac489b225\\\",\\\"url\\\":\\\"https://appinventiv.com/blog/ai-trends/\\\",\\\"name\\\":\\\"appinventiv.com\\\"},\\\"citableContent\\\":[\\\"*
+        \  **Autonomous Systems:** The use of autonomous systems to make decisions
+        for users is one of the most notable new developments in the AI field.\\\",\\\"These
+        AI agents are made to take on jobs proactively, enhancing output and decision-making
+        across a range of sectors, including banking and healthcare.\\\",\\\"Agentic
+        AI can lower the cognitive burden on human operators and streamline workflows
+        by acting autonomously and anticipating user needs.\\\",\\\"*   **Multi-Modal
+        AI:** Combining text, image, and speech processing.\\\",\\\"*   **Explainable
+        AI:** For transparency in decision-making.\\\",\\\"*   **Digital Twins:**
+        Gaining prominence for simulating real-world objects digitally.\\\"],\\\"textRanges\\\":[{\\\"startIndex\\\":2771,\\\"endIndex\\\":2771},{\\\"startIndex\\\":2923,\\\"endIndex\\\":2923},{\\\"startIndex\\\":3061,\\\"endIndex\\\":3061},{\\\"startIndex\\\":3155,\\\"endIndex\\\":3155},{\\\"startIndex\\\":3216,\\\"endIndex\\\":3216},{\\\"startIndex\\\":3401,\\\"endIndex\\\":3401}]},{\\\"sourceFile\\\":{\\\"id\\\":\\\"c28b6eeb0db74fad88afdd8403570c66\\\",\\\"url\\\":\\\"https://ep.jhu.edu/news/advancements-in-ai-and-machine-learning/\\\",\\\"name\\\":\\\"jhu.edu\\\"},\\\"citableContent\\\":[\\\"*
+        \  **Advancements in LLMs:** There's remarkable progress in generative AI,
+        particularly with advanced LLMs.\\\",\\\"Meta recently released Llama 4, including
+        models like Scout and Maverick, designed to handle contentious questions more
+        effectively with reduced political bias.\\\",\\\"These models can process
+        diverse data types like text, video, images, and audio.\\\",\\\"*   **Ember
+        Framework:** Nvidia, Google, and Foundry introduced Ember, an open-source
+        framework that facilitates interactions among different AI models with varying
+        reasoning strengths and response times, aiming to optimize performance by
+        breaking down complex prompts into smaller tasks routed to the most suitable
+        AI agents.\\\",\\\"*   **Revolutionizing Engineering:** AI has revolutionized
+        the entire field of engineering.\\\",\\\"Platforms like Altair's HyperWorks\xAE
+        use geometric deep learning to deliver simulation results up to 1,000 times
+        faster than previous methods.\\\",\\\"*   **Manufacturing Optimization:**
+        AI optimizes production lines and reduces costs in manufacturing.\\\",\\\"The
+        World Economic Forum's Global Lighthouse Network highlights AI's role in transforming
+        the manufacturing industry through applications ranging from predictive maintenance
+        to quality control.\\\",\\\"*   **Machine Learning in Automation:** ML is
+        revolutionizing industries by making systems more intelligent and flexible.\\\",\\\"Companies
+        can transition from traditional robotic process automation to agentic AI,
+        which combines traditional robotic process automation to agentic AI.\\\",\\\"*
+        \  **AI-Driven Tools:** AI and ML advancements are transforming engineering
+        by automating complex tasks and enhancing decision-making processes for professionals,
+        allowing design engineers to optimize time-sensitive solutions more rapidly.\\\",\\\"AI
+        also allows for more robust predictive maintenance by analyzing data to foresee
+        equipment failures, thereby reducing downtime and operational costs.\\\"],\\\"textRanges\\\":[{\\\"startIndex\\\":250,\\\"endIndex\\\":250},{\\\"startIndex\\\":411,\\\"endIndex\\\":411},{\\\"startIndex\\\":492,\\\"endIndex\\\":492},{\\\"startIndex\\\":819,\\\"endIndex\\\":819},{\\\"startIndex\\\":1499,\\\"endIndex\\\":1499},{\\\"startIndex\\\":1642,\\\"endIndex\\\":1642},{\\\"startIndex\\\":1744,\\\"endIndex\\\":1744},{\\\"startIndex\\\":1938,\\\"endIndex\\\":1938},{\\\"startIndex\\\":2060,\\\"endIndex\\\":2060},{\\\"startIndex\\\":2213,\\\"endIndex\\\":2213},{\\\"startIndex\\\":2454,\\\"endIndex\\\":2454},{\\\"startIndex\\\":2606,\\\"endIndex\\\":2606}]}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:17 GMT
+      Set-Cookie:
+      - GCLB=CKOqtuyB3fTmERAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

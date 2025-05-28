@@ -57,8 +57,6 @@ The project uses [go-task](https://taskfile.dev/) to manage development tasks. H
 
 | Task | Description |
 |------|-------------|
-| `task examples` | Run basic examples |
-| `task run:search-example` | Run Glean search example |
 | `task spell:check` | Check spelling |
 | `task spell:fix` | Fix spelling |
 | `task clean` | Clean build artifacts |
@@ -80,7 +78,6 @@ glean-agent-toolkit/
 │     ├─ tools/
 │     └─ cli.py
 ├─ tests/
-├─ examples/
 └─ docs/
 ```
 

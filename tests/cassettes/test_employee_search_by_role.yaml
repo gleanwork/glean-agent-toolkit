@@ -1,0 +1,80 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"senior
+      software engineer"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '101'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"blogs_13885855234891319528\\\",\\\"trackingToken\\\":\\\"SEARCH_D9il6l04FSJAUkPi,Cl4KF1NFQVJDSF9EOWlsNmwwNEZTSkFVa1BpGhpibG9nc18xMzg4NTg1NTIzNDg5MTMxOTUyOCIFYmxvZ3MqA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5U\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Shaping
+        the future of software engineering leadership in the age of AI\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/software-eng-lead-ai-future\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Moreover,
+        participants underscored the importance of maintaining a mix of senior and
+        junior talent to maximise AI\u2019s potential in different contexts, ensuring
+        diverse perspectives in technical decision-making.\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_6233151185487970756\\\",\\\"trackingToken\\\":\\\"SEARCH_D9il6l04FSJAUkPi,CmEKF1NFQVJDSF9EOWlsNmwwNEZTSkFVa1BpEAEaGWdsZWFuXzYyMzMxNTExODU0ODc5NzA3NTYiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAB\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Workplace
+        trends shaping the future of software engineering\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/resources/guides/software-eng-future-trends\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Workplace
+        trends shaping the future of software engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Trends shaping the future of software engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Discover
+        in this whitepaper four critical trends that software engineering teams need
+        to keep in mind in order to maximize their\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_2367254856715250220\\\",\\\"trackingToken\\\":\\\"SEARCH_D9il6l04FSJAUkPi,CmEKF1NFQVJDSF9EOWlsNmwwNEZTSkFVa1BpEAIaGWdsZWFuXzIzNjcyNTQ4NTY3MTUyNTAyMjAiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAC\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"The
+        starter\u2019s guide to AI prompting for software engineers\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/resources/guides/glean-prompting-engineers-ebook\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"The
+        starter\u2019s guide to AI prompting for software engineers\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        The starter\u2019s guide to AI prompting for software engineers\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Discover how to create effective prompts for software engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"the
+        potential of software engineers. \\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"blogs_10816463994829305746\\\",\\\"trackingToken\\\":\\\"SEARCH_D9il6l04FSJAUkPi,CmIKF1NFQVJDSF9EOWlsNmwwNEZTSkFVa1BpEAMaGmJsb2dzXzEwODE2NDYzOTk0ODI5MzA1NzQ2IgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAw==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Using
+        AI prompting in software engineering to write code, debug, and deploy faster\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/glean-ai-prompting-guide-engineers\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Using
+        AI prompting in software engineering to write code, debug, and deploy faster\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Using AI prompting in software engineering to write code, debug, and deploy
+        faster\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"AI
+        prompts is essential for software engineers to leverage AI effectively in\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_9691591264699521500\\\",\\\"trackingToken\\\":\\\"SEARCH_D9il6l04FSJAUkPi,CmEKF1NFQVJDSF9EOWlsNmwwNEZTSkFVa1BpEAQaGWdsZWFuXzk2OTE1OTEyNjQ2OTk1MjE1MDAiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAE\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Glean
+        Chat for Software Engineers | Glean Work AI\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/resources/guides/glean-chat-software-engineers\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Chat for Software Engineers | Glean Work AI\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Glean Chat for Software Engineers\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"How
+        software engineers can utilize Glean Chat to supercharge day-to-day tasks
+        and workflows\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"How
+        software engineers can utilize Glean Chat to\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_5289137456252210092\\\",\\\"trackingToken\\\":\\\"SEARCH_D9il6l04FSJAUkPi,CmEKF1NFQVJDSF9EOWlsNmwwNEZTSkFVa1BpEAUaGWdsZWFuXzUyODkxMzc0NTYyNTIyMTAwOTIiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAF\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"AI-powered
+        engineering\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/webinars/ai-powered-engineering\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Expert
+        insights and actionable strategies for accelerating developer productivity.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Conversations
+        around AI and the future of software engineering often revolve around faster
+        code, smarter tools, and more automation. \\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:03 GMT
+      Set-Cookie:
+      - GCLB=COjRnZrUgN3IqAEQAw; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

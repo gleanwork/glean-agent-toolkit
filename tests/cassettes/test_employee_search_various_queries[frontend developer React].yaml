@@ -1,0 +1,84 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"frontend
+      developer React"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '101'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"devdocs_4357926754481314936\\\",\\\"trackingToken\\\":\\\"SEARCH_WHmMMNHP0krPya8G,CmEKF1NFQVJDSF9XSG1NTU5IUDBrclB5YThHGhtkZXZkb2NzXzQzNTc5MjY3NTQ0ODEzMTQ5MzYiB2RldmRvY3MqA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5U\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"React
+        - Glean Developer Portal\\\",\\\"datasource\\\":\\\"devdocs\\\",\\\"url\\\":\\\"https://developers.glean.com/web/guides/react\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"React
+        - Glean Developer Portal\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Developer Portal home pageSearch...\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"React\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Developer Portal home pageSearch...Ask AISearch...NavigationGuidesReactGuides\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        React\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Integrate
+        Glean Search into your React application\\\"}]},{\\\"id\\\":\\\"blogs_358727392061223514\\\",\\\"trackingToken\\\":\\\"SEARCH_WHmMMNHP0krPya8G,CmAKF1NFQVJDSF9XSG1NTU5IUDBrclB5YThHEAEaGGJsb2dzXzM1ODcyNzM5MjA2MTIyMzUxNCIFYmxvZ3MqA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5UQAE=\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Can
+        AI really double developer productivity?\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/ai-developer-productivity\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Researching
+        solutions, writing and reviewing documentation, responding to bugs, answering
+        questions, and collaborating with teammates can take up as much as 75% of
+        a developer\u2019s day. \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Can
+        AI really double developer productivity?\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"devdocs_9066465201548448969\\\",\\\"trackingToken\\\":\\\"SEARCH_WHmMMNHP0krPya8G,CmUKF1NFQVJDSF9XSG1NTU5IUDBrclB5YThHEAIaG2RldmRvY3NfOTA2NjQ2NTIwMTU0ODQ0ODk2OSIHZGV2ZG9jcyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAg==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Brightspot
+        - Glean Developer Portal\\\",\\\"datasource\\\":\\\"devdocs\\\",\\\"url\\\":\\\"https://developers.glean.com/web/guides/brightspot\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Navigate
+        to Front-end Settings\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"React\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Select
+        the Front-end tab 2. \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Brightspot
+        - Glean Developer Portal\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Developer Portal home pageSearch...\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Developer Portal home pageSearch...Ask AISearch...NavigationGuidesBrightspotGuides\\\"}]},{\\\"id\\\":\\\"blogs_16691484877350814691\\\",\\\"trackingToken\\\":\\\"SEARCH_WHmMMNHP0krPya8G,CmIKF1NFQVJDSF9XSG1NTU5IUDBrclB5YThHEAMaGmJsb2dzXzE2NjkxNDg0ODc3MzUwODE0NjkxIgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAw==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"A
+        complete guide to agentic reasoning\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/a-complete-guide-to-agentic-reasoning\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"They
+        help developers stay focused on deeper work by handling repetitive tasks and
+        surfacing relevant information.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"break
+        down complex problems, gather and analyze information, and respond in context
+        \u2014 all while learning and refining its approach. \\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}},{\\\"id\\\":\\\"devdocs_15370901200933880484\\\",\\\"trackingToken\\\":\\\"SEARCH_WHmMMNHP0krPya8G,CmYKF1NFQVJDSF9XSG1NTU5IUDBrclB5YThHEAQaHGRldmRvY3NfMTUzNzA5MDEyMDA5MzM4ODA0ODQiB2RldmRvY3MqA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5UQAQ=\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Community
+        Projects - Glean Developer Portal\\\",\\\"datasource\\\":\\\"devdocs\\\",\\\"url\\\":\\\"https://developers.glean.com/home/community\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Embedded
+        Modal search + Server driven auth in React ,Example of using Glean\u2019s
+        embedded search with server driven authentication in React\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Community
+        Projects - Glean Developer Portal\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Developer Portal home page\\\"}]},{\\\"id\\\":\\\"devdocs_4915944253633717608\\\",\\\"trackingToken\\\":\\\"SEARCH_WHmMMNHP0krPya8G,CmUKF1NFQVJDSF9XSG1NTU5IUDBrclB5YThHEAUaG2RldmRvY3NfNDkxNTk0NDI1MzYzMzcxNzYwOCIHZGV2ZG9jcyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABQ==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"LumApps
+        - Glean Developer Portal\\\",\\\"datasource\\\":\\\"devdocs\\\",\\\"url\\\":\\\"https://developers.glean.com/web/guides/lumapps\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"React\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"LumApps
+        - Glean Developer Portal\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Developer Portal home pageSearch...\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Developer Portal home pageSearch...Ask AISearch...NavigationGuidesLumAppsGuides\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Get
+        Started\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Welcome\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Change
+        Log\\\"}]}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:01 GMT
+      Set-Cookie:
+      - GCLB=CILIvu61s6bS-gEQAw; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

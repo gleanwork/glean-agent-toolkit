@@ -1,0 +1,170 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"sustainable
+      technology solutions"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '111'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"aiWebSearch\":{\"response\":\"Sustainable
+        technology solutions are technologies that are created or applied with consideration
+        of environmental, social, and economic factors. The goal is to develop new
+        technologies using sustainable processes and materials and to address environmental,
+        social, and governance (ESG) issues.\\n\\nHere''s a breakdown of key areas
+        and examples:\\n\\n**1. Renewable Energy Technologies**\\n\\n*   **Solar Power:**  Photovoltaic
+        (PV) panels convert sunlight into electricity, becoming more efficient and
+        affordable. Solar energy is expanding globally through rooftop installations
+        and large-scale solar farms.\\n*   **Wind Energy:** Wind turbines harness
+        the wind''s kinetic energy to generate electricity, with both onshore and
+        offshore wind farms contributing significantly. Turbine design and materials
+        are continuously improving.\\n*   **Geothermal Energy:** Geothermal power
+        plants utilize the Earth''s internal heat to produce electricity, particularly
+        effective in regions with high geothermal activity, providing a reliable source
+        of baseload power.\\n\\n**2. Energy Efficiency**\\n\\n*   **LED Lighting:**  LED
+        light efficiency is a sustainable technology implementation that is reshaping
+        industries.\\n*   **Smart Grids and Energy Management Systems:** These optimize
+        electricity distribution and consumption using data to monitor and manage
+        energy flows, improving efficiency and reliability.\\n*   **Green Construction
+        and Energy-Efficient Building Design:** Green buildings consume less energy
+        and water through innovations like smart glass and advanced insulation materials.\\n\\n**3.
+        Carbon Capture and Storage (CCS)**\\n\\n*   **Carbon Capture and Storage:**
+        CCS enables industries to capture carbon at its source, compress it, and move
+        it to a suitable permanent storage site.\\n*   **CO2 Absorption:** Using mixed
+        plastic feedstock to generate porous carbon materials for CO2 capture.\\n\\n**4.
+        Sustainable Transportation**\\n\\n*   **Electric Vehicles (EVs):** EVs reduce
+        reliance on fossil fuels and decrease greenhouse gas emissions.\\n*   **Public
+        Electric Transport:** Municipalities are implementing electric vehicles and
+        smart navigation systems to improve public transportation.\\n\\n**5. Waste
+        Management and Circular Economy**\\n\\n*   **Advanced Recycling Technologies:**
+        Chemical recycling and automated sorting systems recover valuable waste-stream
+        materials.\\n*   **Bioplastics:** Made from renewable biomass sources like
+        cornstarch and sugarcane, offering a sustainable alternative to traditional
+        plastics.\\n*   **Biodegradable Packaging**: Reducing the use of plastic in
+        packaging and opting for recyclable or biodegradable materials\\n*   **Plastic
+        Recycling:** Adopting circular models like pyrolysis and chemical recycling
+        to prevent plastic waste.\\n\\n**6. Water Management**\\n\\n*   **Wastewater
+        Treatment:** Environmentally friendly nanocomposites are being explored to
+        combat water pollution.\\n*   **Water Purification Technologies:** Technologies
+        like reverse osmosis and UV filtration provide access to safe, clean water.\\n\\n**7.
+        Sustainable Agriculture**\\n\\n*   **Vertical Farming:** Using hydroponics
+        or aeroponics, vertical farms minimize water consumption and eliminate the
+        need for vast tracts of land.\\n*   **Precision Agriculture:** Managing crop
+        and livestock production through observing, measuring, and responding to factors
+        such as temperature and spatial variability.\\n\\n**8. Green Computing**\\n\\n*   **Energy-Efficient
+        Data Centers:** Utilizing advanced cooling technologies, renewable energy
+        sources, and optimized hardware to minimize energy consumption and reduce
+        carbon emissions.\\n*   **Green Cloud Computing:** Using renewable energy
+        to power data centers, implementing energy-efficient infrastructure, and offering
+        customers tools to monitor and reduce their own carbon footprints.\\n\\n**9.
+        AI and Automation**\\n\\n*   **AI Automation:** AI systems help tech industries
+        optimize their processes, reduce waste, and increase efficiency.\\n\\n**Companies
+        in Sustainable Technology:**\\n\\n*   **NextChem:** Dedicated to sustainable
+        technology solutions, leveraging expertise in nitrogen, hydrogen, carbon capture,
+        fuels, chemicals, and polymers.\\n*   **Honeywell:** Creating future-forward
+        solutions that change the way the world works, with a focus on energy transition
+        and sustainability.\\n*   **KBR:** Committed to helping customers deliver
+        a more sustainable future through holistic solutions across the asset life
+        cycle.\\n*   **RebelDot:** An AI-first software development agency that helps
+        global brands design, build, and launch digital products that drive growth
+        in the Greentech sector.\\n\\nThe sustainable technology market is experiencing
+        rapid growth, with projections estimating it will reach $48.36 billion by
+        2027.\\n\",\"groundingChunks\":[{\"sourceFile\":{\"id\":\"c0613985fb62440a972211eb4134332b\",\"url\":\"https://www.ibm.com/think/topics/sustainable-technology\",\"name\":\"ibm.com\"},\"citableContent\":[\"Sustainable
+        technology solutions are technologies that are created or applied with consideration
+        of environmental, social, and economic factors.\",\"The goal is to develop
+        new technologies using sustainable processes and materials and to address
+        environmental, social, and governance (ESG) issues.\"],\"textRanges\":[{\"startIndex\":144,\"endIndex\":144},{\"startIndex\":293,\"endIndex\":293}]},{\"sourceFile\":{\"id\":\"1cbe3f2a1ec74f62a6acbe3f0e47d93d\",\"url\":\"https://www.computer.org/publications/tech-news/trends/technologies-minimizing-environmental-impact/\",\"name\":\"computer.org\"},\"citableContent\":[\"**1.\",\"*   **Green
+        Construction and Energy-Efficient Building Design:** Green buildings consume
+        less energy and water through innovations like smart glass and advanced insulation
+        materials.\",\"**3.\",\"AI and Automation**\",\"*   **AI Automation:** AI
+        systems help tech industries optimize their processes, reduce waste, and increase
+        efficiency.\"],\"textRanges\":[{\"startIndex\":346,\"endIndex\":346},{\"startIndex\":1556,\"endIndex\":1556},{\"startIndex\":1562,\"endIndex\":1562},{\"startIndex\":3789,\"endIndex\":3789},{\"startIndex\":3910,\"endIndex\":3910}]},{\"sourceFile\":{\"id\":\"85dae8dae8894b3e93486ccae56ace94\",\"url\":\"https://ess.honeywell.com/us/en/home\",\"name\":\"honeywell.com\"},\"citableContent\":[\"**1.\",\"*   **Honeywell:**
+        Creating future-forward solutions that change the way the world works, with
+        a focus on energy transition and sustainability.\"],\"textRanges\":[{\"startIndex\":346,\"endIndex\":346},{\"startIndex\":4254,\"endIndex\":4254}]},{\"sourceFile\":{\"id\":\"2479f2d0cbd249a3b035919fc3a0dcde\",\"url\":\"https://htec.com/insights/blogs/these-7-sustainable-technology-implementations-will-reshape-our-future/\",\"name\":\"htec.com\"},\"citableContent\":[\"*   **LED
+        Lighting:**  LED light efficiency is a sustainable technology implementation
+        that is reshaping industries.\",\"Carbon Capture and Storage (CCS)**\",\"*   **Carbon
+        Capture and Storage:** CCS enables industries to capture carbon at its source,
+        compress it, and move it to a suitable permanent storage site.\",\"*   **Public
+        Electric Transport:** Municipalities are implementing electric vehicles and
+        smart navigation systems to improve public transportation.\",\"**7.\",\"The
+        sustainable technology market is experiencing rapid growth, with projections
+        estimating it will reach $48.36 billion by 2027.\"],\"textRanges\":[{\"startIndex\":1181,\"endIndex\":1181},{\"startIndex\":1597,\"endIndex\":1597},{\"startIndex\":1753,\"endIndex\":1753},{\"startIndex\":2152,\"endIndex\":2152},{\"startIndex\":2999,\"endIndex\":2999},{\"startIndex\":4688,\"endIndex\":4688}]},{\"sourceFile\":{\"id\":\"f883d994a4f34d04975b157b782afac0\",\"url\":\"https://www.forbes.com/councils/forbestechcouncil/2024/01/09/five-sustainability-technologies-to-anticipate-in-2024/\",\"name\":\"forbes.com\"},\"citableContent\":[\"*   **CO2
+        Absorption:** Using mixed plastic feedstock to generate porous carbon materials
+        for CO2 capture.\",\"*   **Wastewater Treatment:** Environmentally friendly
+        nanocomposites are being explored to combat water pollution.\"],\"textRanges\":[{\"startIndex\":1860,\"endIndex\":1860},{\"startIndex\":2863,\"endIndex\":2863}]},{\"sourceFile\":{\"id\":\"7c67884f3722432d880952a9691c9236\",\"url\":\"https://www.kbr.com/en/what-we-do/sustainable-technology-solutions\",\"name\":\"kbr.com\"},\"citableContent\":[\"*   **KBR:**
+        Committed to helping customers deliver a more sustainable future through holistic
+        solutions across the asset life cycle.\"],\"textRanges\":[{\"startIndex\":4388,\"endIndex\":4388}]},{\"sourceFile\":{\"id\":\"30d16a52238f4c0a83d56c6cbe9869e8\",\"url\":\"https://www.rebeldot.com/blog/15-best-green-tech-development-companies\",\"name\":\"rebeldot.com\"},\"citableContent\":[\"**1.\",\"**3.\",\"*   **RebelDot:**
+        An AI-first software development agency that helps global brands design, build,
+        and launch digital products that drive growth in the Greentech sector.\"],\"textRanges\":[{\"startIndex\":346,\"endIndex\":346},{\"startIndex\":1562,\"endIndex\":1562},{\"startIndex\":4557,\"endIndex\":4557}]},{\"sourceFile\":{\"id\":\"42b89cd3e7f548d196deada774899406\",\"url\":\"https://magellanx.co/sustainable-technology-examples-solutions/\",\"name\":\"magellanx.co\"},\"citableContent\":[\"**1.\"],\"textRanges\":[{\"startIndex\":346,\"endIndex\":346}]},{\"sourceFile\":{\"id\":\"ded8356d40de45bfad3dea72adb81048\",\"url\":\"https://vectorglobe.com/top-sustainable-tech-driving-environmental-change/\",\"name\":\"vectorglobe.com\"},\"citableContent\":[\"*   **Solar
+        Power:**  Photovoltaic (PV) panels convert sunlight into electricity, becoming
+        more efficient and affordable.\",\"Solar energy is expanding globally through
+        rooftop installations and large-scale solar farms.\",\"*   **Wind Energy:**
+        Wind turbines harness the wind''s kinetic energy to generate electricity,
+        with both onshore and offshore wind farms contributing significantly.\",\"*   **Geothermal
+        Energy:** Geothermal power plants utilize the Earth''s internal heat to produce
+        electricity, particularly effective in regions with high geothermal activity,
+        providing a reliable source of baseload power.\",\"*   **Advanced Recycling
+        Technologies:** Chemical recycling and automated sorting systems recover valuable
+        waste-stream materials.\",\"*   **Bioplastics:** Made from renewable biomass
+        sources like cornstarch and sugarcane, offering a sustainable alternative
+        to traditional plastics.\",\"*   **Vertical Farming:** Using hydroponics or
+        aeroponics, vertical farms minimize water consumption and eliminate the need
+        for vast tracts of land.\"],\"textRanges\":[{\"startIndex\":501,\"endIndex\":501},{\"startIndex\":595,\"endIndex\":595},{\"startIndex\":759,\"endIndex\":759},{\"startIndex\":1037,\"endIndex\":1037},{\"startIndex\":2330,\"endIndex\":2330},{\"startIndex\":2478,\"endIndex\":2478},{\"startIndex\":3175,\"endIndex\":3175}]},{\"sourceFile\":{\"id\":\"91d8836ea21e4e07b230a28069543dea\",\"url\":\"https://sustainabilitymag.com/top10/top-10-sustainability-innovations\",\"name\":\"sustainabilitymag.com\"},\"citableContent\":[\"*   **Smart
+        Grids and Energy Management Systems:** These optimize electricity distribution
+        and consumption using data to monitor and manage energy flows, improving efficiency
+        and reliability.\",\"*   **Water Purification Technologies:** Technologies
+        like reverse osmosis and UV filtration provide access to safe, clean water.\",\"*   **Precision
+        Agriculture:** Managing crop and livestock production through observing, measuring,
+        and responding to factors such as temperature and spatial variability.\"],\"textRanges\":[{\"startIndex\":1373,\"endIndex\":1373},{\"startIndex\":2993,\"endIndex\":2993},{\"startIndex\":3346,\"endIndex\":3346}]},{\"sourceFile\":{\"id\":\"29a66b7311e24be1909900e84df3d2b5\",\"url\":\"https://www.lythouse.com/blog/top-8-green-technology-innovations\",\"name\":\"lythouse.com\"},\"citableContent\":[\"*   **Electric
+        Vehicles (EVs):** EVs reduce reliance on fossil fuels and decrease greenhouse
+        gas emissions.\",\"**8.\"],\"textRanges\":[{\"startIndex\":2004,\"endIndex\":2004},{\"startIndex\":3352,\"endIndex\":3352}]},{\"sourceFile\":{\"id\":\"1aea64fc2d7f402091f146fe83cd563f\",\"url\":\"https://cgnet.com/blog/sustainable-technology-initiatives-in-2024/\",\"name\":\"cgnet.com\"},\"citableContent\":[\"*   **Biodegradable
+        Packaging**: Reducing the use of plastic in packaging and opting for recyclable
+        or biodegradable materials\",\"*   **Energy-Efficient Data Centers:** Utilizing
+        advanced cooling technologies, renewable energy sources, and optimized hardware
+        to minimize energy consumption and reduce carbon emissions.\",\"*   **Green
+        Cloud Computing:** Using renewable energy to power data centers, implementing
+        energy-efficient infrastructure, and offering customers tools to monitor and
+        reduce their own carbon footprints.\"],\"textRanges\":[{\"startIndex\":2605,\"endIndex\":2605},{\"startIndex\":3560,\"endIndex\":3560},{\"startIndex\":3763,\"endIndex\":3763}]},{\"sourceFile\":{\"id\":\"165eb0104feb4a81ab5ce2aeec34f9a3\",\"url\":\"https://www.groupmaire.com/en/about-us/technology/\",\"name\":\"groupmaire.com\"},\"citableContent\":[\"*   **NextChem:**
+        Dedicated to sustainable technology solutions, leveraging expertise in nitrogen,
+        hydrogen, carbon capture, fuels, chemicals, and polymers.\"],\"textRanges\":[{\"startIndex\":4110,\"endIndex\":4110}]}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:35 GMT
+      Set-Cookie:
+      - GCLB=CMTIpKOP_Y66EhAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

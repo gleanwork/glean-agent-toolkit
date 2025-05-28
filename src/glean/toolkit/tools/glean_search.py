@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from glean import models
+from glean.api_client import models
 from glean.toolkit.decorators import tool_spec
 from glean.toolkit.tools._common import run_tool
 
@@ -17,7 +17,7 @@ from glean.toolkit.tools._common import run_tool
         "- This is your primary tool to access all knowledge within the company.\n"
         "- The results returned are not exhaustive; we only return the top few most relevant "
         "documents to a query.\n"
-        "- For analytics questions such as \"how many documents...\" use the \"statistics\" "
+        '- For analytics questions such as "how many documents..." use the "statistics" '
         "field in the output."
     ),
 )

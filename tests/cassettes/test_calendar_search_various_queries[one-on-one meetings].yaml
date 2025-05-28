@@ -1,0 +1,82 @@
+interactions:
+- request:
+    body: '{"name":"Meeting Lookup","parameters":{"query":{"name":"query","value":"one-on-one
+      meetings"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '95'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"glean_5006207680345555837\\\",\\\"trackingToken\\\":\\\"SEARCH_oGzXuNOCCXh6w0GQ,Cl0KF1NFQVJDSF9vR3pYdU5PQ0NYaDZ3MEdRGhlnbGVhbl81MDA2MjA3NjgwMzQ1NTU1ODM3IgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlQ=\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Google
+        Calendar integration with Glean | Glean Work AI\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/connectors/google-calendar\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"To
+        use the integration, you will need to authenticate yourself in Glean through
+        Google Calendar, after which point our app will be allowed to make API calls
+        as you. \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Google
+        Calendar is designed for teams and allows people to schedule meetings and
+        events\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}},{\\\"id\\\":\\\"ZENDESK_0_Article_32443041250587\\\",\\\"trackingToken\\\":\\\"SEARCH_oGzXuNOCCXh6w0GQ,CmUKF1NFQVJDSF9vR3pYdU5PQ0NYaDZ3MEdREAEaIFpFTkRFU0tfMF9BcnRpY2xlXzMyNDQzMDQxMjUwNTg3Igd6ZW5kZXNrKgNhbGwyB2FydGljbGU6DUtOT1dMRURHRV9IVUJAAQ==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"GOOGLECALENDAR-1\\\",\\\"datasource\\\":\\\"zendesk\\\",\\\"url\\\":\\\"https://support.glean.com/hc/en-us/articles/32443041250587-GOOGLECALENDAR-1\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Google
+        Calendar uses the Directory Admin configured for the GDRIVE App. \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Ensure
+        a Directory Admin e-mail is set in the GDRIVE App and that this is a valid
+        email account on the Google Calendar service.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"not
+        connect to Google Calendar service.\\\"}],\\\"owner\\\":{\\\"id\\\":\\\"0773496074B958531FFB82B4ACAEA86D\\\",\\\"name\\\":\\\"Akash
+        Sagar\\\",\\\"pronoun\\\":\\\"None\\\"},\\\"updateTime\\\":\\\"2025-01-12\\\"},{\\\"id\\\":\\\"blogs_8821533716902200094\\\",\\\"trackingToken\\\":\\\"SEARCH_oGzXuNOCCXh6w0GQ,CmEKF1NFQVJDSF9vR3pYdU5PQ0NYaDZ3MEdREAIaGWJsb2dzXzg4MjE1MzM3MTY5MDIyMDAwOTQiBWJsb2dzKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAC\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Glean
+        Platform Apps Launch: Powering Workplace Efficiency with AI\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/glean-platform-appslaunch\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"latest
+        features will empower users to leverage the most advanced large language models
+        to create their own custom generative AI apps and agents on top of the secure,
+        permission-aware data connections and best-in-class retrieval engine of the
+        Glean Platform.\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"gleandocs_9675481189372718006\\\",\\\"trackingToken\\\":\\\"SEARCH_oGzXuNOCCXh6w0GQ,CmkKF1NFQVJDSF9vR3pYdU5PQ0NYaDZ3MEdREAMaHWdsZWFuZG9jc185Njc1NDgxMTg5MzcyNzE4MDA2IglnbGVhbmRvY3MqA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5UQAM=\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Google
+        Calendar Native Connector - Glean Help Center\\\",\\\"datasource\\\":\\\"gleandocs\\\",\\\"url\\\":\\\"https://docs.glean.com/connectors/native/gcal/native-setup\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"How
+        to use: Use \u2018app: googlecalendar after:now\u2019 to find all future meetings\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Type:
+        Reflects the different event types. Currently only supports a single event
+        type\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Teams\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Events
+        that occur in the future are indexed for a duration of up to two weeks.\\\"}]},{\\\"id\\\":\\\"glean_11151265334238572309\\\",\\\"trackingToken\\\":\\\"SEARCH_oGzXuNOCCXh6w0GQ,CmIKF1NFQVJDSF9vR3pYdU5PQ0NYaDZ3MEdREAQaGmdsZWFuXzExMTUxMjY1MzM0MjM4NTcyMzA5IgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABA==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"AI
+        apps - customizable to your enterprise needs\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/product/apps\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"and
+        deploy no-code and low-code AI apps, agents, assistants, and chatbots that
+        automate repetitive tasks and proactively engage in everyday work\u2014 with
+        the confidence that everything is grounded in the enterprise-grade connectivity,
+        retrieval, and\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"devdocs_10715807253831284618\\\",\\\"trackingToken\\\":\\\"SEARCH_oGzXuNOCCXh6w0GQ,CmYKF1NFQVJDSF9vR3pYdU5PQ0NYaDZ3MEdREAUaHGRldmRvY3NfMTA3MTU4MDcyNTM4MzEyODQ2MTgiB2RldmRvY3MqA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5UQAU=\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Google
+        Calendar Events Retrieval Action - Glean Developer Portal\\\",\\\"datasource\\\":\\\"devdocs\\\",\\\"url\\\":\\\"https://developers.glean.com/actions/examples/google-calendar-events\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"of
+        events.  content:  application/json:  schema:  type: object  properties:  items:
+        \ type: array  items:  type: object  properties:  id:  type: string  description:
+        Identifier of the event.  status:  type: string  description: Status of the
+        event\\\"}]}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:50 GMT
+      Set-Cookie:
+      - GCLB=CKfaquuyp67RYBAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

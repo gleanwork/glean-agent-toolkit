@@ -1,5 +1,5 @@
 {
-  "include": ["src", "tests", "examples"],
+  "include": ["src", "tests"],
   "executionEnvironments": [
     {
       "root": "."

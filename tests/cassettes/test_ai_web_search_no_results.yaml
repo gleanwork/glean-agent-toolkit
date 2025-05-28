@@ -1,0 +1,75 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"nonexistent
+      technology xyz123"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '108'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"aiWebSearch\":{\"response\":\"The query
+        \\\"nonexistent technology xyz123\\\" doesn''t refer to one specific technology,
+        but the search results suggest a few possibilities where \\\"xyz123\\\" might
+        appear:\\n\\n*   **Model Numbers/Identifiers:** \\\"XYZ123\\\" is sometimes
+        used as a model number or identifier for various products, such as the \\\"Digital
+        Watt Meter XYZ-123\\\" [5] or the \\\"Denver Electronics 1.96\\\" Smartwatch
+        - Model XYZ123\\\" [7]. A \\\"Powerful Jaw Crusher for Stone and Ore - Model
+        XYZ123\\\" is also mentioned [2].\\n*   **Technology Components:** It can
+        represent a specific server (e.g., \\\"server XYZ123\\\") within a technology
+        architecture [3].\\n*   **Software/Services:** \\\"XYZ123\\\" is listed as
+        providing portal and cloud-based hosting services for OSSI applications [1].\\n*   **Data
+        Handling:** In healthcare discussions, \\\"XYZ123\\\" was used as a key to
+        represent patient data in a de-identified manner [10].\\n*   **General Identifier:**
+        It can be used as a general string of characters in examples, such as a string
+        literal in GIS definitions [4] or a DOI name example [8].\\n*   **Watchmaking:**
+        \\\"xyz123\\\" might follow the word \\\"caliber\\\" to designate a movement
+        model number [11].\\n\",\"groundingChunks\":[{\"sourceFile\":{\"id\":\"aef9285a67584465af0c90f5bcfd04ed\",\"url\":\"https://www.afrimart.co.za/product/powerful-jaw-crusher-for-stone-and-ore--model-xyz123\",\"name\":\"afrimart.co.za\"},\"citableContent\":[\"A
+        \\\"Powerful Jaw Crusher for Stone and Ore - Model XYZ123\\\" is also mentioned
+        [2].\"],\"textRanges\":[{\"startIndex\":471,\"endIndex\":471}]},{\"sourceFile\":{\"id\":\"a1a106c192924231acaa823ac409467d\",\"url\":\"https://www.ossi.com/\",\"name\":\"ossi.com\"},\"citableContent\":[\"*   **Software/Services:**
+        \\\"XYZ123\\\" is listed as providing portal and cloud-based hosting services
+        for OSSI applications [1].\"],\"textRanges\":[{\"startIndex\":725,\"endIndex\":725}]},{\"sourceFile\":{\"id\":\"4fe4a3bd454c4ca486ec73e37d5ba0dd\",\"url\":\"https://www.codetechnology.com/blog/brigham-hyde-ph-d-sits-code-talk-hipaa-isms-big-data-data-ownership-healthcare/\",\"name\":\"codetechnology.com\"},\"citableContent\":[\"*   **Data
+        Handling:** In healthcare discussions, \\\"XYZ123\\\" was used as a key to
+        represent patient data in a de-identified manner [10].\"],\"textRanges\":[{\"startIndex\":860,\"endIndex\":860}]},{\"sourceFile\":{\"id\":\"2388241ff44849448e56334e07fd3f8d\",\"url\":\"https://www.hodinkee.com/articles/why-watch-movements-are-called-calibers\",\"name\":\"hodinkee.com\"},\"citableContent\":[\"*   **Watchmaking:**
+        \\\"xyz123\\\" might follow the word \\\"caliber\\\" to designate a movement
+        model number [11].\"],\"textRanges\":[{\"startIndex\":1130,\"endIndex\":1130}]}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:47 GMT
+      Set-Cookie:
+      - GCLB=CK-X2onDhrDA-AEQAw; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

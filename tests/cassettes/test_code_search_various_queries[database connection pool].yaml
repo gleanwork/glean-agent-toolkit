@@ -1,0 +1,60 @@
+interactions:
+- request:
+    body: '{"name":"Code Search","parameters":{"query":{"name":"query","value":"database
+      connection pool"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '97'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '
+
+        <html><head>
+
+        <meta http-equiv="content-type" content="text/html;charset=utf-8">
+
+        <title>502 Server Error</title>
+
+        </head>
+
+        <body text=#000000 bgcolor=#ffffff>
+
+        <h1>Error: Server Error</h1>
+
+        <h2>The server encountered a temporary error and could not complete your request.<p>Please
+        try again in 30 seconds.</h2>
+
+        <h2></h2>
+
+        </body></html>
+
+        '
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Content-Length:
+      - '332'
+      Content-Type:
+      - text/html; charset=UTF-8
+      Date:
+      - Thu, 05 Jun 2025 01:48:57 GMT
+      Referrer-Policy:
+      - no-referrer
+      Set-Cookie:
+      - GCLB=CPSGrLHGr8WGHRAD; path=/; HttpOnly
+    status:
+      code: 502
+      message: Bad Gateway
+version: 1

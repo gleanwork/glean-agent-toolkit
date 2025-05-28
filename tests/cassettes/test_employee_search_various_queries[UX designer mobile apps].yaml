@@ -1,0 +1,80 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"UX
+      designer mobile apps"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '100'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"searchResponse\":{\"documents\":[{\"id\":\"blogs_8821533716902200094\",\"trackingToken\":\"SEARCH_aayRROnXvIL9oqYG,Cl0KF1NFQVJDSF9hYXlSUk9uWHZJTDlvcVlHGhlibG9nc184ODIxNTMzNzE2OTAyMjAwMDk0IgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlQ=\",\"documentDebugInfo\":{},\"title\":\"Glean
+        Platform Apps Launch: Powering Workplace Efficiency with AI\",\"datasource\":\"blogs\",\"url\":\"https://www.glean.com/blog/glean-platform-appslaunch\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Beyond
+        building tools like industry or workflow-specific mobile apps with turnkey
+        generative AI solutions, developers can also build custom UX around those
+        experiences, embedding Glean into any surface like intranets or customer service
+        portals.\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"blogs_1196225684157470183\",\"trackingToken\":\"SEARCH_aayRROnXvIL9oqYG,CmEKF1NFQVJDSF9hYXlSUk9uWHZJTDlvcVlHEAEaGWJsb2dzXzExOTYyMjU2ODQxNTc0NzAxODMiBWJsb2dzKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAB\",\"documentDebugInfo\":{},\"title\":\"Enhance
+        work-life harmony: 5 ways Glean boosts productivity\",\"datasource\":\"blogs\",\"url\":\"https://www.glean.com/blog/5-ways-glean-helps-you-have-a-healthier-relationship-with-work\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Glean''s
+        mobile app allows users to find necessary information quickly, helping them
+        separate work from personal life while staying productive.\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"ProtectSafely
+        scale AI at work   SecuritySecure by design from day oneGLEAN WHERE YOU WORKGlean
+        in SlackGlean\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"glean_13288043901370473923\",\"trackingToken\":\"SEARCH_aayRROnXvIL9oqYG,CmIKF1NFQVJDSF9hYXlSUk9uWHZJTDlvcVlHEAIaGmdsZWFuXzEzMjg4MDQzOTAxMzcwNDczOTIzIgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAg==\",\"documentDebugInfo\":{},\"title\":\"InVision
+        integration with Glean | Glean Work AI\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/connectors/invision\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"InVision
+        is a digital product design platform that helps teams create, prototype, and
+        collaborate on user interface (UI) and user experience (UX) designs. \"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"design
+        teams with the ability to quickly search previous interactions with the InVision
+        app.\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"ZENDESK_0_Article_31175068681371\",\"trackingToken\":\"SEARCH_aayRROnXvIL9oqYG,CmUKF1NFQVJDSF9hYXlSUk9uWHZJTDlvcVlHEAMaIFpFTkRFU0tfMF9BcnRpY2xlXzMxMTc1MDY4NjgxMzcxIgd6ZW5kZXNrKgNhbGwyB2FydGljbGU6DUtOT1dMRURHRV9IVUJAAw==\",\"documentDebugInfo\":{},\"title\":\"Deploy
+        the Glean Apps\",\"datasource\":\"zendesk\",\"url\":\"https://support.glean.com/hc/en-us/articles/31175068681371-Deploy-the-Glean-Apps\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"The
+        Glean Browser Extension provides a better user experience and creates habits
+        for higher adoption and usage, allowing everyone to get the most out of Glean.\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Deploy
+        the Glean mobile apps to your managed devices to help your employees find\"}],\"owner\":{\"id\":\"249CEEAB2C1E902DD714B73F87D221A3\",\"name\":\"Nathan
+        Catania\",\"pronoun\":\"None\"},\"updateTime\":\"2024-11-22\"},{\"id\":\"glean_9986954965967231674\",\"trackingToken\":\"SEARCH_aayRROnXvIL9oqYG,CmEKF1NFQVJDSF9hYXlSUk9uWHZJTDlvcVlHEAQaGWdsZWFuXzk5ODY5NTQ5NjU5NjcyMzE2NzQiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAE\",\"documentDebugInfo\":{},\"title\":\"Download
+        or install Glean\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/download-glean\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Stay
+        up to date on projects, prepare for meetings, find experts, and keep up with
+        company and industry news from one app, Glean mobile.\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"ProtectSafely
+        scale AI at work   SecuritySecure by design from day oneGLEAN WHERE YOU WORKGlean
+        in SlackGlean in\"}],\"updateTime\":\"2025-06-03\",\"similarResults\":{\"numResults\":1}},{\"id\":\"gleandocs_7545779490286399104\",\"trackingToken\":\"SEARCH_aayRROnXvIL9oqYG,CmkKF1NFQVJDSF9hYXlSUk9uWHZJTDlvcVlHEAUaHWdsZWFuZG9jc183NTQ1Nzc5NDkwMjg2Mzk5MTA0IglnbGVhbmRvY3MqA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5UQAU=\",\"documentDebugInfo\":{},\"title\":\"Deploy
+        the Glean Apps - Glean Help Center\",\"datasource\":\"gleandocs\",\"url\":\"https://docs.glean.com/get-started/golive/deploy-apps\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"The
+        Glean Browser Extension provides a better user experience and creates habits
+        for higher adoption and usage, allowing everyone to get the most out of Glean.\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Deploy
+        the Glean mobile apps to your managed devices to help your employees find\"}]}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:02 GMT
+      Set-Cookie:
+      - GCLB=CJPv7bit-NrABxAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

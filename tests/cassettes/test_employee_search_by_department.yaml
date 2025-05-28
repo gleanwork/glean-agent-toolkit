@@ -1,0 +1,83 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"engineering
+      department"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '99'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"glean_11439343465145122997\\\",\\\"trackingToken\\\":\\\"SEARCH_4Vtf4MelSjDPVHwQ,Cl4KF1NFQVJDSF80VnRmNE1lbFNqRFBWSHdRGhpnbGVhbl8xMTQzOTM0MzQ2NTE0NTEyMjk5NyIFZ2xlYW4qA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5U\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Glean
+        for Engineering\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/jp/resources/product-videos/glean-for-engineering\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        for Engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Extension\u30B5\u30A4\u30F3\u30A4\u30F3\u9867\u5BA2\u30BD\u30EA\u30E5\u30FC\u30B7\u30E7\u30F3
+        \ \u90E8\u9580\u30C1\u30FC\u30E0\u4E00\u89A7\u30A8\u30F3\u30B8\u30CB\u30A2\u30EA\u30F3\u30B0\u30AB\u30B9\u30BF\u30DE\u30FC\u30B5\u30FC\u30D3\u30B9\u30BB\u30FC\u30EB\u30B9\u4EBA\u4E8B\u30FB\u7DCF\u52D9IT\u696D\u754C\u5C0F\u58F2\u91D1\u878D\u30B5\u30FC\u30D3\u30B9\u30B5\u30A4\u30F3\u30A4\u30F3WebinarAI-powered
+        engineering\u30A6\u30A7\u30D3\u30CA\u30FC\u3092\u898B\u308B  \u30EA\u30BD\u30FC\u30B9
+        \ \u63A2\u7D22\u3059\u308B\u30D6\u30ED\u30B0\u30D7\u30ED\u30F3\u30D7\u30C8
+        \u30E9\u30A4\u30D6\u30E9\u30EA\u30AC\u30A4\u30C9\u88FD\u54C1\u52D5\u753B\u53C2\u52A0\u3059\u308B\u30A6\u30A7\u30D3\u30CA\u30FC\u30CB\u30E5\u30FC\u30B9\u30EB\u30FC\u30E0Glean:GOEventsGleaniverse
+        Community\u30B5\u30DD\u30FC\u30C8\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}},{\\\"id\\\":\\\"blogs_18083028294636081723\\\",\\\"trackingToken\\\":\\\"SEARCH_4Vtf4MelSjDPVHwQ,CmIKF1NFQVJDSF80VnRmNE1lbFNqRFBWSHdREAEaGmJsb2dzXzE4MDgzMDI4Mjk0NjM2MDgxNzIzIgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAQ==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Why
+        prompt engineering is essential for CIOs to deliver AI transformation\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/glean-cio-prompt-eng-ai-transform\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Proper
+        prompt engineering education helps mitigate security risks associated with
+        unauthorized AI tools (shadow IT) by ensuring employees use authorized AI
+        tools within IT department guidelines, maintaining data security and compliance.\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_5289137456252210092\\\",\\\"trackingToken\\\":\\\"SEARCH_4Vtf4MelSjDPVHwQ,CmEKF1NFQVJDSF80VnRmNE1lbFNqRFBWSHdREAIaGWdsZWFuXzUyODkxMzc0NTYyNTIyMTAwOTIiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAC\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"AI-powered
+        engineering\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/webinars/ai-powered-engineering\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"AI-powered
+        engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        AI-powered engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Joel
+        McKelveyHead of Industry and Departmental Solutions, GleanAbdullah HaydarDirector
+        of Engineering, LinkedIn\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"around
+        AI and the future of software engineering often revolve around faster code,\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}},{\\\"id\\\":\\\"glean_8500943336338429083\\\",\\\"trackingToken\\\":\\\"SEARCH_4Vtf4MelSjDPVHwQ,CmEKF1NFQVJDSF80VnRmNE1lbFNqRFBWSHdREAMaGWdsZWFuXzg1MDA5NDMzMzYzMzg0MjkwODMiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAD\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Enterprise
+        AI customer stories | Glean Work AI\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/resources/customer-stories\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Engineer\u201CWith
+        Glean, employees are finding information they may not have otherwise known
+        existed and using that to provide better experiences for our clients.\u201DDave
+        AlbertVP of Operations\u201CWith Glean, it doesn't matter the tenure, department,
+        or\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_16181278525073287921\\\",\\\"trackingToken\\\":\\\"SEARCH_4Vtf4MelSjDPVHwQ,CmIKF1NFQVJDSF80VnRmNE1lbFNqRFBWSHdREAQaGmdsZWFuXzE2MTgxMjc4NTI1MDczMjg3OTIxIgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABA==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Enterprise
+        AI for engineering teams\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/solutions/engineering\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Enterprise
+        AI for engineering teams\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Empower engineering teams with generative AI.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Limit time spent on non-engineering work\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Accelerate
+        time to impact by preparing engineers to code and complete pull requests immediately\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"blogs_7666188307596404759\\\",\\\"trackingToken\\\":\\\"SEARCH_4Vtf4MelSjDPVHwQ,CmEKF1NFQVJDSF80VnRmNE1lbFNqRFBWSHdREAUaGWJsb2dzXzc2NjYxODgzMDc1OTY0MDQ3NTkiBWJsb2dzKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAF\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Personalizing
+        AI work assistants: outperforming humans?\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/making-it-personal-how-ai-work-assistants-might-outperform-human-ones\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"When
+        you ask your AI work assistant to help with \u201Conboarding,\u201D you expect
+        the assistant to understand that you are filling a particular role on a particular
+        team in a particular department. \\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:02 GMT
+      Set-Cookie:
+      - GCLB=CImgqe_orbv6ogEQAw; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

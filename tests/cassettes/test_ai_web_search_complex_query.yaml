@@ -1,0 +1,91 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"comparative
+      analysis of LLM models GPT vs Claude performance benchmarks"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '150'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"aiWebSearch\":{\"response\":\"The performance
+        benchmarks of GPT and Claude models are frequently compared, and here''s a
+        summary of how they generally stack up:\\n\\n**Overall Performance:**\\n\\n*   **Claude
+        3 Opus** generally demonstrates superior performance across a spectrum of
+        tasks that test for knowledge and reasoning abilities, with an especially
+        notable advantage in complex reasoning and coding tasks.\\n*   **GPT-4o**
+        shines in consistency and well-rounded performance, particularly in knowledge-based
+        tasks.\\n\\n**Specific Benchmarks:**\\n\\n*   **Software Engineering (SWE-bench):**
+        Claude Opus 4 scores significantly higher than GPT-4.1.\\n*   **Graduate-Level
+        Reasoning:** Claude Opus 4 outperforms GPT-4.1.\\n*   **High School Math:**
+        Claude Opus achieves a high score, while GPT-4.1 didn''t report results for
+        this test.\\n*   **Multilingual Q&A:** Claude Opus leads GPT-4.1.\\n*   **Visual
+        Reasoning:** Claude Opus performs slightly better than GPT-4.1.\\n*   **Agentic
+        Tool Use:** Claude Opus demonstrates better performance in retail and airline
+        settings compared to GPT-4.1.\\n*   **HumanEval Coding Benchmark:** Claude
+        3.5 Sonnet significantly outperforms GPT-4o.\\n\\n**Other factors:**\\n\\n*   **Context
+        Window:** Claude 3 has a larger context window than GPT-4, allowing it to
+        hold more information in its memory.\\n*   **Cost:** GPT-4.1 is more cost-efficient
+        for high-volume use cases, while Claude Opus 4 is more expensive but may be
+        justified for scenarios where accuracy is critical.\\n\\nKeep in mind that
+        these benchmarks can change as models are updated.\\n\",\"groundingChunks\":[{\"sourceFile\":{\"id\":\"0822480ef2dd4c80acb0face7cb84876\",\"url\":\"https://community.openai.com/t/gpt4-comparison-to-anthropic-opus-on-benchmarks/726147\",\"name\":\"openai.com\"},\"citableContent\":[\"*   **Claude
+        3 Opus** generally demonstrates superior performance across a spectrum of
+        tasks that test for knowledge and reasoning abilities, with an especially
+        notable advantage in complex reasoning and coding tasks.\"],\"textRanges\":[{\"startIndex\":374,\"endIndex\":374}]},{\"sourceFile\":{\"id\":\"e8695e8c0941404db9692ba6d0508463\",\"url\":\"https://www.getcensus.com/blog/gpt-vs-claude-whats-the-best-ai-model\",\"name\":\"getcensus.com\"},\"citableContent\":[\"*   **Claude
+        3 Opus** generally demonstrates superior performance across a spectrum of
+        tasks that test for knowledge and reasoning abilities, with an especially
+        notable advantage in complex reasoning and coding tasks.\",\"*   **GPT-4o**
+        shines in consistency and well-rounded performance, particularly in knowledge-based
+        tasks.\",\"*   **HumanEval Coding Benchmark:** Claude 3.5 Sonnet significantly
+        outperforms GPT-4o.\"],\"textRanges\":[{\"startIndex\":374,\"endIndex\":374},{\"startIndex\":480,\"endIndex\":480},{\"startIndex\":1126,\"endIndex\":1126}]},{\"sourceFile\":{\"id\":\"966a98a416514dd7b65e14df8cc1e309\",\"url\":\"https://www.appypieautomate.ai/blog/claude-vs-chatgpt\",\"name\":\"appypieautomate.ai\"},\"citableContent\":[\"*   **GPT-4o**
+        shines in consistency and well-rounded performance, particularly in knowledge-based
+        tasks.\"],\"textRanges\":[{\"startIndex\":480,\"endIndex\":480}]},{\"sourceFile\":{\"id\":\"3f98475f1c754061beb6259cd7dee682\",\"url\":\"https://www.edenai.co/post/claude-opus-4-vs-gpt-4-1\",\"name\":\"edenai.co\"},\"citableContent\":[\"*   **Software
+        Engineering (SWE-bench):** Claude Opus 4 scores significantly higher than
+        GPT-4.1.\",\"*   **Graduate-Level Reasoning:** Claude Opus 4 outperforms GPT-4.1.\",\"*   **High
+        School Math:** Claude Opus achieves a high score, while GPT-4.1 didn''t report
+        results for this test.\",\"*   **Agentic Tool Use:** Claude Opus demonstrates
+        better performance in retail and airline settings compared to GPT-4.1.\",\"*   **Cost:**
+        GPT-4.1 is more cost-efficient for high-volume use cases, while Claude Opus
+        4 is more expensive but may be justified for scenarios where accuracy is critical.\"],\"textRanges\":[{\"startIndex\":605,\"endIndex\":605},{\"startIndex\":674,\"endIndex\":674},{\"startIndex\":786,\"endIndex\":786},{\"startIndex\":1038,\"endIndex\":1038},{\"startIndex\":1445,\"endIndex\":1445}]},{\"sourceFile\":{\"id\":\"8ee6470ce56a4db2a11ec62ce64ec6d0\",\"url\":\"https://www.proxet.com/blog/claude-3-vs-gpt-4-the-competitive-ai-landscape-weve-all-been-waiting-for\",\"name\":\"proxet.com\"},\"citableContent\":[\"*   **Context
+        Window:** Claude 3 has a larger context window than GPT-4, allowing it to
+        hold more information in its memory.\"],\"textRanges\":[{\"startIndex\":1272,\"endIndex\":1272}]}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:43 GMT
+      Set-Cookie:
+      - GCLB=CO_Z-umNwv7s1AEQAw; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

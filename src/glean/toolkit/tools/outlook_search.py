@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from glean import models
+from glean.api_client import models
 from glean.toolkit.decorators import tool_spec
 from glean.toolkit.tools._common import run_tool
 

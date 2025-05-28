@@ -1,0 +1,81 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"data
+      scientist machine learning"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '108'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"blogs_17991257366096817487\\\",\\\"trackingToken\\\":\\\"SEARCH_qbCY7ghzFVFwZFP4,Cl4KF1NFQVJDSF9xYkNZN2doekZWRndaRlA0GhpibG9nc18xNzk5MTI1NzM2NjA5NjgxNzQ4NyIFYmxvZ3MqA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5U\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Cognitive
+        search: What it is & how it works (Guide for 2024)\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/cognitive-search\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Cognitive
+        search uses AI, NLP, and machine learning to understand and retrieve digital
+        content, going beyond keyword matching to comprehend user intent and provide
+        accurate results.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"-learning,
+        dynamically refining their algorithms as they process new data.\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"blogs_4849841338496463244\\\",\\\"trackingToken\\\":\\\"SEARCH_qbCY7ghzFVFwZFP4,CmEKF1NFQVJDSF9xYkNZN2doekZWRndaRlA0EAEaGWJsb2dzXzQ4NDk4NDEzMzg0OTY0NjMyNDQiBWJsb2dzKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAB\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"A
+        comprehensive guide to information retrieval in 2024\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/glean-information-retrieval-2024\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Technological
+        advances in AI and machine learning have led to sophisticated information
+        retrieval systems that understand natural language queries and handle large,
+        complex data sets efficiently.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Machine
+        learning is revolutionizing information retrieval\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"ZENDESK_0_Article_31173260498587\\\",\\\"trackingToken\\\":\\\"SEARCH_qbCY7ghzFVFwZFP4,CmUKF1NFQVJDSF9xYkNZN2doekZWRndaRlA0EAIaIFpFTkRFU0tfMF9BcnRpY2xlXzMxMTczMjYwNDk4NTg3Igd6ZW5kZXNrKgNhbGwyB2FydGljbGU6DUtOT1dMRURHRV9IVUJAAg==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"About
+        the Crawling & Learning Process\\\",\\\"datasource\\\":\\\"zendesk\\\",\\\"url\\\":\\\"https://support.glean.com/hc/en-us/articles/31173260498587-About-the-Crawling-Learning-Process\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Learning
+        - Glean processes the data that was fetched using Machine Learning (ML) to
+        create a search and ranking algorithm tailored to your organization's data
+        and users.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        About Machine Learning (M/L)\\\"}],\\\"owner\\\":{\\\"id\\\":\\\"249CEEAB2C1E902DD714B73F87D221A3\\\",\\\"name\\\":\\\"Nathan
+        Catania\\\",\\\"pronoun\\\":\\\"None\\\"},\\\"updateTime\\\":\\\"2024-11-22\\\"},{\\\"id\\\":\\\"blogs_4192947358530979602\\\",\\\"trackingToken\\\":\\\"SEARCH_qbCY7ghzFVFwZFP4,CmEKF1NFQVJDSF9xYkNZN2doekZWRndaRlA0EAMaGWJsb2dzXzQxOTI5NDczNTg1MzA5Nzk2MDIiBWJsb2dzKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAD\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"9
+        Best enterprise search software platforms in 2025\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/top-enterprise-search-software\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"AI-powered
+        optimization: Coveo utilizes machine learning algorithms to enhance relevance
+        and information retrieval. \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"GraphCustom
+        Language Models     ConnectorsConnect to all company data         Model HubGet
+        access to the latest models\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_10038982220108074363\\\",\\\"trackingToken\\\":\\\"SEARCH_qbCY7ghzFVFwZFP4,CmIKF1NFQVJDSF9xYkNZN2doekZWRndaRlA0EAQaGmdsZWFuXzEwMDM4OTgyMjIwMTA4MDc0MzYzIgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABA==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Data
+        Meets GenAI: 5 Tips for CDOs Implementing RAG\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/webinars/data-meets-genai-5-tips-for-cdos\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"JainFounder
+        & CEOTamar YehoshuaPresident, Product and TechnologyManu NarayanCIOCarter
+        BusseCIOSteve JanuarioVP of TechnologyDaniel RosenthalGlobal Head of PartnershipsBratin
+        SahaVP of Machine Learning Services\xA9 2024, Glean Technologies, Inc.TermsPrivacy\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"blogs_1967467604217624031\\\",\\\"trackingToken\\\":\\\"SEARCH_qbCY7ghzFVFwZFP4,CmEKF1NFQVJDSF9xYkNZN2doekZWRndaRlA0EAUaGWJsb2dzXzE5Njc0Njc2MDQyMTc2MjQwMzEiBWJsb2dzKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAF\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"How
+        Semantic Search Boosts Productivity in the Workplace\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/semantic-search-productivity\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Leveraging
+        sophisticated natural language processing (NLP) techniques and machine learning
+        algorithms, semantic search platforms transform the way employees interact
+        with data.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"semantic
+        search and advanced machine learning algorithms to provide a\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:01 GMT
+      Set-Cookie:
+      - GCLB=CNHlgOqv-seJYRAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

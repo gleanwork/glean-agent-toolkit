@@ -1,0 +1,81 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"invalid
+      query that causes error"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '108'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"ZENDESK_0_Article_30458821065883\\\",\\\"trackingToken\\\":\\\"SEARCH_ueXvvtnPrcqQGlFH,CmEKF1NFQVJDSF91ZVh2dnRuUHJjcVFHbEZIGiBaRU5ERVNLXzBfQXJ0aWNsZV8zMDQ1ODgyMTA2NTg4MyIHemVuZGVzayoDYWxsMgdhcnRpY2xlOg1LTk9XTEVER0VfSFVC\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Rest
+        API Error Messages and Codes\\\",\\\"datasource\\\":\\\"zendesk\\\",\\\"url\\\":\\\"https://support.glean.com/hc/en-us/articles/30458821065883-Rest-API-Error-Messages-and-Codes\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"In
+        this article, we will explore the most common error messages and codes you
+        might encounter while using Gleans' REST APIs, explain their causes, and provide
+        guidance on how to resolve them\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"This
+        error occurs when the server\\\"}],\\\"owner\\\":{\\\"id\\\":\\\"0CD4E7E7AC0309B4189C400D7C18B602\\\",\\\"name\\\":\\\"Iliana
+        Portugal\\\",\\\"pronoun\\\":\\\"None\\\"},\\\"updateTime\\\":\\\"2024-11-01\\\"},{\\\"id\\\":\\\"blogs_14157498475934972208\\\",\\\"trackingToken\\\":\\\"SEARCH_ueXvvtnPrcqQGlFH,CmIKF1NFQVJDSF91ZVh2dnRuUHJjcVFHbEZIEAEaGmJsb2dzXzE0MTU3NDk4NDc1OTM0OTcyMjA4IgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAQ==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Essential
+        crawler for building a workplace ChatGPT\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/why-a-great-crawler-is-essential-for-building-a-workplace-chatgpt\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"The
+        crawler must handle interactions with third-party systems, manage transient
+        errors, and ensure retries are appropriately executed to avoid missing content
+        and ensure permissions are correctly applied.\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"ZENDESK_0_Article_32593540665115\\\",\\\"trackingToken\\\":\\\"SEARCH_ueXvvtnPrcqQGlFH,CmUKF1NFQVJDSF91ZVh2dnRuUHJjcVFHbEZIEAIaIFpFTkRFU0tfMF9BcnRpY2xlXzMyNTkzNTQwNjY1MTE1Igd6ZW5kZXNrKgNhbGwyB2FydGljbGU6DUtOT1dMRURHRV9IVUJAAg==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Actions
+        : Permission error (Invalid redirect URI or Access blocked)\\\",\\\"datasource\\\":\\\"zendesk\\\",\\\"url\\\":\\\"https://support.glean.com/hc/en-us/articles/32593540665115-Actions-Permission-error-Invalid-redirect-URI-or-Access-blocked\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"When
+        clicking \u201Cconnect\u201D in assistant response it redirect to the particular
+        application to complete the authentication but receives redirect_uri_mismatch
+        or Access blocked error.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Error:\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"As
+        the error suggests seems like the\\\"}],\\\"owner\\\":{\\\"id\\\":\\\"3DE94591033CCD55BEC194618E5BC886\\\",\\\"name\\\":\\\"Sumit
+        Mahto\\\",\\\"pronoun\\\":\\\"None\\\"},\\\"updateTime\\\":\\\"2025-01-20\\\"},{\\\"id\\\":\\\"devdocs_3117398870180765945\\\",\\\"trackingToken\\\":\\\"SEARCH_ueXvvtnPrcqQGlFH,CmUKF1NFQVJDSF91ZVh2dnRuUHJjcVFHbEZIEAMaG2RldmRvY3NfMzExNzM5ODg3MDE4MDc2NTk0NSIHZGV2ZG9jcyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAw==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Making
+        Requests - Glean Developer Portal\\\",\\\"datasource\\\":\\\"devdocs\\\",\\\"url\\\":\\\"https://developers.glean.com/client\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"If
+        the X-Glean-ActAs header is specified with an invalid email, the request will
+        fail with a 401: Invalid identity error.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"For
+        example, the token may have expired, causing the request to fail.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"token
+        may have expired, causing the request to fail.\\\"}]},{\\\"id\\\":\\\"devdocs_5341626205396135956\\\",\\\"trackingToken\\\":\\\"SEARCH_ueXvvtnPrcqQGlFH,CmUKF1NFQVJDSF91ZVh2dnRuUHJjcVFHbEZIEAQaG2RldmRvY3NfNTM0MTYyNjIwNTM5NjEzNTk1NiIHZGV2ZG9jcyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABA==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Filtering
+        Results - Glean Developer Portal\\\",\\\"datasource\\\":\\\"devdocs\\\",\\\"url\\\":\\\"https://developers.glean.com/client/search/filtering-results\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"If
+        you pass in an invalid special value, you will get an 422 error letting you
+        know you have an invalid operator. Invalid special values for time filters
+        are the only case in which a 422 error is returned.\\\"}]},{\\\"id\\\":\\\"glean_9646943581637478292\\\",\\\"trackingToken\\\":\\\"SEARCH_ueXvvtnPrcqQGlFH,CmEKF1NFQVJDSF91ZVh2dnRuUHJjcVFHbEZIEAUaGWdsZWFuXzk2NDY5NDM1ODE2Mzc0NzgyOTIiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAF\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Glean's
+        Terms of Service | Glean\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/website-terms\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"and
+        you acknowledge that Glean shall not be responsible or liable, directly or
+        indirectly, for any damage or loss caused or alleged to be caused by on in
+        connection with your use of such linked websites or any content or materials
+        contained therein.\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:00 GMT
+      Set-Cookie:
+      - GCLB=CPfN3JrC5rT5YhAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

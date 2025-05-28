@@ -1,0 +1,98 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"machine
+      learning frameworks 2025"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '111'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"aiWebSearch\":{\"response\":\"Here are
+        some of the top machine learning frameworks to consider in 2025:\\n\\n*   **TensorFlow**:
+        An open-source framework developed by Google, widely used for deep learning
+        and neural networks. It''s known for its flexibility, scalability, and strong
+        community support, making it suitable for both research and production.\\n*   **PyTorch**:
+        Another popular open-source framework, particularly favored in the research
+        community due to its dynamic computation graphs and ease of use. It''s developed
+        by Facebook''s AI Research lab and is known for its flexibility and strong
+        integration with Python.\\n*   **Scikit-learn**: A versatile Python library
+        providing tools for various machine learning tasks like classification, regression,
+        clustering, and more. It is known for its ease of use, comprehensive documentation,
+        and seamless integration with other Python data science libraries like NumPy
+        and Pandas.\\n*   **Keras**: A user-friendly API that simplifies building
+        and training deep learning models.\\n*   **Hugging Face Transformers**: A
+        library that has revolutionized natural language processing (NLP), offering
+        pre-trained models and a simple interface for various NLP tasks.\\n*   **JAX**:
+        Created by Google Research, JAX is noted for scientific tasks, machine learning
+        research, and neural network experimentation.\\n\\nOther frameworks mentioned
+        include:\\n\\n*   LightGBM\\n*   CatBoost\\n*   FastAI\\n*   Optuna\\n*   Theano\\n*   Microsoft
+        CNTK\\n*   Apache Mahout\\n*   Amazon Machine Learning\\n*   PaddlePaddle\\n*   Caffe\\n*   MXNet\\n*   Deeplearning4j
+        (DL4J)\\n*   Chainer\\n*   Amazon SageMaker\\n*   Accord.NET\\n*   Apache
+        Spark MLlib\\n\",\"groundingChunks\":[{\"sourceFile\":{\"id\":\"1c3b6d8f2a4b455bbd0373e08d1eb6a4\",\"url\":\"https://www.api-ninjas.com/blog/5-machine-learning-frameworks-to-learn-in-2025\",\"name\":\"api-ninjas.com\"},\"citableContent\":[\"*   **TensorFlow**:
+        An open-source framework developed by Google, widely used for deep learning
+        and neural networks.\",\"It''s known for its flexibility, scalability, and
+        strong community support, making it suitable for both research and production.\",\"It
+        is known for its ease of use, comprehensive documentation, and seamless integration
+        with other Python data science libraries like NumPy and Pandas.\",\"*   **Keras**:
+        A user-friendly API that simplifies building and training deep learning models.\",\"*   Apache
+        Spark MLlib\"],\"textRanges\":[{\"startIndex\":191,\"endIndex\":191},{\"startIndex\":319,\"endIndex\":319},{\"startIndex\":897,\"endIndex\":897},{\"startIndex\":992,\"endIndex\":992},{\"startIndex\":1605,\"endIndex\":1605}]},{\"sourceFile\":{\"id\":\"5d00126ce83844d581dbf1e600d7406a\",\"url\":\"https://www.geeksforgeeks.org/top-artificial-intelligence-frameworks/\",\"name\":\"geeksforgeeks.org\"},\"citableContent\":[\"*   **TensorFlow**:
+        An open-source framework developed by Google, widely used for deep learning
+        and neural networks.\",\"*   **Scikit-learn**: A versatile Python library
+        providing tools for various machine learning tasks like classification, regression,
+        clustering, and more.\",\"*   **JAX**: Created by Google Research, JAX is
+        noted for scientific tasks, machine learning research, and neural network
+        experimentation.\",\"*   Theano\",\"*   Microsoft CNTK\",\"*   Apache Mahout\",\"*   Amazon
+        Machine Learning\",\"*   PaddlePaddle\",\"*   Caffe\"],\"textRanges\":[{\"startIndex\":191,\"endIndex\":191},{\"startIndex\":746,\"endIndex\":746},{\"startIndex\":1309,\"endIndex\":1309},{\"startIndex\":1406,\"endIndex\":1406},{\"startIndex\":1425,\"endIndex\":1425},{\"startIndex\":1443,\"endIndex\":1443},{\"startIndex\":1471,\"endIndex\":1471},{\"startIndex\":1488,\"endIndex\":1488},{\"startIndex\":1498,\"endIndex\":1498}]},{\"sourceFile\":{\"id\":\"ca75c9a936e44208ae1dff458800e36d\",\"url\":\"https://machinelearningmastery.com/10-must-know-python-libraries-for-machine-learning-in-2025/\",\"name\":\"machinelearningmastery.com\"},\"citableContent\":[\"*   **TensorFlow**:
+        An open-source framework developed by Google, widely used for deep learning
+        and neural networks.\",\"*   LightGBM\",\"*   CatBoost\",\"*   Optuna\"],\"textRanges\":[{\"startIndex\":191,\"endIndex\":191},{\"startIndex\":1360,\"endIndex\":1360},{\"startIndex\":1373,\"endIndex\":1373},{\"startIndex\":1395,\"endIndex\":1395}]},{\"sourceFile\":{\"id\":\"96e1b1edc3014f339d9a383ef496eae2\",\"url\":\"https://codewave.com/insights/top-dl-frameworks/\",\"name\":\"codewave.com\"},\"citableContent\":[\"*   **PyTorch**:
+        Another popular open-source framework, particularly favored in the research
+        community due to its dynamic computation graphs and ease of use.\",\"*   Microsoft
+        CNTK\",\"*   Apache Mahout\",\"*   MXNet\",\"*   Deeplearning4j (DL4J)\",\"*   Chainer\",\"*   Amazon
+        SageMaker\",\"*   Accord.NET\"],\"textRanges\":[{\"startIndex\":477,\"endIndex\":477},{\"startIndex\":1425,\"endIndex\":1425},{\"startIndex\":1443,\"endIndex\":1443},{\"startIndex\":1508,\"endIndex\":1508},{\"startIndex\":1534,\"endIndex\":1534},{\"startIndex\":1546,\"endIndex\":1546},{\"startIndex\":1567,\"endIndex\":1567},{\"startIndex\":1582,\"endIndex\":1582}]},{\"sourceFile\":{\"id\":\"7f1e7bb9829840458ca3488e912795f9\",\"url\":\"https://www.digitalocean.com/community/conceptual-articles/python-libraries-for-machine-learning\",\"name\":\"digitalocean.com\"},\"citableContent\":[\"*   **Scikit-learn**:
+        A versatile Python library providing tools for various machine learning tasks
+        like classification, regression, clustering, and more.\",\"*   **Keras**:
+        A user-friendly API that simplifies building and training deep learning models.\",\"*   **Hugging
+        Face Transformers**: A library that has revolutionized natural language processing
+        (NLP), offering pre-trained models and a simple interface for various NLP
+        tasks.\"],\"textRanges\":[{\"startIndex\":746,\"endIndex\":746},{\"startIndex\":992,\"endIndex\":992},{\"startIndex\":1170,\"endIndex\":1170}]}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:21 GMT
+      Set-Cookie:
+      - GCLB=CKnpgYO11s3azgEQAw; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

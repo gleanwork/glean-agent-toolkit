@@ -69,17 +69,25 @@ tasks:
     cmds:
       - "{{.PYTEST}} --cov=glean --cov-report=term --cov-report=html -v {{.TEST_DIR}}"
 
-  # Run examples task
-  examples:
-    desc: Run examples
+  # VCR Cassette Management
+  test:vcr:regenerate:
+    desc: "Regenerate all VCR cassettes by re-recording HTTP interactions"
     cmds:
-      - "{{.PYTHON}} examples/basic_usage.py"
+      - "{{.PYTEST}} -v {{.TEST_DIR}} --tb=auto -rA"
+    env:
+      VCR_REGENERATE: "true"
+    preconditions:
+      - sh: '[ -n "$GLEAN_API_TOKEN" ]'
+        msg: "GLEAN_API_TOKEN environment variable is required for recording"
+      - sh: '[ -n "$GLEAN_INSTANCE" ]'
+        msg: "GLEAN_INSTANCE environment variable is required for recording"
 
-  # Run search example task
-  run:search-example:
-    desc: Run Glean search example
+  # Test fixtures clean task: Delete all VCR cassettes to force regeneration on next test run
+  test:vcr:clean:
+    desc: "Delete all VCR cassettes to force regeneration on next test run"
     cmds:
-      - "{{.PYTHON}} examples/glean_search_tool.py"
+      - rm -rf tests/cassettes/*
+      - echo "Deleted all VCR cassettes"
 
   # Lint task: Run all linters
   lint:

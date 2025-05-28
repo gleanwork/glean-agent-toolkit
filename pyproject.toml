@@ -11,54 +11,50 @@ authors = [{ name = "Glean", email = "dev@glean.com" }]
 license = {text = "MIT"}
 requires-python = ">=3.10,<4.0"
 dependencies = [
-    "pydantic>=2.7",
-    "typer>=0.12.0",
-    "rich>=13.0.0",
-    "shellingham>=1.5.0",
-    "glean-api-client>=0.5.2",
+    "pydantic>=2.7,<3.0",
+    "glean-api-client>=0.6.0,<1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
-    "commitizen>=4.4.1",
+    "commitizen>=4.4.1,<5.0",
+    "pip-audit>=2.6.0,<3.0",
+    "vcrpy>=6.0.2,<7.0",
 ]
 test = [
-    "pytest>=7.4.3",
-    "pytest-asyncio>=0.23.2",
-    "pytest-cov>=4.1.0",
-    "pytest-httpx>=0.35.0",
+    "pytest>=7.4.3,<9.0",
+    "pytest-asyncio>=0.23.2,<1.0",
+    "pytest-cov>=4.1.0,<6.0",
+    "pytest-httpx>=0.35.0,<1.0",
     # Optional dependencies for testing adapters
-    "openai>=1.0.0",
-    "openai-agents>=0.0.11",
-    "langchain>=0.1.0",
-    "crewai>=0.28.0",
-    "google-adk>=0.1.0",
+    "openai>=1.0.0,<2.0",
+    "openai-agents>=0.0.11,<1.0",
+    "langchain>=0.1.0,<1.0",
+    "crewai>=0.28.0,<1.0",
+    "google-adk>=0.1.0,<1.0",
 ]
 openai = [
-    "openai>=1.0.0",
-    "openai-agents>=0.0.11",
+    "openai>=1.0.0,<2.0",
+    "openai-agents>=0.0.11,<1.0",
 ]
 adk = [
-    "google-adk>=0.1.0",
+    "google-adk>=0.1.0,<1.0",
 ]
 langchain = [
-    "langchain>=0.1.0",
+    "langchain>=0.1.0,<1.0",
 ]
 crewai = [
-    "crewai>=0.28.0",
+    "crewai>=0.28.0,<1.0",
 ]
 codespell = [
-    "codespell>=2.2.6",
+    "codespell>=2.2.6,<3.0",
 ]
 lint = [
-    "ruff>=0.5",
+    "ruff>=0.5,<1.0",
 ]
 typing = [
-    "pyright>=1.1.370",
+    "pyright>=1.1.370,<2.0",
 ]
-
-[project.scripts]
-glean-toolkit = "glean.toolkit.cli:app"
 
 [project.urls]
 "Source Code" = "https://github.com/gleanwork/glean-agent-toolkit"
@@ -89,15 +85,15 @@ exclude = [
     "__pycache__/",
     "dist/",
     "build/",
-    "test/"
+    "tests/"
 ]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "W", "N", "D", "UP", "ANN", "T201"]
-ignore = ["ANN401", "D203", "D212", "F401"]
+ignore = ["ANN401", "D203", "D212", "F401", "T201"]
 
 [tool.ruff.lint.per-file-ignores]
-"examples/*.py" = ["T201"]
+"tests/**/*.py" = ["ANN", "D", "W291", "W292", "W293", "UP007"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["glean"]
@@ -113,10 +109,17 @@ indent-style = "space"
 omit = ["tests/*"]
 
 [tool.pytest.ini_options]
-addopts = "--strict-markers --strict-config --durations=5"
+minversion = "6.0"
+addopts = "-ra -q --strict-markers"
 testpaths = ["tests"]
 python_files = "test_*.py"
 asyncio_mode = "auto"
 markers = [
-    "load_json(name): Marks a test to load a JSON fixture file from tests/fixtures/<name>.json",
+    "load_json: Load JSON fixture data from tests/fixtures directory",
+    "vcr_record_with_real_auth: Record VCR cassettes using real Glean API credentials",
 ] 
+
+[dependency-groups]
+dev = [
+    "vcrpy>=5.1.0",
+]

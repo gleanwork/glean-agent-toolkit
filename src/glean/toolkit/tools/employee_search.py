@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from glean import models
+from glean.api_client import models
 from glean.toolkit.decorators import tool_spec
 from glean.toolkit.tools._common import run_tool
 
@@ -14,8 +14,8 @@ from glean.toolkit.tools._common import run_tool
     description=(
         "Finds people at the company based on their personal information.\n"
         "INSTRUCTIONS:\n"
-        "- Only use this when the user explicitly wants to find people in the company (e.g., \"who\" "
-        "questions) or for aggregation queries on people.\n"
+        "- Only use this when the user explicitly wants to find people in the company (e.g.,"
+        ' "who" questions) or for aggregation queries on people.\n'
         "- You can also use this tool to find personal information about employees (e.g., what is "
         "person X's phone number or email address).\n"
         "- Do not use this when the user wants to find people outside of the company, or people "
@@ -24,7 +24,7 @@ from glean.toolkit.tools._common import run_tool
         "location.\n"
         "- The results returned are not exhaustive; we only return the top few most relevant "
         "people to a query.\n"
-        "- For analytics questions such as \"how many people...\" use the \"statistics\" field "
+        '- For analytics questions such as "how many people..." use the "statistics" field '
         "in the output."
     ),
 )

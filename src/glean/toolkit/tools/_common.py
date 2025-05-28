@@ -5,7 +5,7 @@ from __future__ import annotations
 import os
 from typing import Any
 
-from glean import Glean, models
+from glean.api_client import Glean, models
 
 
 def api_client() -> Glean:
@@ -24,16 +24,13 @@ def run_tool(
     parameters: dict[str, models.ToolsCallParameter],
 ) -> dict[str, Any]:
     """Execute a Glean stub tool and wrap the response."""
-    with api_client() as g_client:
-        try:
+    try:
+        with api_client() as g_client:
             result = g_client.client.tools.run(
                 name=tool_display_name,
                 parameters=parameters,
-                tool_parameters=models.ToolParameters(
-                    parameters=parameters,
-                ),
             )
 
             return {"result": result}
-        except Exception as exc:  # pylint: disable=broad-except
-            return {"error": str(exc), "result": None}
+    except Exception as exc:
+        return {"error": str(exc), "result": None}

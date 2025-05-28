@@ -1,0 +1,76 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"nonexistent
+      person xyz"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '99'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"searchResponse\":{\"documents\":[{\"id\":\"glean_13479360298925827590\",\"trackingToken\":\"SEARCH_v3CUoYoQNEGc8nkT,Cl4KF1NFQVJDSF92M0NVb1lvUU5FR2M4bmtUGhpnbGVhbl8xMzQ3OTM2MDI5ODkyNTgyNzU5MCIFZ2xlYW4qA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5U\",\"documentDebugInfo\":{},\"title\":\"Enterprise
+        AI for people teams\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/solutions/people\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Product  WORK
+        AI PLATFORMPlatform Overview              Glean AssistantYour personal AI
+        assistantUniversal KnowledgeData AnalysisPrompt LibraryDeep ResearchCompanion              Glean
+        AgentsBuild and manage AI agentsAgent BuilderAgent OrchestrationAgent\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"blogs_7666188307596404759\",\"trackingToken\":\"SEARCH_v3CUoYoQNEGc8nkT,CmEKF1NFQVJDSF92M0NVb1lvUU5FR2M4bmtUEAEaGWJsb2dzXzc2NjYxODgzMDc1OTY0MDQ3NTkiBWJsb2dzKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAB\",\"documentDebugInfo\":{},\"title\":\"Personalizing
+        AI work assistants: outperforming humans?\",\"datasource\":\"blogs\",\"url\":\"https://www.glean.com/blog/making-it-personal-how-ai-work-assistants-might-outperform-human-ones\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"#
+        A personal assistant for each person in the enterprise\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Product  WORK
+        AI PLATFORMPlatform Overview              Glean AssistantYour personal AI
+        assistantUniversal KnowledgeData AnalysisPrompt LibraryDeep ResearchCompanion\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"glean_6647920048056397545\",\"trackingToken\":\"SEARCH_v3CUoYoQNEGc8nkT,CmEKF1NFQVJDSF92M0NVb1lvUU5FR2M4bmtUEAIaGWdsZWFuXzY2NDc5MjAwNDgwNTYzOTc1NDUiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAC\",\"documentDebugInfo\":{},\"title\":\"Enterprise
+        AI for all\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/solutions/all-teams\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Product  WORK
+        AI PLATFORMPlatform Overview              Glean AssistantYour personal AI
+        assistantUniversal KnowledgeData AnalysisPrompt LibraryDeep ResearchCompanion              Glean
+        AgentsBuild and manage AI agentsAgent BuilderAgent OrchestrationAgent\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"blogs_11057336810297352049\",\"trackingToken\":\"SEARCH_v3CUoYoQNEGc8nkT,CmIKF1NFQVJDSF92M0NVb1lvUU5FR2M4bmtUEAMaGmJsb2dzXzExMDU3MzM2ODEwMjk3MzUyMDQ5IgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAw==\",\"documentDebugInfo\":{},\"title\":\"Glean
+        expands horizontal, agent platform with open agent interoperability, dozens
+        of personal and business agents, and comprehensive AI security\",\"datasource\":\"blogs\",\"url\":\"https://www.glean.com/blog/go-agents-launch\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Glean
+        expands horizontal, agent platform with open agent interoperability, dozens
+        of personal and business agents, and comprehensive AI security\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Overview              Glean
+        AssistantYour personal AI assistantUniversal KnowledgeData\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"glean_14301523418432450876\",\"trackingToken\":\"SEARCH_v3CUoYoQNEGc8nkT,CmIKF1NFQVJDSF92M0NVb1lvUU5FR2M4bmtUEAQaGmdsZWFuXzE0MzAxNTIzNDE4NDMyNDUwODc2IgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABA==\",\"documentDebugInfo\":{},\"title\":\"Find
+        the best LLM model for each AI agent | Work AI for all\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/product/model-hub\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Product  WORK
+        AI PLATFORMPlatform Overview              Glean AssistantYour personal AI
+        assistantUniversal KnowledgeData AnalysisPrompt LibraryDeep ResearchCompanion              Glean
+        AgentsBuild and manage AI agentsAgent BuilderAgent OrchestrationAgent\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"glean_8261395045349279202\",\"trackingToken\":\"SEARCH_v3CUoYoQNEGc8nkT,CmEKF1NFQVJDSF92M0NVb1lvUU5FR2M4bmtUEAUaGWdsZWFuXzgyNjEzOTUwNDUzNDkyNzkyMDIiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAF\",\"documentDebugInfo\":{},\"title\":\"The
+        Glean knowledge graph\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/resources/guides/glean-knowledge-graph\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Product  WORK
+        AI PLATFORMPlatform Overview              Glean AssistantYour personal AI
+        assistantUniversal KnowledgeData AnalysisPrompt LibraryDeep ResearchCompanion              Glean
+        AgentsBuild and manage AI agentsAgent BuilderAgent OrchestrationAgent\"}],\"updateTime\":\"2025-06-03\"}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:03 GMT
+      Set-Cookie:
+      - GCLB=CJrv5oK2t5W78wEQAw; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

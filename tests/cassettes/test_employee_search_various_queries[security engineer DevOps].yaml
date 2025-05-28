@@ -1,0 +1,81 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"security
+      engineer DevOps"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '101'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"glean_6966963616891231816\\\",\\\"trackingToken\\\":\\\"SEARCH_6ReujndsukPh6WK7,Cl0KF1NFQVJDSF82UmV1am5kc3VrUGg2V0s3GhlnbGVhbl82OTY2OTYzNjE2ODkxMjMxODE2IgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlQ=\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Azure
+        DevOps (Beta) integration with Glean | Glean Work AI\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/connectors/azure-devops\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Azure
+        DevOps captures relevant documentation that provides context into engineering
+        projects and code. \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Engineering
+        organizations often use Azure Wikis for documentation and project management.
+        \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"view
+        into engineering work whether that be a\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}},{\\\"id\\\":\\\"blogs_11942759329610652094\\\",\\\"trackingToken\\\":\\\"SEARCH_6ReujndsukPh6WK7,CmIKF1NFQVJDSF82UmV1am5kc3VrUGg2V0s3EAEaGmJsb2dzXzExOTQyNzU5MzI5NjEwNjUyMDk0IgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAQ==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Secure
+        generative AI: right permissions for enterprise\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/secure-generative-ai-for-the-enterprise-requires-the-right-permissions-structure\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Engineering\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Implementing
+        permissioning involves handling complex data access rules, concurrency, scalability,
+        and unique behaviors of different datasources, requiring significant engineering
+        efforts.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"and
+        reverse engineering to discover how the\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_5581874135313596059\\\",\\\"trackingToken\\\":\\\"SEARCH_6ReujndsukPh6WK7,CmEKF1NFQVJDSF82UmV1am5kc3VrUGg2V0s3EAIaGWdsZWFuXzU1ODE4NzQxMzUzMTM1OTYwNTkiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAC\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Identify
+        experts to review document | Glean Work AI Prompt Library\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/prompt-library/identify-experts-to-review-document\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Determine
+        which members of the security team should review [[Engineering design document]]
+        based on the [[List of security team members and areas of responsiblity]]\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Based
+        on engineering design document, identify experts to review.\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"blogs_11724606145070641740\\\",\\\"trackingToken\\\":\\\"SEARCH_6ReujndsukPh6WK7,CmIKF1NFQVJDSF82UmV1am5kc3VrUGg2V0s3EAMaGmJsb2dzXzExNzI0NjA2MTQ1MDcwNjQxNzQwIgVibG9ncyoDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAw==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Work
+        AI blog - AI agents, assistant, and search resources\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Chief
+        Security Officer\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Shaping the future of software engineering leadership in the age of AI\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Shaping the future of software engineering leadership in the age of AI\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Network
+        why AI in software engineering requires balancing both\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_6662514302351592859\\\",\\\"trackingToken\\\":\\\"SEARCH_6ReujndsukPh6WK7,CmEKF1NFQVJDSF82UmV1am5kc3VrUGg2V0s3EAQaGWdsZWFuXzY2NjI1MTQzMDIzNTE1OTI4NTkiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAE\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"AI
+        deep research | Work AI for all\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/product/deep-research\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Engineers
+        solve incidents faster, leading to an overall better experience for everyone
+        involved.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"AirtableAmazon
+        S3 (beta)AribaAsanaAzureAzure DevOps (Beta)Azure File ShareBambooHRTrelloTestRailTableauSwaggerStack
+        Overflow for\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_9191384556349067946\\\",\\\"trackingToken\\\":\\\"SEARCH_6ReujndsukPh6WK7,CmEKF1NFQVJDSF82UmV1am5kc3VrUGg2V0s3EAUaGWdsZWFuXzkxOTEzODQ1NTYzNDkwNjc5NDYiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAF\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"AI
+        agent orchestration \u2014 workflows across your tools\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/product/agent-orchestration\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Engineers
+        solve incidents faster, leading to an overall better experience for everyone
+        involved.\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"AirtableAmazon
+        S3 (beta)AribaAsanaAzureAzure DevOps (Beta)Azure File ShareBambooHRTrelloTestRailTableauSwaggerStack
+        Overflow for\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:01 GMT
+      Set-Cookie:
+      - GCLB=CMvgi8H9stKTWBAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

@@ -1,0 +1,90 @@
+interactions:
+- request:
+    body: '{"name":"Gemini Web Search","parameters":{"query":{"name":"query","value":"blockchain
+      applications"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '102'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"aiWebSearch\":{\"response\":\"Blockchain
+        technology has a wide array of applications across various industries. Here''s
+        a breakdown of some key areas:\\n\\n**1. Finance and Banking:**\\n\\n*   **Cryptocurrencies:**
+        As pioneered by Bitcoin, blockchain facilitates cryptocurrency transfers and
+        has gained immense popularity.\\n*   **Money Transfers:** Blockchain can save
+        financial companies money and time by eliminating bureaucratic processes,
+        providing real-time ledger systems, and reducing third-party fees.\\n*   **Cross-border
+        Payments:** Making cross-border payments faster and safer.\\n*   **Trade Finance:**
+        Simplifying and securing trade finance processes.\\n*   **Streamlining accounting
+        processes and banking services:** Accounts payable departments can make payments
+        directly to transaction partners, bypassing banks.\\n\\n**2. Supply Chain
+        and Logistics:**\\n\\n*   **Tracking and Tracing:** Providing real-time tracking
+        to confirm the authenticity and ethical sourcing of products.\\n*   **Food
+        Safety:** Tracking perishables from farm to table.\\n*   **Supply Chain Finance:**
+        Improving efficiency and transparency in supply chain financing.\\n\\n**3.
+        Healthcare:**\\n\\n*   **Secure Data Sharing:** Ensuring patient data is shared
+        securely.\\n*   **Pharmaceutical Supply Chain:** Tracking medicines to verify
+        their authenticity.\\n*   **Medical Records Management:** Securely managing
+        and accessing medical records.\\n\\n**4. Government and Public Sector:**\\n\\n*   **Voting
+        Systems:** Facilitating secure and transparent voting processes.\\n*   **Land
+        Registries:** Managing and securing land registration information.\\n\\n**5.
+        Other Industries:**\\n\\n*   **Internet of Things (IoT):** Enhancing security
+        and transparency in IoT networks.\\n*   **Energy Management:** Creating peer-to-peer
+        energy trading platforms and streamlining access to renewable energy.\\n*   **Media
+        and Entertainment:** Managing copyright data and protecting intellectual property.\\n*   **Retail:**
+        Tracking the movement of goods between suppliers and buyers.\\n\\n**6. Emerging
+        Applications:**\\n\\n*   **Non-Fungible Tokens (NFTs):** Creating and managing
+        unique digital assets.\\n\\n**General Benefits of Blockchain Applications:**\\n\\n*   **Increased
+        Transparency and Fairness:** Providing greater visibility and accountability.\\n*   **Cost
+        and Time Savings:** Reducing bureaucratic red tape and streamlining processes.\\n*   **Enhanced
+        Security:** Utilizing cryptography and distributed ledgers to protect data.\\n*   **Automation:**
+        Automatically triggering actions, events, and payments once conditions are
+        met.\\n*   **Improved Efficiency and ROI:** Creating leaner, more efficient,
+        and more profitable processes.\\n*   **Faster Processes:** Speeding up process
+        execution in multi-party scenarios.\\n*   **Data privacy:** Information is
+        translated into a series of letters and numbers by a hash code.\\n\\n**Blockchain
+        as a Service (BaaS):**\\n\\n*   This cloud-based service allows businesses
+        to develop blockchain applications without the need for in-house resources.
+        It provides the infrastructure and tools necessary to customize and implement
+        blockchain technology quickly and efficiently.\\n\"}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:39 GMT
+      Set-Cookie:
+      - GCLB=CLPB7oncgcHoZxAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

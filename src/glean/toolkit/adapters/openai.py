@@ -14,6 +14,7 @@ else:
 
 HAS_OPENAI: bool
 
+
 class _FallbackOpenAIFunctionTool:
     """Fallback for agents.tool.FunctionTool."""
 

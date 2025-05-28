@@ -1,0 +1,83 @@
+interactions:
+- request:
+    body: '{"name":"Glean Search","parameters":{"query":{"name":"query","value":"company
+      holidays 2025"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '95'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"glean_15349475685754208208\\\",\\\"trackingToken\\\":\\\"SEARCH_h7Ou5IRDa26ngPjk,Cl4KF1NFQVJDSF9oN091NUlSRGEyNm5nUGprGhpnbGVhbl8xNTM0OTQ3NTY4NTc1NDIwODIwOCIFZ2xlYW4qA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5U\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Company
+        homepage for Work AI | Glean\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/product/work-hub\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        The state of AI at work in 2025\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"StoriesBlogEventsWebinarsDevelopersHelp
+        CenterDownload GleanProduct UpdatesGleaniverse CommunityCompanyAboutCareersNewsroomReferralsPartnersTrust
+        center\xA9 2025, Glean Technologies, Inc.Website TermsPrivacy\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_6654379767485761790\\\",\\\"trackingToken\\\":\\\"SEARCH_h7Ou5IRDa26ngPjk,CmEKF1NFQVJDSF9oN091NUlSRGEyNm5nUGprEAEaGWdsZWFuXzY2NTQzNzk3Njc0ODU3NjE3OTAiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAB\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"The
+        Top 25 AI Companies of 2025 | Glean Press\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/jp/press/the-top-25-ai-companies-of-2025\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"The
+        Top 25 AI Companies of 2025 | Glean Press\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        The Top 25 AI Companies of 2025\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Missed
+        Glean:GO 2025? \\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Register
+        for Glean:GO ReplaysRegister for Glean:GO 2025\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"for
+        Glean:GO replaysRead the announcement blog         Close bannerMissed Glean:GO
+        2025? \\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_16896837545363256215\\\",\\\"trackingToken\\\":\\\"SEARCH_h7Ou5IRDa26ngPjk,CmIKF1NFQVJDSF9oN091NUlSRGEyNm5nUGprEAIaGmdsZWFuXzE2ODk2ODM3NTQ1MzYzMjU2MjE1IgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAg==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Brainstorm
+        holiday campaign ideas | Glean Work AI Prompt Library\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/prompt-library/brainstorm-holiday-campaign-ideas\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"MarketingNo
+        items found.Link to current prompt\xA9 2025, Glean Technologies, Inc.Website
+        TermsPrivacy\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"five
+        different ideas for social media campaigns that connect my company to [[holiday/moment]].All
+        ideas should be accompanied by one tweet that\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}},{\\\"id\\\":\\\"glean_5186463824823882694\\\",\\\"trackingToken\\\":\\\"SEARCH_h7Ou5IRDa26ngPjk,CmEKF1NFQVJDSF9oN091NUlSRGEyNm5nUGprEAMaGWdsZWFuXzUxODY0NjM4MjQ4MjM4ODI2OTQiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAD\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Glean
+        Named to Fast Company\u2019s Annual List of the World\u2019s Most Innovative
+        Companies of 2025 | Glean Press\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/press/glean-worlds-most-innovative-companies-2025\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        Named to Fast Company\u2019s Annual List of the World\u2019s Most Innovative
+        Companies of 2025 | Glean Press\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        Glean Named to Fast Company\u2019s Annual List of the World\u2019s Most Innovative
+        Companies of 2025\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"list
+        of the World\u2019s Most Innovative Companies of 2025\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\",\\\"similarResults\\\":{\\\"numResults\\\":1}},{\\\"id\\\":\\\"blogs_8234474374217943605\\\",\\\"trackingToken\\\":\\\"SEARCH_h7Ou5IRDa26ngPjk,CmEKF1NFQVJDSF9oN091NUlSRGEyNm5nUGprEAQaGWJsb2dzXzgyMzQ0NzQzNzQyMTc5NDM2MDUiBWJsb2dzKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAE\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"How
+        to prepare for sales calls in 2025?\\\",\\\"datasource\\\":\\\"blogs\\\",\\\"url\\\":\\\"https://www.glean.com/blog/how-to-prepare-for-sales-calls\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Glean
+        SearchThe foundation of enterprise AIHybrid SearchKnowledge GraphCustom Language
+        Models     ConnectorsConnect to all company data         Model HubGet access
+        to the latest models              APIsBuild generative AI experiences   Glean\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"},{\\\"id\\\":\\\"glean_17369412423928020827\\\",\\\"trackingToken\\\":\\\"SEARCH_h7Ou5IRDa26ngPjk,CmIKF1NFQVJDSF9oN091NUlSRGEyNm5nUGprEAUaGmdsZWFuXzE3MzY5NDEyNDIzOTI4MDIwODI3IgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABQ==\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Enterprise
+        AI for support teams\\\",\\\"datasource\\\":\\\"glean\\\",\\\"url\\\":\\\"https://www.glean.com/solutions/support\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"#
+        The state of AI at work in 2025\\\"},{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"of
+        enterprise AIHybrid SearchKnowledge GraphCustom Language Models     ConnectorsConnect
+        to all company data         Model HubGet access to the latest models              APIsBuild
+        generative AI experiences\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"}]}}\"}}"
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:03 GMT
+      Set-Cookie:
+      - GCLB=CK3Qip6gh9TgEBAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

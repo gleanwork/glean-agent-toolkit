@@ -1,0 +1,78 @@
+interactions:
+- request:
+    body: '{"name":"Employee Search","parameters":{"query":{"name":"query","value":"John
+      Smith engineering manager"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '107'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: '{"rawResponse":{"result":"{\"searchResponse\":{\"documents\":[{\"id\":\"glean_17247857971575796883\",\"trackingToken\":\"SEARCH_XO9RvcOelca1MX7L,Cl4KF1NFQVJDSF9YTzlSdmNPZWxjYTFNWDdMGhpnbGVhbl8xNzI0Nzg1Nzk3MTU3NTc5Njg4MyIFZ2xlYW4qA2FsbDIIRG9jdW1lbnQ6EVBVQkxJU0hFRF9DT05URU5U\",\"documentDebugInfo\":{},\"title\":\"Glean
+        for Engineering\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/resources/product-videos/glean-for-engineering\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"personal
+        AI assistantUniversal KnowledgeData AnalysisPrompt LibraryDeep ResearchCompanion              Glean
+        AgentsBuild and manage AI agentsAgent BuilderAgent OrchestrationAgent LibraryAgentic
+        Reasoning Engine           Glean SearchThe foundation of\"}],\"updateTime\":\"2025-06-03\",\"similarResults\":{\"numResults\":1}},{\"id\":\"glean_13470591166676425800\",\"trackingToken\":\"SEARCH_XO9RvcOelca1MX7L,CmIKF1NFQVJDSF9YTzlSdmNPZWxjYTFNWDdMEAEaGmdsZWFuXzEzNDcwNTkxMTY2Njc2NDI1ODAwIgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAQ==\",\"documentDebugInfo\":{},\"title\":\"Engineering
+        self-evaluation | Glean Agent Library\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/agent-library/engineering-self-evaluation\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Software
+        Engineers,Engineering Managers,Directors of Engineering\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Also
+        involved cross-browser testing and coordination with design to preserve UX
+        integrity.\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Glean AgentsBuild
+        and manage AI agentsAgent BuilderAgent\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"glean_4057644097837722986\",\"trackingToken\":\"SEARCH_XO9RvcOelca1MX7L,CmEKF1NFQVJDSF9YTzlSdmNPZWxjYTFNWDdMEAIaGWdsZWFuXzQwNTc2NDQwOTc4Mzc3MjI5ODYiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAC\",\"documentDebugInfo\":{},\"title\":\"Engineering
+        project onboarding | Glean Agent Library\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/agent-library/engineering-project-onboarding\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Software
+        Engineers,Developers,Engineering Managers\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"is
+        an internal registry that enables backend services to discover and communicate
+        with each other reliably. It manages service registration, health checks,
+        and environment-specific metadata to ensure\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"glean_16181278525073287921\",\"trackingToken\":\"SEARCH_XO9RvcOelca1MX7L,CmIKF1NFQVJDSF9YTzlSdmNPZWxjYTFNWDdMEAMaGmdsZWFuXzE2MTgxMjc4NTI1MDczMjg3OTIxIgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRAAw==\",\"documentDebugInfo\":{},\"title\":\"Enterprise
+        AI for engineering teams\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/solutions/engineering\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"personal
+        AI assistantUniversal KnowledgeData AnalysisPrompt LibraryDeep ResearchCompanion              Glean
+        AgentsBuild and manage AI agentsAgent BuilderAgent OrchestrationAgent LibraryAgentic
+        Reasoning Engine           Glean SearchThe foundation of\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"glean_15819965738486899873\",\"trackingToken\":\"SEARCH_XO9RvcOelca1MX7L,CmIKF1NFQVJDSF9YTzlSdmNPZWxjYTFNWDdMEAQaGmdsZWFuXzE1ODE5OTY1NzM4NDg2ODk5ODczIgVnbGVhbioDYWxsMghEb2N1bWVudDoRUFVCTElTSEVEX0NPTlRFTlRABA==\",\"documentDebugInfo\":{},\"title\":\"Work
+        AI for knowledge management | Glean Work AI\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/solutions/knowledge-management\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"#
+        Engineering\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Engineering\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Engineering\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Engineering\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Engineering\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Engineering\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Work
+        AI for knowledge management | Glean Work AI\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"ResearchCompanion              Glean
+        AgentsBuild and manage AI agentsAgent BuilderAgent OrchestrationAgent\"}],\"updateTime\":\"2025-06-03\"},{\"id\":\"glean_3308925235644768610\",\"trackingToken\":\"SEARCH_XO9RvcOelca1MX7L,CmEKF1NFQVJDSF9YTzlSdmNPZWxjYTFNWDdMEAUaGWdsZWFuXzMzMDg5MjUyMzU2NDQ3Njg2MTAiBWdsZWFuKgNhbGwyCERvY3VtZW50OhFQVUJMSVNIRURfQ09OVEVOVEAF\",\"documentDebugInfo\":{},\"title\":\"Launch
+        documentation | Glean Agent Library\",\"datasource\":\"glean\",\"url\":\"https://www.glean.com/agent-library/launch-documentation\",\"snippets\":[{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Product
+        Managers,Engineering Managers,Software Engineers\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Get
+        up to speed on engineering projects faster with a complete view of project
+        docs, code, tickets, and owners.\"},{\"source\":\"SEARCH_RESULT_SNIPPET\",\"snippet\":\"Glean
+        AgentsBuild and manage AI agentsAgent BuilderAgent\"}],\"updateTime\":\"2025-06-03\"}]}}"}}'
+    headers:
+      Alt-Svc:
+      - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:48:59 GMT
+      Set-Cookie:
+      - GCLB=CJCl0uiF-fWWdhAD; path=/; HttpOnly
+      Strict-Transport-Security:
+      - max-age=63072000; includeSubDomains; preload
+      Transfer-Encoding:
+      - chunked
+      Vary:
+      - Origin
+      Via:
+      - 1.1 google
+      X-Content-Type-Options:
+      - nosniff
+      X-Frame-Options:
+      - SAMEORIGIN
+      X-Xss-Protection:
+      - 1; mode=block
+    status:
+      code: 200
+      message: OK
+version: 1

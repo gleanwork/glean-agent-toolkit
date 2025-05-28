@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from glean import models
+from glean.api_client import models
 from glean.toolkit.decorators import tool_spec
 from glean.toolkit.tools._common import run_tool
 
@@ -14,7 +14,8 @@ from glean.toolkit.tools._common import run_tool
     description=(
         "Can search for up-to-date external information from the web. Closely evaluate the "
         "instructions below for the user query to decide whether to use web search. If you think "
-        "the scenarios are contradictory, do not use web search unless there is clear user intent.\n"
+        "the scenarios are contradictory, do not use web search unless there is clear user intent."
+        "\n"
         "INSTRUCTIONS:\n"
         "Examples of when to use this tool:\n"
         "- User Intent: Use this tool if the user is asking you to search the web, look online, "
@@ -32,7 +33,6 @@ from glean.toolkit.tools._common import run_tool
         "specific information."
     ),
 )
-
 def web_search(parameters: dict[str, models.ToolsCallParameter]) -> dict[str, Any]:
     """Search the web for up-to-date external information."""
     return run_tool("Web Browser", parameters)
