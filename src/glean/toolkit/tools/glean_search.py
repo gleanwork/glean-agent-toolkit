@@ -11,7 +11,15 @@ from glean.toolkit.tools._common import run_tool
 
 @tool_spec(
     name="glean_search",
-    description="Search Glean for relevant documents given a natural-language query.",
+    description=(
+        "Finds relevant documents in the company.\n"
+        "INSTRUCTIONS:\n"
+        "- This is your primary tool to access all knowledge within the company.\n"
+        "- The results returned are not exhaustive; we only return the top few most relevant "
+        "documents to a query.\n"
+        "- For analytics questions such as \"how many documents...\" use the \"statistics\" "
+        "field in the output."
+    ),
 )
 def glean_search(parameters: dict[str, models.ToolsCallParameter]) -> dict[str, Any]:
     """Search Glean for relevant documents using the query."""

@@ -14,9 +14,9 @@ from importlib import import_module as _import_module
 
 _tool_modules: list[str] = [
     "glean_search",
-    "web_browser",
-    "gemini_web_search",
-    "meeting_lookup",
+    "web_search",
+    "ai_web_search",
+    "calendar_search",
     "expert_search",
     "employee_search",
     "code_search",
@@ -30,18 +30,18 @@ for _mod in _tool_modules:
 from .code_search import code_search  # noqa: E402
 from .employee_search import employee_search  # noqa: E402
 from .expert_search import expert_search  # noqa: E402
-from .gemini_web_search import gemini_web_search  # noqa: E402
-from .glean_search import glean_search  # noqa: E402  pylint: disable=wrong-import-position
 from .gmail_search import gmail_search  # noqa: E402
-from .meeting_lookup import meeting_lookup  # noqa: E402
 from .outlook_search import outlook_search  # noqa: E402
-from .web_browser import web_browser  # noqa: E402
+from .web_search import web_search  # noqa: E402
+from .glean_search import glean_search  # noqa: E402
+from .ai_web_search import ai_web_search  # noqa: E402
+from .calendar_search import calendar_search  # noqa: E402
 
 __all__: list[str] = [
     "glean_search",
-    "web_browser",
-    "gemini_web_search",
-    "meeting_lookup",
+    "web_search",
+    "ai_web_search",
+    "calendar_search",
     "expert_search",
     "employee_search",
     "code_search",

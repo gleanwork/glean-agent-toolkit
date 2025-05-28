@@ -8,16 +8,11 @@ from pydantic import BaseModel
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# ---------------------------------------------------------------------------
-# Optional dependency handling
-# ---------------------------------------------------------------------------
-
 if TYPE_CHECKING:
     from crewai.tools import BaseTool as CrewBaseTool
 else:
     CrewBaseTool = Any  # type: ignore  # noqa: N816
 
-# Pydantic helpers (import unconditionally)
 from pydantic import Field as PydanticField  # type: ignore
 from pydantic import create_model as pydantic_create_model
 
@@ -33,7 +28,6 @@ class _FallbackCrewBaseTool:
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: D107
         pass
 
-    # Minimal stub so static type checking finds the attribute
     def _run(self, *args: Any, **kwargs: Any) -> Any:  # noqa: D401
         ...
 
@@ -64,7 +58,6 @@ except ImportError:  # pragma: no cover
     HAS_CREWAI = False
 
 
-# Define the tool class at the module level
 class GleanCrewAITool(BaseTool):  # type: ignore[misc]
     """CrewAI tool implementation for Glean tools."""
 
@@ -75,7 +68,6 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
     # *do not* override the attribute here to avoid accidentally setting it to
     # ``None`` and breaking CrewAI's internal description generation logic.
 
-    # Custom field to store the function
     _function: Callable[..., Any]
 
     def __init__(
@@ -93,10 +85,8 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
             function: The function to call when the tool is invoked
             args_schema: Optional schema for the arguments
         """
-        # Pass the required fields to the parent constructor
         super().__init__(name=name, description=description)
 
-        # Store the wrapped callable
         self._function = function
 
         # Only override ``args_schema`` when we actually created one; otherwise
@@ -104,7 +94,6 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
         if args_schema is not None:
             self.args_schema = args_schema
 
-        # Store a ref to the original tool spec for testing (not a field in the model)
         object.__setattr__(self, "_tool_spec_ref", None)
 
     def _run(self, **kwargs: Any) -> Any:
@@ -187,7 +176,6 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
         model_name = f"{self.tool_spec.name}ArgsSchema"
         model = pydantic_create_model(model_name, **field_defs)  # type: ignore
 
-        # Return the dynamically created model.
         return cast(type[BaseModel], model)
 
     def _get_field_type(self, schema: dict[str, Any]) -> type:
@@ -199,11 +187,9 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
         Returns:
             Appropriate Python type
         """
-        # Handle enum values if present
         if "enum" in schema:
             return str
 
-        # Get the basic type from schema
         schema_type = schema.get("type", "string")
 
         if schema_type == "string":
@@ -215,10 +201,8 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
         elif schema_type == "boolean":
             return bool
         elif schema_type == "array":
-            # Return list rather than specific type to avoid mypy issues
             return list
         elif schema_type == "object":
             return dict
         else:
-            # Default fallback
-            return str  # More strict than Any for mypy
+            return str

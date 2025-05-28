@@ -11,7 +11,12 @@ from glean.toolkit.tools._common import run_tool
 
 @tool_spec(
     name="outlook_search",
-    description="Search for emails in Outlook mailbox.",
+    description=(
+        "Finds relevant emails in the user's mailbox.\n"
+        "- Only use this tool if the user asks for email.\n"
+        "- Results returned are not exhaustive; we can only return the top 10 emails sorted by "
+        "recency (most recent first)."
+    ),
 )
 def outlook_search(parameters: dict[str, models.ToolsCallParameter]) -> dict[str, Any]:
     """Search Outlook messages based on the query."""

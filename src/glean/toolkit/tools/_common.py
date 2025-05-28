@@ -26,7 +26,13 @@ def run_tool(
     """Execute a Glean stub tool and wrap the response."""
     with api_client() as g_client:
         try:
-            result = g_client.client.tools.run(name=tool_display_name, parameters=parameters)
+            result = g_client.client.tools.run(
+                name=tool_display_name,
+                parameters=parameters,
+                tool_parameters=models.ToolParameters(
+                    parameters=parameters,
+                ),
+            )
 
             return {"result": result}
         except Exception as exc:  # pylint: disable=broad-except

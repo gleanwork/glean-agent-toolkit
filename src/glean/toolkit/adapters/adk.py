@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any, TypeAlias
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# Optional dependency handling
 if TYPE_CHECKING:
     from google.adk.tools import FunctionTool as _RealAdkFunctionTool
 else:
@@ -71,20 +70,12 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
         Returns:
             An ADK FunctionTool instance
         """
-        # Ensure the wrapped function advertises the intended description so that
-        # ``tool.description`` matches the ``ToolSpec`` description even when the
-        # original callable lacks a docstring (common in tests).
         func = self.tool_spec.function
         if not func.__doc__:
             func.__doc__ = self.tool_spec.description
 
-        # Instantiate ADK FunctionTool (real or fallback). Parameter schema is
-        # inferred automatically by ADK; we still attach the original JSON
-        # schema so downstream code can access it consistently.
-
         tool = _RuntimeAdkFunctionTool(func=func)  # type: ignore[arg-type]
 
-        # Attach JSON schema for parity with other adapters
         setattr(tool, "schema", self.tool_spec.input_schema)
 
         return tool

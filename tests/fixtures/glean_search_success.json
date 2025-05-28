@@ -1,0 +1,396 @@
+{
+    "Value": {
+        "documents": [
+            {
+                "title": "2025 Glean Holiday/Week-off Calendar - US",
+                "datasource": "gdrive",
+                "url": "https://docs.google.com/document/d/1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc",
+                "snippets": [
+                    "# 2025 Glean Holiday/Week-off Calendar - US",
+                    "# Holiday,Date,Weekday",
+                    "# Days off: 16",
+                    "New Year's Day,Jan. 1,Wednesday",
+                    "Martin Luther King Day,Jan. 20,Monday",
+                    "Presidents Day,Feb. 17,Monday",
+                    "Memorial Day,May. 26,Monday"
+                ],
+                "owner": {
+                    "name": "Emi Hall",
+                    "pronoun": "None"
+                },
+                "updateTime": "2025-04-22",
+                "similarResults": {
+                    "numResults": 1
+                }
+            },
+            {
+                "title": "What are the Holidays for India in 2025",
+                "datasource": "answers",
+                "url": "/knowledge/answers/4613",
+                "snippets": [
+                    "https://docs.google.com/document/d/1GckoISFth7UX4i95TzfXYU8ZrvJu1tADSh1sGdyRdZ0/edit?usp=sharing"
+                ],
+                "ownedAndUpdatedBy": {
+                    "name": "Tapas Satapathy",
+                    "pronoun": "None"
+                },
+                "updateTime": "2024-12-16",
+                "similarResults": {
+                    "numResults": 1
+                }
+            },
+            {
+                "title": "Glean Holiday/Week-off Calendar - US",
+                "datasource": "gdrive",
+                "url": "https://docs.google.com/document/d/13ZeFx3fZtcHNbKw2kqXpljR3Rw1jnoHV7NFoD3Qj3fw",
+                "snippets": [
+                    "Note: Monday, Dec. 30th, 2024 and Tuesday, Dec. 31st, 2024 are not company holidays, Wednesday, Jan. 1st, 2025 is a company holiday.",
+                    "Total holidays: 13 Days",
+                    "# 2024 Glean Holiday/Week-off Calendar - US"
+                ],
+                "ownedAndUpdatedBy": {
+                    "name": "Arvind Jain",
+                    "pronoun": "None"
+                },
+                "updateTime": "2025-02-15",
+                "verificationState": "DEPRECATED"
+            },
+            {
+                "title": "Holiday Calendar Clarification",
+                "datasource": "slack",
+                "url": "https://askscio.slack.com/archives/C03AVKJ2622/p1743012289703859",
+                "snippets": [
+                    "I remember it being on the updated 2025 holiday calendar doc but not seeing it on my calendar",
+                    "I thought the same - I booked stuff a while back looking at the holiday but now it seems like it's gone from history"
+                ],
+                "owner": {
+                    "name": "Margot Keeler",
+                    "pronoun": "None"
+                },
+                "channel": {
+                    "name": "palo-alto-office",
+                    "visibility": "public"
+                }
+            },
+            {
+                "title": "go/gdocs",
+                "datasource": "nonindexedshortcut",
+                "url": "https://docs.google.com",
+                "snippets": [
+                    "A quick link to google docs"
+                ]
+            },
+            {
+                "title": "Query | PROD | Identify queries from ADA CodeBuddy in the logs",
+                "datasource": "zendesk",
+                "url": "https://gleanwork.zendesk.com/agent/tickets/8189",
+                "snippets": [
+                    "\"user_query\": \"What are the holidays in 2025?\"",
+                    "holidays in 2025 based on the provided context.\n\n• The search results don't contain a list of holidays for 2025 or any other year.\n\n• The only date mentioned for 2025 is January 10, which appears"
+                ],
+                "owner": {
+                    "name": "Sumit Mahto",
+                    "pronoun": "None"
+                },
+                "updateTime": "2025-04-24"
+            }
+        ]
+    },
+    "AdditionalData": {
+        "SearchedQuery": "what are the holidays in 2025",
+        "Results": [
+            {
+                "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,CnwKF1NFQVJDSF81cHBQZEhURFNhUElFV2gzGjNHRFJJVkVfMVNkUGdTNWdTZGloSEU1Szl1b0lWRjR3NW1fZTVybHktUlRCYmZtUnlESmMiBmdkcml2ZSoDYWxsMghEb2N1bWVudDoVQ09MTEFCT1JBVElWRV9DT05URU5U",
+                "document": {
+                    "id": "GDRIVE_1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc",
+                    "datasource": "gdrive",
+                    "docType": "Document",
+                    "parentDocument": {
+                        "id": "GDRIVE_0AEAN0nAx4NxlUk9PVA"
+                    },
+                    "title": "2025 Glean Holiday/Week-off Calendar - US",
+                    "url": "https://docs.google.com/document/d/1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc",
+                    "metadata": {
+                        "datasource": "gdrive",
+                        "datasourceInstance": "gdrive",
+                        "objectType": "Document",
+                        "mimeType": "application/vnd.google-apps.document",
+                        "documentId": "GDRIVE_1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc",
+                        "loggingId": "1129AFD97586549BB68954FCA1A54D92",
+                        "createTime": "2024-08-22T22:16:10Z",
+                        "updateTime": "2025-04-22T22:48:19Z",
+                        "author": {
+                            "name": "Emi Hall",
+                            "obfuscatedId": "9D068ADE1CA6B2ACCB2082A51566A04F",
+                            "metadata": {
+                                "lastExtensionUse": "0001-01-01T00:00:00Z",
+                                "loggingId": "9D068ADE1CA6B2ACCB2082A51566A04F"
+                            }
+                        },
+                        "owner": {
+                            "name": "Emi Hall",
+                            "obfuscatedId": "9D068ADE1CA6B2ACCB2082A51566A04F",
+                            "metadata": {
+                                "lastExtensionUse": "0001-01-01T00:00:00Z",
+                                "loggingId": "9D068ADE1CA6B2ACCB2082A51566A04F"
+                            }
+                        },
+                        "visibility": "DOMAIN_LINK",
+                        "assignedTo": {
+                            "name": "Emi Hall",
+                            "obfuscatedId": "9D068ADE1CA6B2ACCB2082A51566A04F",
+                            "metadata": {
+                                "lastExtensionUse": "0001-01-01T00:00:00Z",
+                                "loggingId": "9D068ADE1CA6B2ACCB2082A51566A04F"
+                            }
+                        },
+                        "datasourceId": "1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc",
+                        "interactions": {},
+                        "visitCount": {
+                            "count": 14,
+                            "period": {
+                                "maxDaysFromNow": 7,
+                                "start": {
+                                    "daysFromNow": 7
+                                },
+                                "end": {}
+                            },
+                            "org": "org"
+                        },
+                        "documentCategory": "COLLABORATIVE_CONTENT"
+                    },
+                    "sections": [
+                        {
+                            "title": "Tab 1",
+                            "url": "https://docs.google.com/document/d/1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc?tab=t.0"
+                        },
+                        {
+                            "title": "2025 Glean Holiday/Week-off Calendar - US",
+                            "url": "https://docs.google.com/document/d/1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc?tab=t.0#heading=h.arfzjfiys9bi"
+                        },
+                        {
+                            "title": "Days off:  16",
+                            "url": "https://docs.google.com/document/d/1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc?tab=t.0#heading=h.d3e76tqvh9nq"
+                        }
+                    ]
+                },
+                "title": "2025 Glean Holiday/Week-off Calendar - US",
+                "url": "https://docs.google.com/document/d/1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc",
+                "snippets": [
+                    {
+                        "snippet": "",
+                        "mimeType": "text/plain",
+                        "text": "# 2025 Glean Holiday/Week-off Calendar - US",
+                        "ranges": [
+                            {
+                                "startIndex": 2,
+                                "endIndex": 6,
+                                "type": "BOLD"
+                            },
+                            {
+                                "startIndex": 13,
+                                "endIndex": 20,
+                                "type": "BOLD"
+                            }
+                        ],
+                        "url": "https://docs.google.com/document/d/1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc?tab=t.0#heading=h.arfzjfiys9bi"
+                    },
+                    {
+                        "snippet": "",
+                        "mimeType": "text/plain",
+                        "text": "# Holiday,Date,Weekday",
+                        "snippetTextOrdering": 2,
+                        "ranges": [
+                            {
+                                "startIndex": 2,
+                                "endIndex": 9,
+                                "type": "BOLD"
+                            }
+                        ]
+                    },
+                    {
+                        "snippet": "",
+                        "mimeType": "text/plain",
+                        "text": "# Days off: 16",
+                        "snippetTextOrdering": 1
+                    },
+                    {
+                        "snippet": "",
+                        "mimeType": "text/plain",
+                        "text": "New Year's Day,Jan. 1,Wednesday",
+                        "snippetTextOrdering": 3
+                    },
+                    {
+                        "snippet": "",
+                        "mimeType": "text/plain",
+                        "text": "Martin Luther King Day,Jan. 20,Monday",
+                        "snippetTextOrdering": 4
+                    },
+                    {
+                        "snippet": "",
+                        "mimeType": "text/plain",
+                        "text": "Presidents Day,Feb. 17,Monday",
+                        "snippetTextOrdering": 5
+                    },
+                    {
+                        "snippet": "",
+                        "mimeType": "text/plain",
+                        "text": "Memorial Day,May. 26,Monday",
+                        "snippetTextOrdering": 6
+                    }
+                ],
+                "clusteredResults": [
+                    {
+                        "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,CoABChdTRUFSQ0hfNXBwUGRIVERTYVBJRVdoMxABGjNHRFJJVkVfMU53TGpCSTIzRHA0X1MtZGNwMEZBYmdTT3JnTGhYMEFObGxaMmQtRXFSb28iBmdkcml2ZSoDYWxsMghEb2N1bWVudDoVQ09MTEFCT1JBVElWRV9DT05URU5USAE=",
+                        "document": {
+                            "id": "GDRIVE_1NwLjBI23Dp4_S-dcp0FAbgSOrgLhX0ANllZ2d-EqRoo",
+                            "datasource": "gdrive",
+                            "docType": "Document",
+                            "parentDocument": {
+                                "id": "GDRIVE_1I-0YT36TB_0qMjn0eDl3BI3uR6SVLvYr"
+                            },
+                            "title": "2023 Glean Holiday/Week-off Calendar - US",
+                            "url": "https://docs.google.com/document/d/1NwLjBI23Dp4_S-dcp0FAbgSOrgLhX0ANllZ2d-EqRoo",
+                            "metadata": {
+                                "datasource": "gdrive",
+                                "datasourceInstance": "gdrive",
+                                "objectType": "Document",
+                                "mimeType": "application/vnd.google-apps.document",
+                                "documentId": "GDRIVE_1NwLjBI23Dp4_S-dcp0FAbgSOrgLhX0ANllZ2d-EqRoo",
+                                "loggingId": "584B86068FAED42F0C21EFD03EB823F2",
+                                "createTime": "2022-12-07T00:31:52Z",
+                                "updateTime": "2023-10-18T21:52:28Z",
+                                "author": {
+                                    "name": "Arvind Jain",
+                                    "obfuscatedId": "B79FBD4A4DE91C22381F3A7A196693D8",
+                                    "metadata": {
+                                        "lastExtensionUse": "0001-01-01T00:00:00Z",
+                                        "loggingId": "B79FBD4A4DE91C22381F3A7A196693D8"
+                                    }
+                                },
+                                "owner": {
+                                    "name": "Arvind Jain",
+                                    "obfuscatedId": "B79FBD4A4DE91C22381F3A7A196693D8",
+                                    "metadata": {
+                                        "lastExtensionUse": "0001-01-01T00:00:00Z",
+                                        "loggingId": "B79FBD4A4DE91C22381F3A7A196693D8"
+                                    }
+                                },
+                                "visibility": "DOMAIN_LINK",
+                                "assignedTo": {
+                                    "name": "Arvind Jain",
+                                    "obfuscatedId": "B79FBD4A4DE91C22381F3A7A196693D8",
+                                    "metadata": {
+                                        "lastExtensionUse": "0001-01-01T00:00:00Z",
+                                        "loggingId": "B79FBD4A4DE91C22381F3A7A196693D8"
+                                    }
+                                },
+                                "datasourceId": "1NwLjBI23Dp4_S-dcp0FAbgSOrgLhX0ANllZ2d-EqRoo",
+                                "interactions": {},
+                                "verification": {
+                                    "state": "UNVERIFIED"
+                                },
+                                "documentCategory": "COLLABORATIVE_CONTENT"
+                            }
+                        },
+                        "title": "2023 Glean Holiday/Week-off Calendar - US",
+                        "url": "https://docs.google.com/document/d/1NwLjBI23Dp4_S-dcp0FAbgSOrgLhX0ANllZ2d-EqRoo",
+                        "debugInfo": {}
+                    }
+                ],
+                "allClusteredResults": [
+                    {
+                        "clusteredResults": [
+                            {
+                                "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,CoABChdTRUFSQ0hfNXBwUGRIVERTYVBJRVdoMxABGjNHRFJJVkVfMU53TGpCSTIzRHA0X1MtZGNwMEZBYmdTT3JnTGhYMEFObGxaMmQtRXFSb28iBmdkcml2ZSoDYWxsMghEb2N1bWVudDoVQ09MTEFCT1JBVElWRV9DT05URU5USAE=",
+                                "document": {
+                                    "id": "GDRIVE_1NwLjBI23Dp4_S-dcp0FAbgSOrgLhX0ANllZ2d-EqRoo",
+                                    "datasource": "gdrive",
+                                    "docType": "Document",
+                                    "parentDocument": {
+                                        "id": "GDRIVE_1I-0YT36TB_0qMjn0eDl3BI3uR6SVLvYr"
+                                    },
+                                    "title": "2023 Glean Holiday/Week-off Calendar - US",
+                                    "url": "https://docs.google.com/document/d/1NwLjBI23Dp4_S-dcp0FAbgSOrgLhX0ANllZ2d-EqRoo",
+                                    "metadata": {
+                                        "datasource": "gdrive"
+                                    }
+                                },
+                                "title": "2023 Glean Holiday/Week-off Calendar - US",
+                                "url": "https://docs.google.com/document/d/1NwLjBI23Dp4_S-dcp0FAbgSOrgLhX0ANllZ2d-EqRoo",
+                                "debugInfo": {}
+                            }
+                        ],
+                        "clusterType": "FRESHNESS",
+                        "visibleCountHint": 3
+                    }
+                ],
+                "backlinkResults": [
+                    {
+                        "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,CtYBChdTRUFSQ0hfNXBwUGRIVERTYVBJRVdoMxABGjZTTEFDSzJfTWVzc2FnZV9UR0xFTUpGRkdfQzAzQVZLSjI2MjJfMTc0MzAxMjM3NC4wMjY3MjkiBXNsYWNrKgNhbGwyDENvbnZlcnNhdGlvbjoJTUVTU0FHSU5HSAFSWjozU0xBQ0syX19UR0xFTUpGRkdcX0MwM0FWS0oyNjIyXzE3NDMwMTIyODkuNzAzODU5XzBfEiMKGkdEUklWRV8wQUVBTjBuQXg0TnhsVWs5UFZBEJCwpeGXMg==",
+                        "document": {
+                            "id": "SLACK2_Message_TGLEMJFFG_C03AVKJ2622_1743012374.026729",
+                            "datasource": "slack",
+                            "docType": "message"
+                        },
+                        "title": "Conversation",
+                        "url": "https://askscio.slack.com/archives/C03AVKJ2622/p1743012374026729?thread_ts=1743012289.703859&cid=C03AVKJ2622",
+                        "nativeAppUrl": "slack://channel?id=C03AVKJ2622&message=1743012289.703859&team=TGLEMJFFG&thread_ts=1743012289.703859",
+                        "snippets": [
+                            {
+                                "text": "# Snippet placeholder"
+                            }
+                        ],
+                        "fullText": "Hi!  Do we have Monday off for Cesar Chavez Day?  I remember it being on the updated 2025 holiday calendar doc but not seeing it on my calendar\nnope. next one is memorial day on may 26\nhttps://docs.google.com/document/d/1SdPgS5gSdihHE5K9uoIVF4w5m_e5rly-RTBbfmRyDJc/edit? tab=t.0\nhttps://askscio.slack.com/archives/C03AVKJ2622/p1739902573743479\nI thought the same - I booked stuff a while back looking at the holiday but now it seems like it's gone from history\nI thought we originally had juneteeth off too, but I'm no longer seeing it on the calendar\nHi!  We do not have it off as a Glean paid time off holiday.  Please feel free to use your PTO on any days you need to take off.\nwhy was the change not announced?  because i remember Juneteenth and Caesar chavez days were marked in the glean calendar\nAlso, why are we changing our days off when the calendar year has already been underway for 3 months - feels disrespectful to employees who planned trips during that time and are now going to have to use PTO those days.\nHi team\n",
+                        "debugInfo": {}
+                    },
+                    {
+                        "trackingToken": "SECOND_BACKLINK_PLACEHOLDER"
+                    }
+                ],
+                "clusterType": "SIMILAR",
+                "mustIncludeSuggestions": {},
+                "debugInfo": {}
+            },
+            {
+                "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,ClkKF1NFQVJDSF81cHBQZEhURFNhUElFV2gzEAEaE0FOU1dFUlNfYW5zd2VyXzQ2MTMiB2Fuc3dlcnMqA2FsbDIGYW5zd2VyOg9RVUVTVElPTl9BTlNXRVJAAQ==",
+                "document": {
+                    "id": "ANSWERS_answer_4613",
+                    "datasource": "answers",
+                    "title": "What are the Holidays for India in 2025"
+                },
+                "title": "What are the Holidays for India in 2025"
+            },
+            {
+                "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,CoABChdTRUFSQ0hfNXBwUGRIVERTYVBJRVdoMxACGjNHRFJJVkVfMTNaZUZ4M2ZadGNITmJLdzJrcVhwbGpSM1J3MWpub0hWN05Gb0QzUWozZnciBmdkcml2ZSoDYWxsMghEb2N1bWVudDoVQ09MTEFCT1JBVElWRV9DT05URU5UQAI=",
+                "document": {
+                    "id": "GDRIVE_13ZeFx3fZtcHNbKw2kqXpljR3Rw1jnoHV7NFoD3Qj3fw"
+                },
+                "title": "Glean Holiday/Week-off Calendar - US"
+            },
+            {
+                "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,CusBChdTRUFSQ0hfNXBwUGRIVERTYVBJRVdoMxADGjZTTEFDSzJfTWVzc2FnZV9UR0xFTUpGRkdfQzAzQVZLSjI2MjJfMTc0MzAxMjI4OS43MDM4NTkiBXNsYWNrKgNhbGwyDENvbnZlcnNhdGlvbjoJTUVTU0FHSU5HQANSbzozU0xBQ0syX19UR0xFTUpGRkdcX0MwM0FWS0oyNjIyXzE3NDMwMTIyODkuNzAzODU5XzBfCjgKNlNMQUNLMl9NZXNzYWdlX1RHTEVNSkZGR19DMDNBVktKMjYyMl8xNzQzMDEyMjg5LjcwMzg1OQ==",
+                "document": {
+                    "id": "SLACK2_Message_TGLEMJFFG_C03AVKJ2622_1743012289.703859"
+                },
+                "title": "Holiday Calendar Clarification"
+            },
+            {
+                "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,CnsKF1NFQVJDSF81cHBQZEhURFNhUElFV2gzEAQaO05PTklOREVYRURTSE9SVENVVF9ISVNUT1JZXzkzNkM0REQyMEYyNjg5MEMxMzg5REEyQzkyQzFCN0YyIhJub25pbmRleGVkc2hvcnRjdXQqA2FsbDIGZ29saW5rQAQ=",
+                "document": {
+                    "id": "NONINDEXEDSHORTCUT_HISTORY_936C4DD20F26890C1389DA2C92C1B7F2"
+                },
+                "title": "go/gdocs"
+            },
+            {
+                "trackingToken": "SEARCH_5ppPdHTDSaPIEWh3,ClEKF1NFQVJDSF81cHBQZEhURFNhUElFV2gzEAUaE1pFTkRFU0tfVGlja2V0XzgxODkiB3plbmRlc2sqA2FsbDIGdGlja2V0OgdUSUNLRVRTQAU=",
+                "document": {
+                    "id": "ZENDESK_Ticket_8189"
+                },
+                "title": "Query | PROD | Identify queries from ADA CodeBuddy in the logs"
+            }
+        ],
+        "StructuredResults": null,
+        "FacetResults": []
+    }
+}

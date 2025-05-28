@@ -11,7 +11,16 @@ from glean.toolkit.tools._common import run_tool
 
 @tool_spec(
     name="code_search",
-    description="Search the company source-code index.",
+    description=(
+        "Searches over all code changes made in the company.\n"
+        "INSTRUCTIONS:\n"
+        "- Use this tool to help users find information in or about code, add new code, etc. "
+        "Prefer including code snippets in your response.\n"
+        "- This is your primary tool to access knowledge present in the company's code "
+        "repositories.\n"
+        "- The results returned are not exhaustive; we only return the top few most relevant "
+        "results to a query."
+    ),
 )
 def code_search(
     parameters: dict[str, models.ToolsCallParameter],

@@ -26,6 +26,7 @@ test = [
     "pytest>=7.4.3",
     "pytest-asyncio>=0.23.2",
     "pytest-cov>=4.1.0",
+    "pytest-httpx>=0.35.0",
     # Optional dependencies for testing adapters
     "openai>=1.0.0",
     "openai-agents>=0.0.11",
@@ -87,7 +88,8 @@ exclude = [
     "**/site-packages/",
     "__pycache__/",
     "dist/",
-    "build/"
+    "build/",
+    "test/"
 ]
 
 [tool.ruff.lint]
@@ -114,4 +116,7 @@ omit = ["tests/*"]
 addopts = "--strict-markers --strict-config --durations=5"
 testpaths = ["tests"]
 python_files = "test_*.py"
-asyncio_mode = "auto" 
+asyncio_mode = "auto"
+markers = [
+    "load_json(name): Marks a test to load a JSON fixture file from tests/fixtures/<name>.json",
+] 

@@ -14,12 +14,6 @@ else:
 
 HAS_OPENAI: bool
 
-
-# ---------------------------------------------------------------------------
-# Optional dependency handling
-# ---------------------------------------------------------------------------
-
-
 class _FallbackOpenAIFunctionTool:
     """Fallback for agents.tool.FunctionTool."""
 
@@ -43,11 +37,9 @@ except ImportError:  # pragma: no cover
     HAS_OPENAI = False
 
 
-# Single alias for typing only
 OpenAIFunctionTool: TypeAlias = _RealOpenAIFunctionTool | _FallbackOpenAIFunctionTool
 
 
-# Public type exported for callers and generics
 OpenAIToolType = dict[str, Any] | OpenAIFunctionTool
 
 

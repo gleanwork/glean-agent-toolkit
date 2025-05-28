@@ -8,20 +8,17 @@ from pydantic import BaseModel
 from glean.toolkit.adapters.base import BaseAdapter
 from glean.toolkit.spec import ToolSpec
 
-# Optional dependency handling
 if TYPE_CHECKING:
     from langchain.tools import Tool as LangchainTool  # pragma: no cover
 else:
     LangchainTool = Any  # type: ignore  # noqa: N816
 
-# Pydantic helpers (runtime alias regardless of TYPE_CHECKING)
 from pydantic import Field as PydanticField  # type: ignore
 from pydantic import create_model as pydantic_create_model
 
-# Runtime placeholders (will be overwritten if import succeeds)
 ToolClass: Any = object
 Field: Any = object
-create_model = pydantic_create_model  # assigned below
+create_model = pydantic_create_model
 
 
 class _FallbackLangchainTool:
@@ -62,7 +59,6 @@ except ImportError:  # pragma: no cover
     HAS_LANGCHAIN = False
 
 
-# Unified alias for typing-time only; Any at runtime to avoid `TypeError`.
 if TYPE_CHECKING:
     LangChainToolType: TypeAlias = "LangchainTool"
 else:

@@ -11,7 +11,12 @@ from glean.toolkit.tools._common import run_tool
 
 @tool_spec(
     name="gmail_search",
-    description="Search Gmail messages accessible to the agent.",
+    description=(
+        "Finds relevant emails in the user's mailbox.\n"
+        "- Only use this tool if the user asks for email.\n"
+        "- Results returned are not exhaustive; we can only return the top 10 emails sorted by "
+        "recency (most recent first)."
+    ),
 )
 def gmail_search(parameters: dict[str, models.ToolsCallParameter]) -> dict[str, Any]:
     """Search Gmail messages based on the query."""
