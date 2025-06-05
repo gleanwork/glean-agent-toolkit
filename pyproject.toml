@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "glean-agent-toolkit"
 version = "0.1.0"
-description = "Universal Tool/Action Toolkit for Glean agent frameworks"
+description = "AI Agent toolkit for adapting Glean's enterprise tools across multiple frameworks"
 readme = "README.md"
 authors = [{ name = "Glean", email = "dev@glean.com" }]
 license = {text = "MIT"}
