@@ -4,7 +4,7 @@ Thank you for your interest in contributing to the Glean Agent Toolkit! This gui
 
 ## Project Structure
 
-```
+```sh
 src/
 ├─ glean/
 │  ├─ __init__.py        
@@ -63,7 +63,7 @@ The project uses [go-task](https://taskfile.dev/) to manage development tasks. H
 
 | Task | Description |
 |------|-------------|
-| `task lint` | Run Ruff, mypy and formatting checks |
+| `task lint` | Run Ruff, pyright and formatting checks |
 | `task lint:diff` | Same as above but only on changed files |
 | `task lint:package` | Lint only `glean/toolkit` |
 | `task lint:tests` | Lint only `tests` |
