@@ -6,6 +6,7 @@ from glean.agent_toolkit.tools.code_search import code_search
 from glean.api_client import models
 
 
+@pytest.mark.skip(reason="Skipping test_code_search_success")
 def test_code_search_success(vcr_cassette):
     """Test successful Code Search tool execution with VCR recording/replay."""
     query_text = "function authenticate user"

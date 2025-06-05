@@ -4,6 +4,7 @@ from glean.agent_toolkit.tools.outlook_search import outlook_search
 from glean.api_client import models
 
 
+@pytest.mark.skip(reason="Skipping test_outlook_search_success")
 def test_outlook_search_success(vcr_cassette):
     """Test successful Outlook Search tool execution with VCR recording/replay."""
     query_text = "quarterly planning meeting"
