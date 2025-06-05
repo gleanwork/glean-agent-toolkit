@@ -1,12 +1,12 @@
-"""Glean Search tool."""
+"""Glean Search tool for searching company documents and data."""
 
 from __future__ import annotations
 
 from typing import Any
 
+from glean.agent_toolkit.decorators import tool_spec
+from glean.agent_toolkit.tools._common import run_tool
 from glean.api_client import models
-from glean.toolkit.decorators import tool_spec
-from glean.toolkit.tools._common import run_tool
 
 
 @tool_spec(

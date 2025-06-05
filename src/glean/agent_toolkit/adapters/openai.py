@@ -1,11 +1,11 @@
-"""Adapter for OpenAI tools."""
+"""OpenAI adapter for converting tool specifications."""
 
 import json
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
-from glean.toolkit.adapters.base import BaseAdapter
-from glean.toolkit.spec import ToolSpec
+from glean.agent_toolkit.adapters.base import BaseAdapter
+from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
     from agents.tool import FunctionTool as _RealOpenAIFunctionTool

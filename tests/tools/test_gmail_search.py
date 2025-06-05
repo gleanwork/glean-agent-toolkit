@@ -1,9 +1,7 @@
-"""Tests for the Gmail Search tool."""
-
 import pytest
 
+from glean.agent_toolkit.tools.gmail_search import gmail_search
 from glean.api_client import models
-from glean.toolkit.tools.gmail_search import gmail_search
 
 
 def test_gmail_search_success(vcr_cassette):

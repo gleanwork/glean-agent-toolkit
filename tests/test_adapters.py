@@ -2,26 +2,26 @@
 
 import pytest
 
-from glean.toolkit.spec import ToolSpec
+from glean.agent_toolkit.spec import ToolSpec
 
 # Import HAS_X flags from adapter modules for consistency
 try:
-    from glean.toolkit.adapters.openai import HAS_OPENAI
+    from glean.agent_toolkit.adapters.openai import HAS_OPENAI
 except ImportError:
     HAS_OPENAI = False
 
 try:
-    from glean.toolkit.adapters.adk import HAS_ADK
+    from glean.agent_toolkit.adapters.adk import HAS_ADK
 except ImportError:
     HAS_ADK = False
 
 try:
-    from glean.toolkit.adapters.langchain import HAS_LANGCHAIN
+    from glean.agent_toolkit.adapters.langchain import HAS_LANGCHAIN
 except ImportError:
     HAS_LANGCHAIN = False
 
 try:
-    from glean.toolkit.adapters.crewai import HAS_CREWAI
+    from glean.agent_toolkit.adapters.crewai import HAS_CREWAI
 except ImportError:
     HAS_CREWAI = False
 
@@ -54,7 +54,7 @@ def test_openai_adapter_import_error() -> None:
         pytest.skip("OpenAI is installed, cannot test import error")
 
     with pytest.raises(ImportError):
-        from glean.toolkit.adapters.openai import OpenAIAdapter
+        from glean.agent_toolkit.adapters.openai import OpenAIAdapter
 
         OpenAIAdapter(create_mock_tool_spec())
 
@@ -62,7 +62,7 @@ def test_openai_adapter_import_error() -> None:
 @pytest.mark.skipif(not HAS_OPENAI, reason="OpenAI not installed")
 def test_openai_adapter() -> None:
     """Test OpenAI adapter with actual dependency."""
-    from glean.toolkit.adapters.openai import OpenAIAdapter
+    from glean.agent_toolkit.adapters.openai import OpenAIAdapter
 
     tool_spec = create_mock_tool_spec()
     adapter = OpenAIAdapter(tool_spec)
@@ -85,7 +85,7 @@ def test_openai_adapter() -> None:
 @pytest.mark.skipif(not HAS_OPENAI, reason="OpenAI not installed")
 def test_openai_adapter_integration() -> None:
     """Test OpenAI adapter with actual dependency."""
-    from glean.toolkit.adapters.openai import OpenAIAdapter
+    from glean.agent_toolkit.adapters.openai import OpenAIAdapter
 
     tool_spec = create_mock_tool_spec()
     adapter = OpenAIAdapter(tool_spec)
@@ -117,7 +117,7 @@ def test_adk_adapter_import_error() -> None:
         pytest.skip("Google ADK is installed, cannot test import error")
 
     with pytest.raises(ImportError):
-        from glean.toolkit.adapters.adk import ADKAdapter
+        from glean.agent_toolkit.adapters.adk import ADKAdapter
 
         ADKAdapter(create_mock_tool_spec())
 
@@ -125,7 +125,7 @@ def test_adk_adapter_import_error() -> None:
 @pytest.mark.skipif(not HAS_ADK, reason="Google ADK not installed")
 def test_adk_adapter_integration() -> None:
     """Test ADK adapter with actual dependency."""
-    from glean.toolkit.adapters.adk import ADKAdapter
+    from glean.agent_toolkit.adapters.adk import ADKAdapter
 
     tool_spec = create_mock_tool_spec()
     try:
@@ -149,7 +149,7 @@ def test_langchain_adapter_import_error() -> None:
         pytest.skip("LangChain is installed, cannot test import error")
 
     with pytest.raises(ImportError):
-        from glean.toolkit.adapters.langchain import LangChainAdapter
+        from glean.agent_toolkit.adapters.langchain import LangChainAdapter
 
         LangChainAdapter(create_mock_tool_spec())
 
@@ -157,7 +157,7 @@ def test_langchain_adapter_import_error() -> None:
 @pytest.mark.skipif(not HAS_LANGCHAIN, reason="LangChain not installed")
 def test_langchain_adapter_integration() -> None:
     """Test LangChain adapter with actual dependency."""
-    from glean.toolkit.adapters.langchain import LangChainAdapter
+    from glean.agent_toolkit.adapters.langchain import LangChainAdapter
 
     tool_spec = create_mock_tool_spec()
     adapter = LangChainAdapter(tool_spec)
@@ -178,7 +178,7 @@ def test_crewai_adapter_import_error() -> None:
         pytest.skip("CrewAI is installed, cannot test import error")
 
     with pytest.raises(ImportError):
-        from glean.toolkit.adapters.crewai import CrewAIAdapter
+        from glean.agent_toolkit.adapters.crewai import CrewAIAdapter
 
         CrewAIAdapter(create_mock_tool_spec())
 
@@ -186,7 +186,7 @@ def test_crewai_adapter_import_error() -> None:
 @pytest.mark.skipif(not HAS_CREWAI, reason="CrewAI not installed")
 def test_crewai_adapter_integration() -> None:
     """Test CrewAI adapter with actual dependency."""
-    from glean.toolkit.adapters.crewai import CrewAIAdapter
+    from glean.agent_toolkit.adapters.crewai import CrewAIAdapter
 
     tool_spec = create_mock_tool_spec()
     adapter = CrewAIAdapter(tool_spec)

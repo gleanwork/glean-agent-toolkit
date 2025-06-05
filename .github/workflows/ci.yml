@@ -145,7 +145,7 @@ jobs:
         run: |
           # Test installation from built wheel
           uv run pip install dist/*.whl
-          uv run python -c "import glean.toolkit; print('✅ Package installed successfully')"
+          uv run python -c "import glean.agent_toolkit; print('Package installed successfully')"
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4

@@ -65,7 +65,7 @@ The toolkit comes with a suite of production-ready tools that connect to various
 
 ```python
 import os
-from glean.toolkit.tools import glean_search
+from glean.agent_toolkit.tools import glean_search
 from agents import Agent, Runner
 
 # Ensure environment variables are set
@@ -89,7 +89,7 @@ print(f"Search results: {result.final_output}")
 
 ```python
 import os
-from glean.toolkit.tools import glean_search
+from glean.agent_toolkit.tools import glean_search
 from langchain_openai import ChatOpenAI
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
@@ -135,7 +135,7 @@ print(result["output"])
 
 ```python
 import os
-from glean.toolkit.tools import glean_search
+from glean.agent_toolkit.tools import glean_search
 from crewai import Agent, Task, Crew
 
 # Ensure environment variables are set
@@ -172,7 +172,7 @@ print(result)
 #### Employee Directory Search
 
 ```python
-from glean.toolkit.tools import employee_search
+from glean.agent_toolkit.tools import employee_search
 
 # Find engineering team members
 engineering_team = employee_search.as_langchain_tool()
@@ -186,7 +186,7 @@ engineering_team = employee_search.as_langchain_tool()
 #### Code Discovery
 
 ```python
-from glean.toolkit.tools import code_search
+from glean.agent_toolkit.tools import code_search
 
 # Search company codebases
 code_tool = code_search.as_langchain_tool()
@@ -200,7 +200,7 @@ code_tool = code_search.as_langchain_tool()
 #### Email and Calendar Integration
 
 ```python
-from glean.toolkit.tools import gmail_search, calendar_search
+from glean.agent_toolkit.tools import gmail_search, calendar_search
 
 # Search emails and meetings
 gmail_tool = gmail_search.as_langchain_tool()
@@ -215,7 +215,7 @@ calendar_tool = calendar_search.as_langchain_tool()
 #### Web Research with Context
 
 ```python
-from glean.toolkit.tools import web_search, ai_web_search
+from glean.agent_toolkit.tools import web_search, ai_web_search
 
 # External information gathering
 web_tool = web_search.as_langchain_tool()
@@ -232,7 +232,7 @@ ai_web_tool = ai_web_search.as_langchain_tool()
 Define your own tools that work across all supported frameworks:
 
 ```python
-from glean.toolkit import tool_spec
+from glean.agent_toolkit import tool_spec
 from pydantic import BaseModel
 import requests
 
@@ -267,89 +267,6 @@ def get_weather(city: str, units: str = "celsius") -> WeatherResponse:
 openai_weather = get_weather.as_openai_tool()
 langchain_weather = get_weather.as_langchain_tool()
 crewai_weather = get_weather.as_crewai_tool()
-```
-
-## Error Handling and Best Practices
-
-### Environment Setup Validation
-
-```python
-import os
-from glean.toolkit.tools import glean_search
-
-def validate_glean_setup():
-    """Validate that Glean credentials are properly configured."""
-    required_vars = ["GLEAN_API_TOKEN", "GLEAN_INSTANCE"]
-    missing_vars = [var for var in required_vars if not os.getenv(var)]
-    
-    if missing_vars:
-        raise ValueError(f"Missing required environment variables: {missing_vars}")
-    
-    # Test connection with a simple search
-    try:
-        from glean.api_client import models
-        test_params = {
-            "query": models.ToolsCallParameter(name="query", value="test")
-        }
-        result = glean_search(test_params)
-        if "error" in result:
-            raise ValueError(f"Glean API error: {result['error']}")
-        print("✅ Glean connection validated successfully")
-    except Exception as e:
-        raise ValueError(f"Failed to connect to Glean: {e}")
-
-# Run before using tools
-validate_glean_setup()
-```
-
-### Rate Limiting and Retries
-
-```python
-import time
-from typing import Any, Dict
-
-def safe_tool_call(tool_func, params: Dict[str, Any], max_retries: int = 3) -> Dict[str, Any]:
-    """Safely call a Glean tool with retry logic."""
-    for attempt in range(max_retries):
-        try:
-            result = tool_func(params)
-            if "error" not in result:
-                return result
-            
-            # Check if it's a rate limit error
-            if "rate limit" in result.get("error", "").lower():
-                wait_time = 2 ** attempt  # Exponential backoff
-                print(f"Rate limited, waiting {wait_time} seconds...")
-                time.sleep(wait_time)
-                continue
-            
-            # Non-retryable error
-            return result
-            
-        except Exception as e:
-            if attempt == max_retries - 1:
-                return {"error": str(e), "result": None}
-            time.sleep(1)
-    
-    return {"error": "Max retries exceeded", "result": None}
-```
-
-## Security Considerations
-
-* **API Keys**: Never commit API tokens to version control. Use environment variables or secure secret management.
-* **Access Control**: Glean tools respect user permissions. Users can only access data they're authorized to see.
-* **Data Privacy**: Search results may contain sensitive company information. Ensure proper handling in your applications.
-* **Rate Limits**: Implement appropriate retry logic and respect API rate limits to avoid service disruption.
-
-### Debug Mode
-
-Enable detailed logging for troubleshooting:
-
-```python
-import logging
-logging.basicConfig(level=logging.DEBUG)
-
-# Tool calls will now show detailed request/response information
 ```
 
 ## Contributing

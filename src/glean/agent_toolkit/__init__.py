@@ -1,11 +1,15 @@
-"""Universal Tool/Action SDK for agent frameworks."""
+"""
+Glean Agent Toolkit.
+
+Universal Tool/Action Toolkit for Glean agent frameworks.
+"""
 
 import logging
 from importlib.metadata import PackageNotFoundError, version
 
-from glean.toolkit.decorators import tool_spec
-from glean.toolkit.registry import get_registry
-from glean.toolkit.spec import ToolSpec
+from glean.agent_toolkit.decorators import tool_spec
+from glean.agent_toolkit.registry import get_registry
+from glean.agent_toolkit.spec import ToolSpec
 
 from . import adapters
 

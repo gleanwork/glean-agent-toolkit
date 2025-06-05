@@ -1,16 +1,16 @@
-"""Gmail Search tool."""
+"""Outlook Search tool for searching email messages."""
 
 from __future__ import annotations
 
 from typing import Any
 
+from glean.agent_toolkit.decorators import tool_spec
+from glean.agent_toolkit.tools._common import run_tool
 from glean.api_client import models
-from glean.toolkit.decorators import tool_spec
-from glean.toolkit.tools._common import run_tool
 
 
 @tool_spec(
-    name="gmail_search",
+    name="outlook_search",
     description=(
         "Finds relevant emails in the user's mailbox.\n"
         "- Only use this tool if the user asks for email.\n"
@@ -18,6 +18,6 @@ from glean.toolkit.tools._common import run_tool
         "recency (most recent first)."
     ),
 )
-def gmail_search(parameters: dict[str, models.ToolsCallParameter]) -> dict[str, Any]:
-    """Search Gmail messages based on the query."""
-    return run_tool("Gmail Search", parameters)
+def outlook_search(parameters: dict[str, models.ToolsCallParameter]) -> dict[str, Any]:
+    """Search Outlook messages based on the query."""
+    return run_tool("Outlook Search", parameters)

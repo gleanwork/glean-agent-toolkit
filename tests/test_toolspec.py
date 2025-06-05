@@ -1,9 +1,6 @@
-"""Unit tests for ToolSpec class and adapter error handling."""
-
-import pytest
 from pydantic import BaseModel
 
-from glean.toolkit.spec import ToolSpec
+from glean.agent_toolkit.spec import ToolSpec
 
 
 class SampleModel(BaseModel):

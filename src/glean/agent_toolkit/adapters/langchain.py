@@ -1,12 +1,12 @@
-"""Adapter for LangChain tools."""
+"""LangChain adapter for converting tool specifications."""
 
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, TypeAlias, Union, cast
 
 from pydantic import BaseModel
 
-from glean.toolkit.adapters.base import BaseAdapter
-from glean.toolkit.spec import ToolSpec
+from glean.agent_toolkit.adapters.base import BaseAdapter
+from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
     from langchain.tools import Tool as LangchainTool  # pragma: no cover

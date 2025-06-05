@@ -1,9 +1,7 @@
-"""Tests for the Outlook Search tool."""
-
 import pytest
 
+from glean.agent_toolkit.tools.outlook_search import outlook_search
 from glean.api_client import models
-from glean.toolkit.tools.outlook_search import outlook_search
 
 
 def test_outlook_search_success(vcr_cassette):

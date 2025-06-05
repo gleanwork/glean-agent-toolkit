@@ -1,11 +1,8 @@
-"""Unit tests for schema generation edge cases."""
-
 from typing import Optional, Union
 
-import pytest
 from pydantic import BaseModel
 
-from glean.toolkit.decorators import tool_spec
+from glean.agent_toolkit.decorators import tool_spec
 
 
 class ComplexModel(BaseModel):

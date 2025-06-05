@@ -2,8 +2,8 @@
 
 import pytest
 
+from glean.agent_toolkit.tools.glean_search import glean_search
 from glean.api_client import models
-from glean.toolkit.tools.glean_search import glean_search
 
 
 def test_glean_search_success(vcr_cassette):

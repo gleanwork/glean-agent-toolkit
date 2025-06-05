@@ -1,13 +1,11 @@
-"""Unit tests for common tool functionality."""
-
 import os
 from unittest import mock
 from unittest.mock import patch
 
 import pytest
 
+from glean.agent_toolkit.tools._common import api_client, run_tool
 from glean.api_client import models
-from glean.toolkit.tools._common import api_client, run_tool
 
 
 class TestApiClient:
@@ -19,7 +17,7 @@ class TestApiClient:
             "GLEAN_API_TOKEN": "test-token",
             "GLEAN_INSTANCE": "test-instance"
         }):
-            with patch("glean.toolkit.tools._common.Glean") as mock_glean:
+            with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
                 api_client()
                 mock_glean.assert_called_once_with(
                     api_token="test-token",
@@ -73,7 +71,7 @@ class TestRunTool:
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
 
-        with patch("glean.toolkit.tools._common.api_client") as mock_api_client:
+        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
             mock_client = mock.MagicMock()
             mock_client.client.tools.run.return_value = mock_result
             mock_api_client.return_value.__enter__.return_value = mock_client
@@ -92,7 +90,7 @@ class TestRunTool:
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
 
-        with patch("glean.toolkit.tools._common.api_client") as mock_api_client:
+        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
             mock_client = mock.MagicMock()
             mock_client.client.tools.run.side_effect = Exception("API Error")
             mock_api_client.return_value.__enter__.return_value = mock_client
@@ -107,7 +105,7 @@ class TestRunTool:
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
 
-        with patch("glean.toolkit.tools._common.api_client") as mock_api_client:
+        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
             mock_client = mock.MagicMock()
             mock_client.client.tools.run.side_effect = ConnectionError("Network error")
             mock_api_client.return_value.__enter__.return_value = mock_client
@@ -121,7 +119,7 @@ class TestRunTool:
         mock_result = {"status": "success"}
         parameters = {}
 
-        with patch("glean.toolkit.tools._common.api_client") as mock_api_client:
+        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
             mock_client = mock.MagicMock()
             mock_client.client.tools.run.return_value = mock_result
             mock_api_client.return_value.__enter__.return_value = mock_client
@@ -140,7 +138,7 @@ class TestRunTool:
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
 
-        with patch("glean.toolkit.tools._common.api_client") as mock_api_client:
+        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
             mock_api_client.side_effect = ValueError("Missing credentials")
 
             # The run_tool function should catch the ValueError and return an error dict

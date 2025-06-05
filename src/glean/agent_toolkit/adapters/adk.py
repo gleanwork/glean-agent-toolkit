@@ -1,10 +1,10 @@
-"""Adapter for Google Agent Development Kit (ADK)."""
+"""Google ADK adapter for converting tool specifications."""
 
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias
 
-from glean.toolkit.adapters.base import BaseAdapter
-from glean.toolkit.spec import ToolSpec
+from glean.agent_toolkit.adapters.base import BaseAdapter
+from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
     from google.adk.tools import FunctionTool as _RealAdkFunctionTool

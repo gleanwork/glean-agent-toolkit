@@ -1,9 +1,9 @@
-"""Base adapter interface for tool specification conversion."""
+"""Base adapter class for converting tool specifications to framework-specific formats."""
 
 from abc import ABC, abstractmethod
 from typing import Generic, TypeVar
 
-from glean.toolkit.spec import ToolSpec
+from glean.agent_toolkit.spec import ToolSpec
 
 T = TypeVar("T")
 

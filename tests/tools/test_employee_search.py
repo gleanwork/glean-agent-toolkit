@@ -2,8 +2,8 @@
 
 import pytest
 
+from glean.agent_toolkit.tools.employee_search import employee_search
 from glean.api_client import models
-from glean.toolkit.tools.employee_search import employee_search
 
 
 def test_employee_search_success(vcr_cassette):

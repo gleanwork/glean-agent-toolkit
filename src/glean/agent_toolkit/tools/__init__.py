@@ -1,11 +1,7 @@
-"""Built-in stub tools delivered with Glean Toolkit.
+"""
+Each tool lives in its own module under :pymod:`glean.agent_toolkit.tools`.
 
-Each tool lives in its own module under :pymod:`glean.toolkit.tools`. Importing this package
-registers every stub via its ``@tool_spec`` decorator and re-exports the
-callables for convenience::
-
-    from glean.toolkit.tools import glean_search, web_browser
-
+Importing this package will load all available tools.
 """
 
 from __future__ import annotations

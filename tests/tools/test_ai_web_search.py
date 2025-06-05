@@ -1,9 +1,7 @@
-"""Tests for the AI Web Search tool."""
-
 import pytest
 
+from glean.agent_toolkit.tools.ai_web_search import ai_web_search
 from glean.api_client import models
-from glean.toolkit.tools.ai_web_search import ai_web_search
 
 
 def test_ai_web_search_success(vcr_cassette):

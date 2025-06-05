@@ -1,9 +1,7 @@
-"""Tests for the Calendar Search tool."""
-
 import pytest
 
+from glean.agent_toolkit.tools.calendar_search import calendar_search
 from glean.api_client import models
-from glean.toolkit.tools.calendar_search import calendar_search
 
 
 def test_calendar_search_success(vcr_cassette):

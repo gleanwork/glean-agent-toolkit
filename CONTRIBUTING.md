@@ -1,6 +1,24 @@
 # Contributing to Glean Agent Toolkit
 
-This guide explains how to set up a local environment and submit changes to **Glean Agent Toolkit** (`glean-agent-toolkit`).
+Thank you for your interest in contributing to the Glean Agent Toolkit! This guide will help you understand the project structure, development workflow, and how to add new tools.
+
+## Project Structure
+
+```
+src/
+├─ glean/
+│  ├─ __init__.py        
+│  └─ agent_toolkit/     # exposes `glean.agent_toolkit`
+│     ├─ __init__.py
+│     ├─ decorators.py
+│     ├─ registry.py
+│     ├─ spec.py
+│     ├─ adapters/
+│     ├─ tools/
+│     └─ cli.py
+├─ tests/
+└─ docs/
+```
 
 ## Development environment
 
@@ -62,24 +80,6 @@ The project uses [go-task](https://taskfile.dev/) to manage development tasks. H
 | `task clean` | Clean build artifacts |
 | `task build` | Build the package |
 | `task release` | Create a new release (version bump + changelog) |
-
-## Project structure
-
-```text
-glean-agent-toolkit/
-├─ glean/
-│  ├─ __init__.py        # exposes `glean.toolkit`
-│  └─ toolkit/
-│     ├─ __init__.py
-│     ├─ decorators.py
-│     ├─ registry.py
-│     ├─ spec.py
-│     ├─ adapters/
-│     ├─ tools/
-│     └─ cli.py
-├─ tests/
-└─ docs/
-```
 
 ## Pull Request Process
 
