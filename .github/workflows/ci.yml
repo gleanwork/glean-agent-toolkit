@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
   workflow_dispatch:
 
 jobs:
@@ -12,33 +12,23 @@ jobs:
     name: Lint and Type Check
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v4
-      with:
-        python-version: "3.11"
-        
-    - name: Install go-task
-      uses: arduino/setup-task@v2
-      with:
-        version: 3.x
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Set up uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
-      
-    - name: Setup development environment
-      run: task setup
-        
-    - name: Run linters
-      run: task lint
+      - uses: actions/checkout@v4
 
-    - name: Build package
-      run: task build
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+        with:
+          cache: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup development environment
+        run: task setup
+
+      - name: Run linters
+        run: task lint
+
+      - name: Build package
+        run: task build
 
   test:
     name: Test Python ${{ matrix.python-version }}
@@ -48,33 +38,29 @@ jobs:
         python-version: ["3.10", "3.11", "3.12", "3.13"]
 
     steps:
-    - uses: actions/checkout@v4
-    
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
-      with:
-        python-version: ${{ matrix.python-version }}
-        
-    - name: Install go-task
-      uses: arduino/setup-task@v2
-      with:
-        version: 3.x
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Set up uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
-      
-    - name: Setup development environment
-      run: task setup
-        
-    - name: Run tests
-      run: task test
+      - uses: actions/checkout@v4
 
-    - name: Test package installation
-      run: |
-        task build
-        uv run pip install dist/*.whl
-        uv run python -c "import glean.agent_toolkit; print('Package installed successfully')"
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+        with:
+          cache: true
+          mise_toml: |
+            [tools]
+            python = "${{ matrix.python-version }}"
+            task = "latest"
+            uv = "latest"
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup development environment
+        run: task setup
+
+      - name: Run tests
+        run: task test
+
+      - name: Test package installation
+        run: |
+          task build
+          uv run pip install dist/*.whl
+          uv run python -c "import glean.agent_toolkit; print('Package installed successfully')"
