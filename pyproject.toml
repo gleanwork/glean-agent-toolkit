@@ -7,54 +7,32 @@ name = "glean-agent-toolkit"
 version = "0.1.0"
 description = "AI Agent toolkit for adapting Glean's enterprise tools across multiple frameworks"
 readme = "README.md"
-authors = [{ name = "Glean", email = "dev@glean.com" }]
-license = {text = "MIT"}
+authors = [{ name = "Steve Calvert", email = "steve.calvert@glean.com" }]
+license = { text = "MIT" }
 requires-python = ">=3.10,<4.0"
-dependencies = [
-    "pydantic>=2.7,<3.0",
-    "glean-api-client>=0.6.0,<1.0",
-]
+dependencies = ["pydantic>=2.7,<3.0", "glean-api-client>=0.6.0,<1.0"]
 
 [project.optional-dependencies]
-dev = [
-    "commitizen>=4.4.1,<5.0",
-    "pip-audit>=2.6.0,<3.0",
-    "vcrpy>=6.0.2,<7.0",
-]
+dev = ["commitizen>=4.4.1,<5.0", "pip-audit>=2.6.0,<3.0", "vcrpy>=6.0.2,<7.0"]
 test = [
-    "pytest>=7.4.3,<9.0",
-    "pytest-asyncio>=0.23.2,<1.0",
-    "pytest-cov>=4.1.0,<6.0",
-    "pytest-httpx>=0.35.0,<1.0",
-    # Optional dependencies for testing adapters
-    "openai>=1.0.0,<2.0",
-    "openai-agents>=0.0.11,<1.0",
-    "langchain>=0.1.0,<1.0",
-    "crewai>=0.28.0,<1.0",
-    "google-adk>=0.1.0,<1.0",
+  "pytest>=7.4.3,<9.0",
+  "pytest-asyncio>=0.23.2,<1.0",
+  "pytest-cov>=4.1.0,<6.0",
+  "pytest-httpx>=0.35.0,<1.0",
+  # Optional dependencies for testing adapters
+  "openai>=1.0.0,<2.0",
+  "openai-agents>=0.0.11,<1.0",
+  "langchain>=0.1.0,<1.0",
+  "crewai>=0.28.0,<1.0",
+  "google-adk>=0.1.0,<1.0",
 ]
-openai = [
-    "openai>=1.0.0,<2.0",
-    "openai-agents>=0.0.11,<1.0",
-]
-adk = [
-    "google-adk>=0.1.0,<1.0",
-]
-langchain = [
-    "langchain>=0.1.0,<1.0",
-]
-crewai = [
-    "crewai>=0.28.0,<1.0",
-]
-codespell = [
-    "codespell>=2.2.6,<3.0",
-]
-lint = [
-    "ruff>=0.5,<1.0",
-]
-typing = [
-    "pyright>=1.1.370,<2.0",
-]
+openai = ["openai>=1.0.0,<2.0", "openai-agents>=0.0.11,<1.0"]
+adk = ["google-adk>=0.1.0,<1.0"]
+langchain = ["langchain>=0.1.0,<1.0"]
+crewai = ["crewai>=0.28.0,<1.0"]
+codespell = ["codespell>=2.2.6,<3.0"]
+lint = ["ruff>=0.5,<1.0"]
+typing = ["pyright>=1.1.370,<2.0"]
 
 [project.urls]
 "Source Code" = "https://github.com/gleanwork/glean-agent-toolkit"
@@ -70,22 +48,20 @@ pythonVersion = "3.13"
 reportMissingImports = "warning"
 reportUnusedVariable = "warning"
 
-executionEnvironments = [
-  { root = "src" }
-]
+executionEnvironments = [{ root = "src" }]
 
 [tool.ruff]
 src = ["src"]
 line-length = 100
 target-version = "py310"
 exclude = [
-    "docs/",
-    ".venv/",
-    "**/site-packages/",
-    "__pycache__/",
-    "dist/",
-    "build/",
-    "tests/"
+  "docs/",
+  ".venv/",
+  "**/site-packages/",
+  "__pycache__/",
+  "dist/",
+  "build/",
+  "tests/",
 ]
 
 [tool.ruff.lint]
@@ -115,11 +91,9 @@ testpaths = ["tests"]
 python_files = "test_*.py"
 asyncio_mode = "auto"
 markers = [
-    "load_json: Load JSON fixture data from tests/fixtures directory",
-    "vcr_record_with_real_auth: Record VCR cassettes using real Glean API credentials",
-] 
+  "load_json: Load JSON fixture data from tests/fixtures directory",
+  "vcr_record_with_real_auth: Record VCR cassettes using real Glean API credentials",
+]
 
 [dependency-groups]
-dev = [
-    "vcrpy>=5.1.0",
-]
+dev = ["vcrpy>=5.1.0"]
