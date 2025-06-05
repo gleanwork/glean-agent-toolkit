@@ -14,22 +14,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Python 3.11
-      uses: actions/setup-python@v4
+    - name: Set up mise
+      uses: jdx/mise-action@v2
       with:
-        python-version: "3.11"
-        
-    - name: Install go-task
-      uses: arduino/setup-task@v2
-      with:
-        version: 3.x
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Set up uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
+        cache: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
     - name: Setup development environment
       run: task setup
@@ -50,22 +40,15 @@ jobs:
     steps:
     - uses: actions/checkout@v4
     
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v4
+    - name: Set up mise
+      uses: jdx/mise-action@v2
       with:
-        python-version: ${{ matrix.python-version }}
-        
-    - name: Install go-task
-      uses: arduino/setup-task@v2
-      with:
-        version: 3.x
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Set up uv
-      uses: astral-sh/setup-uv@v5
-      with:
-        enable-cache: true
-        cache-dependency-glob: "uv.lock"
+        cache: true
+        mise_toml: |
+          [tools]
+          python = "${{ matrix.python-version }}"
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       
     - name: Setup development environment
       run: task setup
