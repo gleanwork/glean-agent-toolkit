@@ -39,10 +39,120 @@ Before using any Glean tools, you'll need:
 
 1. **Glean API credentials**: Obtain these from your Glean administrator
 2. **Environment variables**:
+
    ```bash
    export GLEAN_API_TOKEN="your-api-token"
    export GLEAN_INSTANCE="your-instance-name"
    ```
+
+## Quickstart Example: Company Assistant with Google ADK
+
+Here's a complete example that demonstrates the power of the Glean Agent Toolkit. We'll build a "Company Assistant" using Google's Agent Development Kit (ADK) that can help employees find information, discover colleagues, and search company resources.
+
+```python
+import os
+from google.adk.agents import Agent
+
+from glean.agent_toolkit.tools import (
+    glean_search, 
+    employee_search, 
+    calendar_search, 
+    gmail_search
+)
+
+# Ensure environment variables are set
+required_env_vars = ["GLEAN_API_TOKEN", "GLEAN_INSTANCE"]
+for var in required_env_vars:
+    if not os.getenv(var):
+        raise ValueError(f"{var} environment variable must be set")
+
+# For Google ADK, you also need authentication
+# Either set GOOGLE_API_KEY for Google AI Studio, or use gcloud auth for Vertex AI
+if not os.getenv("GOOGLE_API_KEY") and not os.getenv("GOOGLE_CLOUD_PROJECT"):
+    raise ValueError("Either GOOGLE_API_KEY or GOOGLE_CLOUD_PROJECT must be set for ADK")
+
+# Convert Glean tools to Google ADK format
+company_search = glean_search.as_adk_tool()
+people_finder = employee_search.as_adk_tool()
+meeting_search = calendar_search.as_adk_tool()
+email_search = gmail_search.as_adk_tool()
+
+# Create a Company Assistant agent
+root_agent = Agent(
+    name="company_assistant",
+    model="gemini-2.0-flash",
+    description="Company Assistant that helps employees find information, people, and resources within the organization.",
+    instruction="""You are a helpful company assistant that helps employees find information, 
+    people, and resources within the organization. You have access to:
+    
+    - Company knowledge base and documents (use glean_search)
+    - Employee directory and contact information (use employee_search)
+    - Calendar and meeting information (use calendar_search)
+    - Email search capabilities (use gmail_search)
+    
+    Always be helpful, professional, and respect privacy. When searching for people, 
+    only share appropriate business contact information.""",
+    tools=[company_search, people_finder, meeting_search, email_search]
+)
+```
+
+### Running the Agent
+
+Create the required project structure:
+
+```bash
+mkdir company_assistant/
+touch company_assistant/__init__.py
+touch company_assistant/.env
+```
+
+In `company_assistant/__init__.py`:
+
+```python
+from . import agent
+```
+
+In `company_assistant/.env`:
+
+```bash
+# Authentication for Google ADK (choose one)
+GOOGLE_API_KEY=your-google-ai-studio-api-key
+# OR for Vertex AI:
+# GOOGLE_CLOUD_PROJECT=your-project-id
+# GOOGLE_CLOUD_LOCATION=us-central1
+
+# Glean credentials
+GLEAN_API_TOKEN=your-glean-api-token
+GLEAN_INSTANCE=your-glean-instance
+```
+
+Place the agent code above in `company_assistant/agent.py` with the root_agent definition.
+
+Then run from the parent directory:
+
+```bash
+# Web UI (recommended for testing)
+adk web
+
+# OR Terminal interface
+adk run company_assistant
+
+# OR API server
+adk api_server
+```
+
+### Real-World Queries You Can Handle
+
+Once set up, your Company Assistant can handle requests like:
+
+- *"Find our security guidelines for handling customer data"*
+- *"Who's the product manager for the mobile app team?"*
+- *"Show me emails about the budget planning meeting from last week"*
+- *"I need the engineering team's architecture docs for the payment system"*
+- *"Find all the design review meetings scheduled for this month"*
+- *"Who worked on the API authentication project? I need to ask them some questions"*
+
+This type of assistant can dramatically improve employee productivity by making company knowledge instantly accessible through natural conversation.
 
 ## Available Tools
 
