@@ -12,13 +12,13 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 Install the base toolkit:
 
-```bash
+```bash snippet=readme/snippet-01.bash
 pip install glean-agent-toolkit
 ```
 
 To include support for specific agent frameworks, install the relevant extras:
 
-```bash
+```bash snippet=readme/snippet-02.bash
 pip install glean-agent-toolkit[openai]
 pip install glean-agent-toolkit[adk]
 pip install glean-agent-toolkit[langchain]
@@ -27,7 +27,7 @@ pip install glean-agent-toolkit[crewai]
 
 You can also install all extras:
 
-```bash
+```bash snippet=readme/snippet-03.bash
 pip install glean-agent-toolkit[all]
 ```
 
@@ -53,16 +53,16 @@ Here's a complete example that demonstrates the power of the Glean Agent Toolkit
 
 First, create the project structure:
 
-```bash
-mkdir company_assistant/
-cd company_assistant/
+```bash snippet=readme/snippet-04.bash
+export GLEAN_API_TOKEN="your-api-token"
+export GLEAN_INSTANCE="your-instance-name"
 ```
 
 ### Step 2: Create the Agent File
 
 Create `company_assistant/agent.py` with your agent definition:
 
-```python
+```python snippet=readme/snippet-01.py
 import os
 
 from google.adk.agents import Agent
@@ -110,7 +110,7 @@ root_agent = Agent(
 
 Create `company_assistant/__init__.py` to import your agent:
 
-```python
+```python snippet=readme/snippet-02.py
 from . import agent
 ```
 
@@ -118,7 +118,16 @@ from . import agent
 
 Create `company_assistant/.env` with your credentials:
 
-```bash
+```bash snippet=readme/snippet-05.bash
+mkdir company_assistant/
+cd company_assistant/
+```
+
+### Step 5: Run Your Agent
+
+From the parent directory (outside `company_assistant/`), run your Company Assistant:
+
+```bash snippet=readme/snippet-06.bash
 # company_assistant/.env
 
 # Authentication for Google ADK (choose one)
@@ -130,21 +139,6 @@ GOOGLE_API_KEY=your-google-ai-studio-api-key
 # Glean credentials
 GLEAN_API_TOKEN=your-glean-api-token
 GLEAN_INSTANCE=your-glean-instance
-```
-
-### Step 5: Run Your Agent
-
-From the parent directory (outside `company_assistant/`), run your Company Assistant:
-
-```bash
-# Web UI (recommended for testing)
-adk web
-
-# OR Terminal interface
-adk run company_assistant
-
-# OR API server
-adk api_server
 ```
 
 ### Real-World Queries You Can Handle
@@ -179,7 +173,7 @@ The toolkit comes with a suite of production-ready tools that connect to various
 
 #### OpenAI Agents SDK
 
-```python
+```python snippet=readme/snippet-03.py
 import os
 
 from agents import Agent, Runner
@@ -206,7 +200,7 @@ print(f"Search results: {result.final_output}")
 
 #### LangChain
 
-```python
+```python snippet=readme/snippet-04.py
 import os
 
 from langchain.agents import AgentExecutor, create_react_agent
@@ -254,7 +248,7 @@ print(result["output"])
 
 #### CrewAI
 
-```python
+```python snippet=readme/snippet-05.py
 import os
 
 from crewai import Agent, Crew, Task
@@ -297,7 +291,7 @@ print(result)
 
 #### Employee Directory Search
 
-```python
+```python snippet=readme/snippet-06.py
 from glean.agent_toolkit.tools import employee_search
 
 # Find engineering team members
@@ -311,7 +305,7 @@ engineering_team = employee_search.as_langchain_tool()
 
 #### Code Discovery
 
-```python
+```python snippet=readme/snippet-07.py
 from glean.agent_toolkit.tools import code_search
 
 # Search company codebases
@@ -325,7 +319,7 @@ code_tool = code_search.as_langchain_tool()
 
 #### Email and Calendar Integration
 
-```python
+```python snippet=readme/snippet-08.py
 from glean.agent_toolkit.tools import calendar_search, gmail_search
 
 # Search emails and meetings
@@ -340,7 +334,7 @@ calendar_tool = calendar_search.as_langchain_tool()
 
 #### Web Research with Context
 
-```python
+```python snippet=readme/snippet-09.py
 from glean.agent_toolkit.tools import ai_web_search, web_search
 
 # External information gathering
@@ -357,7 +351,7 @@ ai_web_tool = ai_web_search.as_langchain_tool()
 
 Define your own tools that work across all supported frameworks:
 
-```python
+```python snippet=readme/snippet-10.py
 import os
 
 import requests

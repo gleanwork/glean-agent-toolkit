@@ -51,7 +51,7 @@ reportUnusedVariable = "warning"
 executionEnvironments = [{ root = "src" }]
 
 [tool.ruff]
-src = ["src"]
+src = ["src", "snippets"]
 line-length = 100
 target-version = "py310"
 exclude = [
@@ -70,6 +70,7 @@ ignore = ["ANN401", "D203", "D212", "F401", "T201"]
 
 [tool.ruff.lint.per-file-ignores]
 "tests/**/*.py" = ["ANN", "D", "W291", "W292", "W293", "UP007"]
+"snippets/**/*.py" = ["D100", "D101"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["glean"]
