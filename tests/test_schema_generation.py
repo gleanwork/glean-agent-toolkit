@@ -37,7 +37,7 @@ class TestSchemaGeneration:
         assert "optional" in schema["properties"]
         assert schema["required"] == [
             "required"
-        ]  # Only required param should be in required list
+        ]
 
     def test_list_parameters(self) -> None:
         """Test schema generation with list parameters."""
