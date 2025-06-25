@@ -29,13 +29,15 @@ class TestSchemaGeneration:
         """Test schema generation with optional parameters."""
 
         @tool_spec(name="test_optional", description="Test optional params")
-        def test_func(required: str, optional: Optional[str] = None) -> str:
+        def test_func(required: str, optional: str | None = None) -> str:
             return f"{required}-{optional or 'default'}"
 
         schema = test_func.tool_spec.input_schema
         assert "required" in schema["properties"]
         assert "optional" in schema["properties"]
-        assert schema["required"] == ["required"]  # Only required param should be in required list
+        assert schema["required"] == [
+            "required"
+        ]
 
     def test_list_parameters(self) -> None:
         """Test schema generation with list parameters."""
@@ -68,7 +70,7 @@ class TestSchemaGeneration:
             text: str = "default",
             number: int = 42,
             flag: bool = False,
-            items: Optional[list[str]] = None
+            items: list[str] | None = None,
         ) -> str:
             return f"{text}-{number}-{flag}-{len(items or [])}"
 
@@ -79,16 +81,13 @@ class TestSchemaGeneration:
         """Test schema generation with complex output model."""
 
         @tool_spec(
-            name="test_complex_output", 
+            name="test_complex_output",
             description="Test complex output",
-            output_model=ComplexModel
+            output_model=ComplexModel,
         )
         def test_func(name: str) -> ComplexModel:
             return ComplexModel(
-                id=1,
-                name=name,
-                tags=["test"],
-                metadata={"source": "test"}
+                id=1, name=name, tags=["test"], metadata={"source": "test"}
             )
 
         output_schema = test_func.tool_spec.output_schema
@@ -104,17 +103,12 @@ class TestSchemaGeneration:
         @tool_spec(
             name="test_nested_output",
             description="Test nested output",
-            output_model=NestedModel
+            output_model=NestedModel,
         )
         def test_func(value: int) -> NestedModel:
             return NestedModel(
                 value=value,
-                complex=ComplexModel(
-                    id=1,
-                    name="test",
-                    tags=[],
-                    metadata={}
-                )
+                complex=ComplexModel(id=1, name="test", tags=[], metadata={}),
             )
 
         output_schema = test_func.tool_spec.output_schema
@@ -169,7 +163,7 @@ class TestSchemaGeneration:
             decimal: float,
             flag: bool,
             items: list[str],
-            optional_num: Optional[int] = None
+            optional_num: int | None = None,
         ) -> str:
             return "mixed"
 
@@ -183,7 +177,7 @@ class TestSchemaGeneration:
         assert schema["properties"]["items"]["type"] == "string"
         # Optional types also fall back to string
         assert schema["properties"]["optional_num"]["type"] == "string"
-        
+
         # Only required parameters should be in the required list
         required_params = set(schema["required"])
         expected_required = {"text", "number", "decimal", "flag", "items"}
@@ -196,4 +190,5 @@ class TestSchemaGeneration:
         def test_func(param: str) -> str:
             return param
 
-        assert test_func.tool_spec.version == "1.0.0" 
+        assert test_func.tool_spec.version == "1.0.0"
+
