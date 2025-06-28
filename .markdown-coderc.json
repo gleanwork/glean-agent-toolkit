@@ -1,0 +1,14 @@
+{
+  "snippetRoot": "./snippets",
+  "markdownGlob": "README.md",
+  "excludeGlob": [
+    "node_modules/**",
+    ".git/**",
+    "dist/**",
+    "build/**",
+    "coverage/**",
+    "target/**",
+    "vendor/**"
+  ],
+  "includeExtensions": [".py", ".bash", ".sh"]
+}

@@ -12,13 +12,13 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 Install the base toolkit:
 
-```bash
+```bash snippet=readme/snippet-01.bash
 pip install glean-agent-toolkit
 ```
 
 To include support for specific agent frameworks, install the relevant extras:
 
-```bash
+```bash snippet=readme/snippet-02.bash
 pip install glean-agent-toolkit[openai]
 pip install glean-agent-toolkit[adk]
 pip install glean-agent-toolkit[langchain]
@@ -27,7 +27,7 @@ pip install glean-agent-toolkit[crewai]
 
 You can also install all extras:
 
-```bash
+```bash snippet=readme/snippet-03.bash
 pip install glean-agent-toolkit[all]
 ```
 
@@ -39,10 +39,111 @@ Before using any Glean tools, you'll need:
 
 1. **Glean API credentials**: Obtain these from your Glean administrator
 2. **Environment variables**:
+
    ```bash
    export GLEAN_API_TOKEN="your-api-token"
    export GLEAN_INSTANCE="your-instance-name"
    ```
+
+## Quickstart Example: Company Assistant with Google ADK
+
+Here's a complete example that demonstrates the power of the Glean Agent Toolkit. We'll build a "Company Assistant" using Google's Agent Development Kit (ADK) that can help employees find information, discover colleagues, and search company resources.
+
+### Step 1: Create Project Directory
+
+First, create the project structure:
+
+```bash snippet=readme/snippet-04.bash
+export GLEAN_API_TOKEN="your-api-token"
+export GLEAN_INSTANCE="your-instance-name"
+```
+
+### Step 2: Create the Agent File
+
+Create `company_assistant/agent.py` with your agent definition:
+
+```python snippet=readme/snippet-01.py
+import os
+
+from google.adk.agents import Agent
+
+from glean.agent_toolkit.tools import calendar_search, employee_search, glean_search, gmail_search
+
+# Ensure environment variables are set
+required_env_vars = ["GLEAN_API_TOKEN", "GLEAN_INSTANCE"]
+for var in required_env_vars:
+    if not os.getenv(var):
+        raise ValueError(f"{var} environment variable must be set")
+
+# For Google ADK, you also need authentication
+# Either set GOOGLE_API_KEY for Google AI Studio, or use gcloud auth for Vertex AI
+if not os.getenv("GOOGLE_API_KEY") and not os.getenv("GOOGLE_CLOUD_PROJECT"):
+    raise ValueError("Either GOOGLE_API_KEY or GOOGLE_CLOUD_PROJECT must be set for ADK")
+
+# Convert Glean tools to Google ADK format
+company_search = glean_search.as_adk_tool()
+people_finder = employee_search.as_adk_tool()
+meeting_search = calendar_search.as_adk_tool()
+email_search = gmail_search.as_adk_tool()
+
+# Create a Company Assistant agent
+root_agent = Agent(
+    name="company_assistant",
+    model="gemini-2.0-flash",
+    description="""Company Assistant that helps employees find information, people, and resources
+    within the organization.""",
+    instruction="""You are a helpful company assistant that helps employees find information,
+    people, and resources within the organization. You have access to:
+
+    - Company knowledge base and documents (use glean_search)
+    - Employee directory and contact information (use employee_search)
+    - Calendar and meeting information (use calendar_search)
+    - Email search capabilities (use gmail_search)
+
+    Always be helpful, professional, and respect privacy. When searching for people,
+    only share appropriate business contact information.""",
+    tools=[company_search, people_finder, meeting_search, email_search],
+)
+```
+
+### Step 3: Create Package Init File
+
+Create `company_assistant/__init__.py` to import your agent:
+
+```python snippet=readme/snippet-02.py
+from . import agent
+```
+
+### Step 4: Configure Environment Variables
+
+Create `company_assistant/.env` with your credentials:
+
+```bash snippet=readme/snippet-05.bash
+export GLEAN_API_TOKEN="your-api-token"
+export GLEAN_INSTANCE="your-instance-name"
+```
+
+### Step 5: Run Your Agent
+
+From the parent directory (outside `company_assistant/`), run your Company Assistant:
+
+```bash snippet=readme/snippet-06.bash
+mkdir company_assistant/
+cd company_assistant/
+```
+
+### Real-World Queries You Can Handle
+
+Once set up, your Company Assistant can handle requests like:
+
+- *"Find our security guidelines for handling customer data"*
+- *"Who's the product manager for the mobile app team?"*
+- *"Show me emails about the budget planning meeting from last week"*
+- *"I need the engineering team's architecture docs for the payment system"*
+- *"Find all the design review meetings scheduled for this month"*
+- *"Who worked on the API authentication project? I need to ask them some questions"*
+
+This type of assistant can dramatically improve employee productivity by making company knowledge instantly accessible through natural conversation.
 
 ## Available Tools
 
@@ -63,10 +164,12 @@ The toolkit comes with a suite of production-ready tools that connect to various
 
 #### OpenAI Agents SDK
 
-```python
+```python snippet=readme/snippet-03.py
 import os
-from glean.agent_toolkit.tools import glean_search
+
 from agents import Agent, Runner
+
+from glean.agent_toolkit.tools import glean_search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
@@ -76,8 +179,9 @@ assert os.getenv("OPENAI_API_KEY"), "OPENAI_API_KEY must be set"
 # Create an agent with the Glean search tool
 agent = Agent(
     name="KnowledgeAssistant",
-    instructions="You help users find information from the company knowledge base using Glean search.",
-    tools=[glean_search.func]  # Use the underlying function
+    instructions="""You help users find information from the company knowledge base using
+    Glean search.""",
+    tools=[glean_search],  # Use the tool function directly
 )
 
 # Run a search query
@@ -87,12 +191,14 @@ print(f"Search results: {result.final_output}")
 
 #### LangChain
 
-```python
+```python snippet=readme/snippet-04.py
 import os
-from glean.agent_toolkit.tools import glean_search
-from langchain_openai import ChatOpenAI
+
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+from glean.agent_toolkit.tools import glean_search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
@@ -133,10 +239,12 @@ print(result["output"])
 
 #### CrewAI
 
-```python
+```python snippet=readme/snippet-05.py
 import os
+
+from crewai import Agent, Crew, Task
+
 from glean.agent_toolkit.tools import glean_search
-from crewai import Agent, Task, Crew
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
@@ -149,16 +257,19 @@ crewai_tool = glean_search.as_crewai_tool()
 researcher = Agent(
     role="Corporate Knowledge Researcher",
     goal="Find and summarize relevant company information",
-    backstory="You are an expert at navigating company knowledge bases to find accurate, up-to-date information.",
+    backstory="""You are an expert at navigating company knowledge bases to find accurate,
+    up-to-date information.""",
     tools=[crewai_tool],
-    verbose=True
+    verbose=True,
 )
 
 # Create a research task
 research_task = Task(
-    description="Find information about our company's remote work policy and summarize the key points.",
-    expected_output="A clear summary of the remote work policy including eligibility, expectations, and guidelines.",
-    agent=researcher
+    description="""Find information about our company's remote work policy and summarize the key
+    points.""",
+    expected_output="""A clear summary of the remote work policy including eligibility,
+    expectations, and guidelines.""",
+    agent=researcher,
 )
 
 # Execute the research
@@ -171,7 +282,7 @@ print(result)
 
 #### Employee Directory Search
 
-```python
+```python snippet=readme/snippet-06.py
 from glean.agent_toolkit.tools import employee_search
 
 # Find engineering team members
@@ -185,7 +296,7 @@ engineering_team = employee_search.as_langchain_tool()
 
 #### Code Discovery
 
-```python
+```python snippet=readme/snippet-07.py
 from glean.agent_toolkit.tools import code_search
 
 # Search company codebases
@@ -199,8 +310,8 @@ code_tool = code_search.as_langchain_tool()
 
 #### Email and Calendar Integration
 
-```python
-from glean.agent_toolkit.tools import gmail_search, calendar_search
+```python snippet=readme/snippet-08.py
+from glean.agent_toolkit.tools import calendar_search, gmail_search
 
 # Search emails and meetings
 gmail_tool = gmail_search.as_langchain_tool()
@@ -214,8 +325,8 @@ calendar_tool = calendar_search.as_langchain_tool()
 
 #### Web Research with Context
 
-```python
-from glean.agent_toolkit.tools import web_search, ai_web_search
+```python snippet=readme/snippet-09.py
+from glean.agent_toolkit.tools import ai_web_search, web_search
 
 # External information gathering
 web_tool = web_search.as_langchain_tool()
@@ -231,10 +342,14 @@ ai_web_tool = ai_web_search.as_langchain_tool()
 
 Define your own tools that work across all supported frameworks:
 
-```python
-from glean.agent_toolkit import tool_spec
-from pydantic import BaseModel
+```python snippet=readme/snippet-10.py
+import os
+
 import requests
+from pydantic import BaseModel
+
+from glean.agent_toolkit import tool_spec
+
 
 class WeatherResponse(BaseModel):
     temperature: float
@@ -242,10 +357,11 @@ class WeatherResponse(BaseModel):
     humidity: int
     city: str
 
+
 @tool_spec(
     name="get_current_weather",
     description="Get current weather information for a specified city",
-    output_model=WeatherResponse
+    output_model=WeatherResponse,
 )
 def get_weather(city: str, units: str = "celsius") -> WeatherResponse:
     """Fetch current weather for a city."""
@@ -255,13 +371,11 @@ def get_weather(city: str, units: str = "celsius") -> WeatherResponse:
         f"https://api.weather.com/v1/current?key={api_key}&q={city}&units={units}"
     )
     data = response.json()
-    
+
     return WeatherResponse(
-        temperature=data["temp"],
-        condition=data["condition"],
-        humidity=data["humidity"],
-        city=city
+        temperature=data["temp"], condition=data["condition"], humidity=data["humidity"], city=city
     )
+
 
 # Use across frameworks
 openai_weather = get_weather.as_openai_tool()

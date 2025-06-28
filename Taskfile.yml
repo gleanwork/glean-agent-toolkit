@@ -96,6 +96,7 @@ tasks:
       - task: lint:ruff
       - task: lint:format:check
       - task: lint:pyright
+      - task: lint:readme
 
   # Lint diff task: Run linters on changed files
   lint:diff:
@@ -197,6 +198,18 @@ tasks:
           echo "Running: {{.PYRIGHT}} {{.PYTHON_FILES}}"
           {{.PYRIGHT}} {{.PYTHON_FILES}}
         fi
+
+   # Lint Readme task: Lint the README.md file
+  lint:readme:
+    desc: Lint the README.md file
+    cmds:
+      - npx -y markdown-code check
+
+  # Lint Readme fix task: Fix the README.md file
+  lint:readme:fix:
+    desc: Fix the README.md file
+    cmds:
+      - npx -y markdown-code sync
 
   # Format task: Run code formatters
   format:
