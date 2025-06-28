@@ -119,8 +119,8 @@ from . import agent
 Create `company_assistant/.env` with your credentials:
 
 ```bash snippet=readme/snippet-05.bash
-mkdir company_assistant/
-cd company_assistant/
+export GLEAN_API_TOKEN="your-api-token"
+export GLEAN_INSTANCE="your-instance-name"
 ```
 
 ### Step 5: Run Your Agent
@@ -128,17 +128,8 @@ cd company_assistant/
 From the parent directory (outside `company_assistant/`), run your Company Assistant:
 
 ```bash snippet=readme/snippet-06.bash
-# company_assistant/.env
-
-# Authentication for Google ADK (choose one)
-GOOGLE_API_KEY=your-google-ai-studio-api-key
-# OR for Vertex AI:
-# GOOGLE_CLOUD_PROJECT=your-project-id
-# GOOGLE_CLOUD_LOCATION=us-central1
-
-# Glean credentials
-GLEAN_API_TOKEN=your-glean-api-token
-GLEAN_INSTANCE=your-glean-instance
+mkdir company_assistant/
+cd company_assistant/
 ```
 
 ### Real-World Queries You Can Handle
