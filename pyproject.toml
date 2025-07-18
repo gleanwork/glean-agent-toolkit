@@ -13,7 +13,12 @@ requires-python = ">=3.10,<4.0"
 dependencies = ["pydantic>=2.7,<3.0", "glean-api-client>=0.6.0,<1.0"]
 
 [project.optional-dependencies]
-dev = ["commitizen>=4.4.1,<5.0", "pip-audit>=2.6.0,<3.0", "vcrpy>=6.0.2,<7.0"]
+dev = [
+  "commitizen>=4.4.1,<5.0",
+  "pip-audit>=2.6.0,<3.0",
+  "vcrpy>=6.0.2,<7.0",
+  "pre-commit>=3.6.0,<4.0",
+]
 test = [
   "pytest>=7.4.3,<9.0",
   "pytest-asyncio>=0.23.2,<1.0",
@@ -97,4 +102,8 @@ markers = [
 ]
 
 [dependency-groups]
-dev = ["vcrpy>=5.1.0"]
+dev = [
+    "commitizen>=4.6.0",
+    "pre-commit>=3.8.0",
+    "vcrpy>=5.1.0",
+]

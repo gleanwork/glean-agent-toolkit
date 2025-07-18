@@ -29,6 +29,7 @@ tasks:
     desc: Set up local environment (install dependencies, etc.)
     cmds:
       - task: install:uv
+      - task: pre-commit:install
 
   # Install uv task: Install Python dependencies using uv
   install:uv:
@@ -47,7 +48,7 @@ tasks:
     desc: Run all tests and lint fixes
     cmds:
       - task: test
-      - task: lint:fix 
+      - task: lint:fix
       - task: lint:pyright
 
   # Test task: Run unit tests
@@ -266,6 +267,31 @@ tasks:
     cmds:
       - "{{.PYTHON}} -m build"
 
+  # Pre-commit setup task: Install pre-commit hooks
+  pre-commit:install:
+    desc: Install pre-commit hooks
+    cmds:
+      - "uv run pre-commit install"
+      - "uv run pre-commit install --hook-type commit-msg"
+
+  # Pre-commit run task: Run pre-commit hooks on all files
+  pre-commit:run:
+    desc: Run pre-commit hooks on all files
+    cmds:
+      - "uv run pre-commit run --all-files"
+
+  # Pre-commit run diff task: Run pre-commit hooks on changed files
+  pre-commit:run:diff:
+    desc: Run pre-commit hooks on changed files
+    cmds:
+      - "uv run pre-commit run"
+
+  # Pre-commit update task: Update pre-commit hooks
+  pre-commit:update:
+    desc: Update pre-commit hooks
+    cmds:
+      - "uv run pre-commit autoupdate"
+
   # Release task: Bump version and create a new tag (use DRY_RUN=true for preview)
   release:
     desc: Bump version and create a new tag (use DRY_RUN=true for preview)
@@ -280,4 +306,4 @@ tasks:
         else
           {{.CZ}} bump --yes
           {{.CZ}} changelog
-        fi 
+        fi
