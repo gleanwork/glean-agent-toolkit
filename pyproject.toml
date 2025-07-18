@@ -24,10 +24,10 @@ test = [
   "openai-agents>=0.0.11,<1.0",
   "langchain>=0.1.0,<1.0",
   "crewai>=0.28.0,<1.0",
-  "google-adk>=0.1.0,<1.0",
+  "google-adk>=1.7.0,<2.0",
 ]
 openai = ["openai>=1.0.0,<2.0", "openai-agents>=0.0.11,<1.0"]
-adk = ["google-adk>=0.1.0,<1.0"]
+adk = ["google-adk>=1.7.0,<2.0"]
 langchain = ["langchain>=0.1.0,<1.0"]
 crewai = ["crewai>=0.28.0,<1.0"]
 codespell = ["codespell>=2.2.6,<3.0"]
