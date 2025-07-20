@@ -45,9 +45,11 @@ class TestSchemaGeneration:
             return [f"{item}-{num}" for item, num in zip(items, numbers)]
 
         schema = test_func.tool_spec.input_schema
-        # Current implementation falls back to string for complex list types
-        assert schema["properties"]["items"]["type"] == "string"
-        assert schema["properties"]["numbers"]["type"] == "string"
+        # List types should now be properly recognized as arrays
+        assert schema["properties"]["items"]["type"] == "array"
+        assert schema["properties"]["items"]["items"]["type"] == "string"
+        assert schema["properties"]["numbers"]["type"] == "array"
+        assert schema["properties"]["numbers"]["items"]["type"] == "integer"
 
     def test_union_types(self) -> None:
         """Test schema generation with Union types."""
@@ -177,10 +179,11 @@ class TestSchemaGeneration:
         assert schema["properties"]["text"]["type"] == "string"
         assert schema["properties"]["number"]["type"] == "integer"
         assert schema["properties"]["decimal"]["type"] == "number"
-        # Boolean is treated as integer due to bool being a subclass of int
-        assert schema["properties"]["flag"]["type"] == "integer"
-        # List types fall back to string in current implementation
-        assert schema["properties"]["items"]["type"] == "string"
+        # Boolean is now correctly identified as boolean type
+        assert schema["properties"]["flag"]["type"] == "boolean"
+        # List types are now correctly identified as arrays
+        assert schema["properties"]["items"]["type"] == "array"
+        assert schema["properties"]["items"]["items"]["type"] == "string"
         # Optional types also fall back to string
         assert schema["properties"]["optional_num"]["type"] == "string"
         

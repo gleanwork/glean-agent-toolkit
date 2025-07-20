@@ -20,7 +20,7 @@ class InputSchema(TypedDict):
     required: list[str]
 
 
-def _extract_field_info(param_type: type) -> tuple[type, FieldInfo | None]:
+def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
     """Extract base type and Field metadata from a type annotation.
 
     Args:
@@ -68,7 +68,7 @@ def _extract_field_info(param_type: type) -> tuple[type, FieldInfo | None]:
     return param_type, None
 
 
-def _create_property_schema(base_type: type, field_info: FieldInfo | None) -> dict[str, Any]:
+def _create_property_schema(base_type: Any, field_info: FieldInfo | None) -> dict[str, Any]:
     """Create a JSON schema property from type and field information.
 
     Args:
@@ -82,22 +82,35 @@ def _create_property_schema(base_type: type, field_info: FieldInfo | None) -> di
 
     if isinstance(base_type, type) and issubclass(base_type, str):
         schema["type"] = "string"
+    elif isinstance(base_type, type) and issubclass(base_type, bool):
+        schema["type"] = "boolean"
     elif isinstance(base_type, type) and issubclass(base_type, int):
         schema["type"] = "integer"
     elif isinstance(base_type, type) and issubclass(base_type, float):
         schema["type"] = "number"
-    elif isinstance(base_type, type) and issubclass(base_type, bool):
-        schema["type"] = "boolean"
-    elif base_type is list or base_type is list[str]:
+    elif base_type is list:
         schema = {
             "type": "array",
             "items": {"type": "string"},
         }
-    elif base_type is list[int]:
-        schema = {
-            "type": "array",
-            "items": {"type": "integer"},
-        }
+    elif get_origin(base_type) is list:
+        # Handle parameterized lists like list[str], list[int]
+        args = get_args(base_type)
+        if args and args[0] is str:
+            schema = {
+                "type": "array", 
+                "items": {"type": "string"},
+            }
+        elif args and args[0] is int:
+            schema = {
+                "type": "array",
+                "items": {"type": "integer"},
+            }
+        else:
+            schema = {
+                "type": "array",
+                "items": {"type": "string"},
+            }
     else:
         schema["type"] = "string"
 
