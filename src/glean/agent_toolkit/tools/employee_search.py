@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Annotated
+
+from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
@@ -11,7 +13,7 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 @tool_spec(
     name="employee_search",
     description=(
-        "Finds people at the company based on their personal information.\n"
+        "Find people at the company based on their personal information.\n"
         "INSTRUCTIONS:\n"
         "- Only use this when the user explicitly wants to find people in the company (e.g.,"
         ' "who" questions) or for aggregation queries on people.\n'
@@ -27,7 +29,21 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
         "in the output."
     ),
 )
-def employee_search(query: str) -> dict[str, Any]:
+def employee_search(
+    query: Annotated[
+        str,
+        Field(
+            description="Employee search query with optional filters. Supports person names, roles, departments, plus filters like 'roletype:', 'startafter:', 'startbefore:', 'reportsto:'",
+            examples=[
+                "John Smith engineering manager",
+                "data scientist machine learning",
+                "roletype:manager startafter:2023-01-01",
+                "frontend developer React",
+                "reportsto:\"Jane Doe\""
+            ]
+        )
+    ]
+) -> dict[str, Any]:
     """Search for employees based on the query.
     
     Args:
