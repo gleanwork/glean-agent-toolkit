@@ -14,9 +14,10 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 )
 def calendar_search(query: str) -> dict[str, Any]:
     """Search the calendar for meetings.
-    
+
     Args:
-        query: Calendar search query in JSON format with fields like participants, topic, after, before
+        query: Calendar search query in JSON format with fields like participants,
+        topic, after, before
     """
     parameters = convert_to_tool_params(query=query)
     return run_tool("Meeting Lookup", parameters)

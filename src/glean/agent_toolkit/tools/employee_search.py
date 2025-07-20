@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Annotated
+from typing import Annotated, Any
 
 from pydantic import Field
 
@@ -33,21 +33,26 @@ def employee_search(
     query: Annotated[
         str,
         Field(
-            description="Employee search query with optional filters. Supports person names, roles, departments, plus filters like 'roletype:', 'startafter:', 'startbefore:', 'reportsto:'",
+            description=(
+                "Employee search query with optional filters. Supports person names, roles, "
+                "departments, plus filters like 'roletype:', 'startafter:', 'startbefore:', "
+                "'reportsto:'"
+            ),
             examples=[
                 "John Smith engineering manager",
                 "data scientist machine learning",
                 "roletype:manager startafter:2023-01-01",
                 "frontend developer React",
-                "reportsto:\"Jane Doe\""
-            ]
-        )
-    ]
+                'reportsto:"Jane Doe"',
+            ],
+        ),
+    ],
 ) -> dict[str, Any]:
     """Search for employees based on the query.
-    
+
     Args:
-        query: Employee search query with optional filters like 'roletype:manager startafter:2023-01-01'
+        query: Employee search query with optional filters
+        like 'roletype:manager startafter:2023-01-01'
     """
     parameters = convert_to_tool_params(query=query)
     return run_tool("Employee Search", parameters)

@@ -23,7 +23,7 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 )
 def code_search(query: str) -> dict[str, Any]:
     """Search code repositories based on the query.
-    
+
     Args:
         query: Code search query with optional filters like 'owner:person updated:past_week'
     """

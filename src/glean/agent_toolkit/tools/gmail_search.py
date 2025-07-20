@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Annotated
+from typing import Annotated, Any
 
 from pydantic import Field
 
@@ -23,19 +23,22 @@ def gmail_search(
     query: Annotated[
         str,
         Field(
-            description="Gmail search query with optional filters. Supports keywords plus filters like 'from:', 'to:', 'has:', 'subject:', 'is:', 'label:', 'after:', 'before:'",
+            description="""
+            Gmail search query with optional filters. Supports keywords plus filters like 'from:',
+            'to:', 'has:', 'subject:', 'is:', 'label:', 'after:', 'before:'
+            """,
             examples=[
                 "urgent emails from:boss@company.com",
                 "has:attachment before:2024-01-01",
                 "subject:invoice is:unread",
                 "project updates to:team@company.com",
-                "from:client@external.com after:2024-01-01"
-            ]
-        )
-    ]
+                "from:client@external.com after:2024-01-01",
+            ],
+        ),
+    ],
 ) -> dict[str, Any]:
     """Search Gmail messages based on the query.
-    
+
     Args:
         query: Gmail search query with optional filters like 'from:person@domain.com has:attachment'
     """

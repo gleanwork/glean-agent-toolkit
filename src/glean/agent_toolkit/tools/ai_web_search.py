@@ -36,7 +36,7 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 )
 def ai_web_search(query: str) -> dict[str, Any]:
     """Search the web for up-to-date external information with AI-powered results.
-    
+
     Args:
         query: Web search query containing keywords (do not use commas in query)
     """

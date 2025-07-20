@@ -19,9 +19,10 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 )
 def outlook_search(query: str) -> dict[str, Any]:
     """Search Outlook messages based on the query.
-    
+
     Args:
-        query: Outlook search query with optional filters like 'from:person@domain.com hasattachment:true'
+        query: Outlook search query with optional filters
+        like 'from:person@domain.com hasattachment:true'
     """
     parameters = convert_to_tool_params(query=query)
     return run_tool("Outlook Search", parameters)

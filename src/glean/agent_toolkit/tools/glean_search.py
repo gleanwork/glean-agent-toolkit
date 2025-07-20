@@ -22,7 +22,7 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 )
 def glean_search(query: str) -> dict[str, Any]:
     """Search Glean for relevant documents using the query.
-    
+
     Args:
         query: Search query with optional filters like 'owner:person updated:past_week'
     """

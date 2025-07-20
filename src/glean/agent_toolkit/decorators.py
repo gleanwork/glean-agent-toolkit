@@ -3,7 +3,7 @@
 import functools
 import inspect
 from collections.abc import Callable
-from typing import Any, Annotated, Protocol, TypedDict, TypeVar, cast, get_args, get_origin
+from typing import Annotated, Any, Protocol, TypedDict, TypeVar, cast, get_args, get_origin
 
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo
@@ -22,66 +22,64 @@ class InputSchema(TypedDict):
 
 def _extract_field_info(param_type: type) -> tuple[type, FieldInfo | None]:
     """Extract base type and Field metadata from a type annotation.
-    
+
     Args:
         param_type: The parameter type annotation
-        
+
     Returns:
         Tuple of (base_type, field_info) where field_info is None if no Field metadata
     """
     # Import here to avoid circular import issues
-    from typing import Annotated
-    from pydantic import Field
-    
+
     # Try get_origin first
     if get_origin(param_type) is Annotated:
         args = get_args(param_type)
         base_type = args[0]
-        
+
         field_info = None
         for metadata in args[1:]:
             if isinstance(metadata, FieldInfo):
                 field_info = metadata
                 break
-                
+
         return base_type, field_info
-    
+
     # Handle case where annotation got converted to string but contains Annotated info
     param_str = str(param_type)
-    if 'Annotated[' in param_str and 'Field(' in param_str:
+    if "Annotated[" in param_str and "Field(" in param_str:
         try:
             # Try to reconstruct the annotation from string
             reconstructed = eval(param_str)
             if get_origin(reconstructed) is Annotated:
                 args = get_args(reconstructed)
                 base_type = args[0]
-                
+
                 field_info = None
                 for metadata in args[1:]:
                     if isinstance(metadata, FieldInfo):
                         field_info = metadata
                         break
-                        
+
                 return base_type, field_info
         except Exception:
             # If eval fails, fall back to simple type
             pass
-    
+
     return param_type, None
 
 
 def _create_property_schema(base_type: type, field_info: FieldInfo | None) -> dict[str, Any]:
     """Create a JSON schema property from type and field information.
-    
+
     Args:
         base_type: The base Python type
         field_info: Optional pydantic FieldInfo with metadata
-        
+
     Returns:
         JSON schema property dict
     """
     schema: dict[str, Any] = {}
-    
+
     if isinstance(base_type, type) and issubclass(base_type, str):
         schema["type"] = "string"
     elif isinstance(base_type, type) and issubclass(base_type, int):
@@ -102,20 +100,20 @@ def _create_property_schema(base_type: type, field_info: FieldInfo | None) -> di
         }
     else:
         schema["type"] = "string"
-    
+
     if field_info:
         if field_info.description:
             schema["description"] = field_info.description
-        
-        if hasattr(field_info, 'examples') and field_info.examples:
+
+        if hasattr(field_info, "examples") and field_info.examples:
             schema["examples"] = field_info.examples
-        
-        if hasattr(field_info, 'json_schema_extra') and field_info.json_schema_extra:
+
+        if hasattr(field_info, "json_schema_extra") and field_info.json_schema_extra:
             if isinstance(field_info.json_schema_extra, dict):
                 for key, value in field_info.json_schema_extra.items():
-                    if key in ['pattern', 'enum', 'format', 'minLength', 'maxLength']:
+                    if key in ["pattern", "enum", "format", "minLength", "maxLength"]:
                         schema[key] = value
-    
+
     return schema
 
 
@@ -229,7 +227,9 @@ def tool_spec(
         if params:
             for param_name, param_type in params.items():
                 base_type, field_info = _extract_field_info(param_type)
-                input_schema["properties"][param_name] = _create_property_schema(base_type, field_info)
+                input_schema["properties"][param_name] = _create_property_schema(
+                    base_type, field_info
+                )
 
         output_schema: dict[str, Any] = {"type": "object"}
         if out_type is not None and hasattr(out_type, "model_json_schema"):
