@@ -98,7 +98,7 @@ def _create_property_schema(base_type: Any, field_info: FieldInfo | None) -> dic
         args = get_args(base_type)
         if args and args[0] is str:
             schema = {
-                "type": "array", 
+                "type": "array",
                 "items": {"type": "string"},
             }
         elif args and args[0] is int:
