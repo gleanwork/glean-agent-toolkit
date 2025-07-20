@@ -5,8 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import run_tool
-from glean.api_client import models
+from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 
 
 @tool_spec(
@@ -33,6 +32,11 @@ from glean.api_client import models
         "specific information."
     ),
 )
-def web_search(parameters: dict[str, models.ToolsCallParameter]) -> dict[str, Any]:
-    """Search the web for up-to-date external information."""
+def web_search(query: str) -> dict[str, Any]:
+    """Search the web for up-to-date external information.
+    
+    Args:
+        query: Web search query containing keywords to search for
+    """
+    parameters = convert_to_tool_params(query=query)
     return run_tool("Web Browser", parameters)

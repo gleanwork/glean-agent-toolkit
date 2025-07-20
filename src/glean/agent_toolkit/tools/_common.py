@@ -19,6 +19,21 @@ def api_client() -> Glean:
     return Glean(api_token=api_token, instance=instance)
 
 
+def convert_to_tool_params(**kwargs: Any) -> dict[str, models.ToolsCallParameter]:
+    """Convert direct parameters to ToolsCallParameter format.
+    
+    Args:
+        **kwargs: Direct parameter values
+        
+    Returns:
+        Dictionary mapping parameter names to ToolsCallParameter objects
+    """
+    return {
+        key: models.ToolsCallParameter(name=key, value=value)
+        for key, value in kwargs.items()
+    }
+
+
 def run_tool(
     tool_display_name: str,
     parameters: dict[str, models.ToolsCallParameter],

@@ -5,8 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import run_tool
-from glean.api_client import models
+from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 
 
 @tool_spec(
@@ -22,8 +21,11 @@ from glean.api_client import models
         "results to a query."
     ),
 )
-def code_search(
-    parameters: dict[str, models.ToolsCallParameter],
-) -> dict[str, Any]:
-    """Search code repositories based on the query."""
+def code_search(query: str) -> dict[str, Any]:
+    """Search code repositories based on the query.
+    
+    Args:
+        query: Code search query with optional filters like 'owner:person updated:past_week'
+    """
+    parameters = convert_to_tool_params(query=query)
     return run_tool("Code Search", parameters)
