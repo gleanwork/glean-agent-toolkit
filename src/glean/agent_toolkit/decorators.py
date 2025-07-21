@@ -3,9 +3,10 @@
 import functools
 import inspect
 from collections.abc import Callable
-from typing import Any, Protocol, TypedDict, TypeVar, cast
+from typing import Annotated, Any, Protocol, TypedDict, TypeVar, cast, get_args, get_origin
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field, TypeAdapter, create_model
+from pydantic.fields import FieldInfo
 
 from glean.agent_toolkit.registry import get_registry
 from glean.agent_toolkit.spec import ToolSpec
@@ -17,6 +18,108 @@ class InputSchema(TypedDict):
     type: str
     properties: dict[str, Any]
     required: list[str]
+
+
+def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
+    """Extract base type and Field metadata from a type annotation.
+
+    Args:
+        param_type: The parameter type annotation
+
+    Returns:
+        Tuple of (base_type, field_info) where field_info is None if no Field metadata
+    """
+    # Try get_origin first
+    if get_origin(param_type) is Annotated:
+        args = get_args(param_type)
+        base_type = args[0]
+
+        field_info = None
+        for metadata in args[1:]:
+            if isinstance(metadata, FieldInfo):
+                field_info = metadata
+                break
+
+        return base_type, field_info
+
+    # Handle case where annotation got converted to string but contains Annotated info
+    param_str = str(param_type)
+    if "Annotated[" in param_str and "Field(" in param_str:
+        try:
+            # Try to evaluate the string as a type annotation
+            # This is a fallback for cases where type annotations got stringified
+            import ast
+            import typing
+
+            # Simple string parsing fallback - use original type if parsing fails
+            return param_type, None
+        except Exception:
+            # If parsing fails, return the original annotation
+            return param_type, None
+
+    return param_type, None
+
+
+def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any]:
+    """Create a JSON schema using Pydantic's TypeAdapter for all parameters.
+
+    Args:
+        signature: Function signature to analyze
+
+    Returns:
+        JSON schema dictionary
+    """
+    fields = {}
+
+    for param_name, param in signature.parameters.items():
+        if param.annotation == inspect.Parameter.empty:
+            fields[param_name] = (str, ...)
+        else:
+            param_type, field_info = _extract_field_info(param.annotation)
+
+            if param.default is param.empty:
+                if field_info:
+                    fields[param_name] = (param_type, field_info)
+                else:
+                    fields[param_name] = (param_type, ...)
+            else:
+                if field_info:
+                    fields[param_name] = (param_type, field_info)
+                else:
+                    fields[param_name] = (param_type, param.default)
+
+    if not fields:
+        return {"type": "object", "properties": {}, "required": []}
+
+    try:
+        dynamic_model = create_model("DynamicInputModel", **fields)
+        schema = dynamic_model.model_json_schema()
+
+        if "type" not in schema:
+            schema["type"] = "object"
+        if "properties" not in schema:
+            schema["properties"] = {}
+        if "required" not in schema:
+            schema["required"] = []
+
+        return schema
+    except Exception:
+        properties = {}
+        required = []
+
+        for param_name, param in signature.parameters.items():
+            if param.default is param.empty:
+                required.append(param_name)
+
+            try:
+                param_type, _ = _extract_field_info(param.annotation)
+                adapter = TypeAdapter(param_type)
+                param_schema = adapter.json_schema()
+                properties[param_name] = param_schema
+            except Exception:
+                properties[param_name] = {"type": "string"}
+
+        return {"type": "object", "properties": properties, "required": required}
 
 
 CallableT = Callable[..., Any]
@@ -102,74 +205,41 @@ def tool_spec(
             Decorated function
         """
         sig = inspect.signature(func)
-        params = {}
-        out_type = None
 
-        for param_name, param in sig.parameters.items():
-            if param.annotation != inspect.Parameter.empty:
-                params[param_name] = param.annotation
+        # Use Pydantic's schema generation instead of manual creation
+        input_schema_dict = _create_pydantic_input_schema(sig)
+        input_schema = cast(InputSchema, input_schema_dict)
 
-        if sig.return_annotation != inspect.Signature.empty:
-            out_type = sig.return_annotation
+        # Generate output schema using Pydantic when possible
+        output_schema: dict[str, Any] = {"type": "object"}
+        out_type = sig.return_annotation
 
-        input_schema: InputSchema = {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        }
-
-        required_fields: list[str] = []
-
-        for param_name, param in sig.parameters.items():
-            if param.default is param.empty:
-                required_fields.append(param_name)
-
-        input_schema["required"] = required_fields
-
-        if params:
-            for param_name, param_type in params.items():
-                if isinstance(param_type, type) and issubclass(param_type, str):
-                    input_schema["properties"][param_name] = {"type": "string"}
-                elif isinstance(param_type, type) and issubclass(param_type, int):
-                    input_schema["properties"][param_name] = {"type": "integer"}
-                elif isinstance(param_type, type) and issubclass(param_type, float):
-                    input_schema["properties"][param_name] = {"type": "number"}
-                elif isinstance(param_type, type) and issubclass(param_type, bool):
-                    input_schema["properties"][param_name] = {"type": "boolean"}
-                elif param_type is list or param_type is list[str]:
-                    input_schema["properties"][param_name] = {
+        if out_type != inspect.Signature.empty:
+            try:
+                if hasattr(out_type, "model_json_schema"):
+                    # Pydantic model
+                    output_schema = out_type.model_json_schema()
+                else:
+                    # Use TypeAdapter for other types
+                    adapter = TypeAdapter(out_type)
+                    output_schema = adapter.json_schema()
+            except Exception:
+                # Fallback for complex types
+                if out_type is int:
+                    output_schema = {"type": "integer"}
+                elif out_type is float:
+                    output_schema = {"type": "number"}
+                elif out_type is bool:
+                    output_schema = {"type": "boolean"}
+                elif out_type is str:
+                    output_schema = {"type": "string"}
+                elif str(out_type).startswith("list") or str(out_type).startswith("List"):
+                    output_schema = {
                         "type": "array",
                         "items": {"type": "string"},
                     }
-                elif param_type is list[int]:
-                    input_schema["properties"][param_name] = {
-                        "type": "array",
-                        "items": {"type": "integer"},
-                    }
                 else:
-                    input_schema["properties"][param_name] = {"type": "string"}
-
-        output_schema: dict[str, Any] = {"type": "object"}
-        if out_type is not None and hasattr(out_type, "model_json_schema"):
-            output_schema = out_type.model_json_schema()
-        elif out_type is int:
-            output_schema = {"type": "integer"}
-        elif out_type is float:
-            output_schema = {"type": "number"}
-        elif out_type is bool:
-            output_schema = {"type": "boolean"}
-        elif out_type is str:
-            output_schema = {"type": "string"}
-        elif out_type is list or out_type is list[str]:
-            output_schema = {
-                "type": "array",
-                "items": {"type": "string"},
-            }
-        elif out_type is list[int]:
-            output_schema = {
-                "type": "array",
-                "items": {"type": "integer"},
-            }
+                    output_schema = {"type": "object"}
 
         tool_spec_obj = ToolSpec(
             name=name,
@@ -260,11 +330,11 @@ def tool_spec(
 
             return adapter.to_tool()
 
+        wrapper.tool_spec = tool_spec_obj  # type: ignore
         wrapper.as_openai_tool = as_openai_tool  # type: ignore
         wrapper.as_adk_tool = as_adk_tool  # type: ignore
         wrapper.as_langchain_tool = as_langchain_tool  # type: ignore
         wrapper.as_crewai_tool = as_crewai_tool  # type: ignore
-        wrapper.tool_spec = tool_spec_obj  # type: ignore
 
         return cast(ToolSpecFunction, wrapper)
 
