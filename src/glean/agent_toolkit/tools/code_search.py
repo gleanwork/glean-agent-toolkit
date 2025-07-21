@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Annotated, Any
+
+from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
@@ -21,11 +23,28 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
         "results to a query."
     ),
 )
-def code_search(query: str) -> dict[str, Any]:
+def code_search(
+    query: Annotated[
+        str,
+        Field(
+            description=(
+                "Code search query with optional filters. Supports function names, class names, "
+                "file paths, and various search filters - the API will determine which filters are valid"
+            ),
+            examples=[
+                "function login validation",
+                "class UserManager",
+                "API endpoint security owner:backend-team",
+                "database connection pool updated:past_month",
+                "error handling middleware from:infrastructure",
+            ],
+        ),
+    ],
+) -> dict[str, Any]:
     """Search code repositories based on the query.
 
     Args:
-        query: Code search query with optional filters like 'owner:person updated:past_week'
+        query: Code search query with optional filters - API will validate filter syntax
     """
     parameters = convert_to_tool_params(query=query)
     return run_tool("Code Search", parameters)

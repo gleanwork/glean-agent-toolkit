@@ -23,10 +23,10 @@ def gmail_search(
     query: Annotated[
         str,
         Field(
-            description="""
-            Gmail search query with optional filters. Supports keywords plus filters like 'from:',
-            'to:', 'has:', 'subject:', 'is:', 'label:', 'after:', 'before:'
-            """,
+            description=(
+                "Gmail search query with optional filters. Supports keywords and various email search filters - "
+                "the API will determine which filters are valid and available"
+            ),
             examples=[
                 "urgent emails from:boss@company.com",
                 "has:attachment before:2024-01-01",
@@ -40,7 +40,7 @@ def gmail_search(
     """Search Gmail messages based on the query.
 
     Args:
-        query: Gmail search query with optional filters like 'from:person@domain.com has:attachment'
+        query: Gmail search query with optional filters - API will validate filter syntax
     """
     parameters = convert_to_tool_params(query=query)
     return run_tool("Gmail Search", parameters)

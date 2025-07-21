@@ -3,7 +3,7 @@
 import functools
 import inspect
 from collections.abc import Callable
-from typing import Annotated, Any, Protocol, TypedDict, TypeVar, cast, get_args, get_origin
+from typing import Annotated, Any, Protocol, TypedDict, TypeVar, cast, get_args, get_origin, Union
 
 from pydantic import BaseModel, Field
 from pydantic.fields import FieldInfo
@@ -80,7 +80,23 @@ def _create_property_schema(base_type: Any, field_info: FieldInfo | None) -> dic
     """
     schema: dict[str, Any] = {}
 
-    if isinstance(base_type, type) and issubclass(base_type, str):
+    # Handle Union types (including Optional)
+    origin = get_origin(base_type)
+    if origin is Union:
+        args = get_args(base_type)
+        # Handle Optional types (Union[T, None])
+        if len(args) == 2 and type(None) in args:
+            non_none_type = args[0] if args[1] is type(None) else args[1]
+            return _create_property_schema(non_none_type, field_info)
+        else:
+            # For complex unions, default to string but note this in description
+            schema["type"] = "string"
+            if field_info and field_info.description:
+                schema["description"] = field_info.description + " (supports multiple types)"
+            elif not field_info:
+                schema["description"] = "Supports multiple types"
+
+    elif isinstance(base_type, type) and issubclass(base_type, str):
         schema["type"] = "string"
     elif isinstance(base_type, type) and issubclass(base_type, bool):
         schema["type"] = "boolean"
@@ -106,13 +122,31 @@ def _create_property_schema(base_type: Any, field_info: FieldInfo | None) -> dic
                 "type": "array",
                 "items": {"type": "integer"},
             }
+        elif args and args[0] is float:
+            schema = {
+                "type": "array", 
+                "items": {"type": "number"},
+            }
+        elif args and args[0] is bool:
+            schema = {
+                "type": "array",
+                "items": {"type": "boolean"},
+            }
         else:
             schema = {
                 "type": "array",
                 "items": {"type": "string"},
             }
+    elif get_origin(base_type) is dict:
+        schema = {
+            "type": "object",
+            "additionalProperties": True,
+        }
     else:
+        # Fallback for unknown types
         schema["type"] = "string"
+        if not field_info or not field_info.description:
+            schema["description"] = f"Type: {base_type}"
 
     if field_info:
         if field_info.description:
