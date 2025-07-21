@@ -2,4 +2,7 @@
 name = "cz_conventional_commits"
 version = "0.2.1"
 tag_format = "$version"
-version_files = ["pyproject.toml:version", "glean/toolkit/__init__.py:__version__"] 
+version_files = [
+  "pyproject.toml:version",
+  "glean/toolkit/__init__.py:__version__",
+]
