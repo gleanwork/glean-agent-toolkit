@@ -62,10 +62,10 @@ def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
 
 def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any]:
     """Create a JSON schema using Pydantic's TypeAdapter for all parameters.
-    
+
     Args:
         signature: Function signature to analyze
-        
+
     Returns:
         JSON schema dictionary
     """
@@ -73,39 +73,28 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
 
     for param_name, param in signature.parameters.items():
         if param.annotation == inspect.Parameter.empty:
-            # No annotation, default to Any with string type
             fields[param_name] = (str, ...)
         else:
-            # Extract type and field info
             param_type, field_info = _extract_field_info(param.annotation)
 
             if param.default is param.empty:
-                # Required parameter
                 if field_info:
                     fields[param_name] = (param_type, field_info)
                 else:
                     fields[param_name] = (param_type, ...)
             else:
-                # Optional parameter with default
                 if field_info:
                     fields[param_name] = (param_type, field_info)
                 else:
                     fields[param_name] = (param_type, param.default)
 
     if not fields:
-        # No parameters - return empty object schema
-        return {
-            "type": "object",
-            "properties": {},
-            "required": []
-        }
+        return {"type": "object", "properties": {}, "required": []}
 
-    # Create a dynamic Pydantic model for all parameters
     try:
-        DynamicModel = create_model('DynamicInputModel', **fields)
-        schema = DynamicModel.model_json_schema()
+        dynamic_model = create_model("DynamicInputModel", **fields)
+        schema = dynamic_model.model_json_schema()
 
-        # Ensure it has the required structure
         if "type" not in schema:
             schema["type"] = "object"
         if "properties" not in schema:
@@ -115,7 +104,6 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
 
         return schema
     except Exception:
-        # Fallback to manual schema if Pydantic model creation fails
         properties = {}
         required = []
 
@@ -123,21 +111,15 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
             if param.default is param.empty:
                 required.append(param_name)
 
-            # Use TypeAdapter for individual parameter types
             try:
                 param_type, _ = _extract_field_info(param.annotation)
                 adapter = TypeAdapter(param_type)
                 param_schema = adapter.json_schema()
                 properties[param_name] = param_schema
             except Exception:
-                # Fallback to string type
                 properties[param_name] = {"type": "string"}
 
-        return {
-            "type": "object",
-            "properties": properties,
-            "required": required
-        }
+        return {"type": "object", "properties": properties, "required": required}
 
 
 CallableT = Callable[..., Any]

@@ -24,8 +24,9 @@ def outlook_search(
         str,
         Field(
             description=(
-                "Outlook search query with optional filters. Supports keywords and various email search filters - "
-                "the API will determine which filters are valid and available"
+                "Outlook search query with optional filters. Supports keywords and "
+                "various email search filters - the API will determine which "
+                "filters are valid and available"
             ),
             examples=[
                 "urgent emails from:boss@company.com",

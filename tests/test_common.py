@@ -141,7 +141,10 @@ class TestRunTool:
         with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
             mock_api_client.side_effect = ValueError("Missing credentials")
 
-            # The run_tool function should catch the ValueError and return an error dict
+            # Simulate error
             result = run_tool("Test Tool", parameters)
 
-            assert result == {"error": "Parameter validation error: Missing credentials", "result": None} 
+            assert result == {
+                "error": "Parameter validation error: Missing credentials",
+                "result": None
+            } 

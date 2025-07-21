@@ -27,7 +27,8 @@ def calendar_search(
         Field(
             description=(
                 "Calendar search query with optional filters. Supports meeting topics, "
-                "participant names, and various calendar search filters - the API will determine which filters are valid"
+                "participant names, and various calendar search filters - "
+                "the API will determine which filters are valid"
             ),
             examples=[
                 "sprint planning meeting",

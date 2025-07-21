@@ -40,13 +40,16 @@ def ai_web_search(
     query: Annotated[
         str,
         Field(
-            description="Web search query containing keywords for AI-powered analysis (do not use commas in query)",
+            description=(
+                "Web search query containing keywords for AI-powered analysis "
+                "(do not use commas in query)"
+            ),
             examples=[
                 "machine learning frameworks comparison 2024",
-                "sustainable technology solutions industry trends",
-                "cybersecurity best practices for startups",
-                "blockchain applications supply chain management",
-                "cloud computing cost optimization strategies",
+                "sustainable technology solutions",
+                "cybersecurity best practices",
+                "cloud computing trends",
+                "blockchain applications",
             ],
         ),
     ],

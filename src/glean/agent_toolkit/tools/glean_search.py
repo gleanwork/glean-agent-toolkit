@@ -27,8 +27,9 @@ def glean_search(
         str,
         Field(
             description=(
-                "Glean search query with optional filters. Supports keywords and various search filters - "
-                "the Glean API will determine which filters are valid and available"
+                "Glean search query with optional filters. Supports keywords and "
+                "various search filters - the Glean API will determine which "
+                "filters are valid and available"
             ),
             examples=[
                 "quarterly financial results",

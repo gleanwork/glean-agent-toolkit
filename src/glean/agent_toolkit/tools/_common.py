@@ -22,49 +22,46 @@ def api_client() -> Glean:
 
 def clean_query(query: str) -> str:
     """Clean up query string with basic formatting.
-    
+
     Args:
         query: The search query
-        
+
     Returns:
         Cleaned query string
-        
+
     Raises:
         ValueError: If query is empty
     """
     if not query or not query.strip():
         raise ValueError("Query cannot be empty")
 
-    # Basic cleanup only
-    query = query.strip()
-
-    # Remove multiple spaces
-    query = re.sub(r'\s+', ' ', query)
-
-    return query
+    return query.strip()
 
 
-def convert_to_tool_params(**kwargs: Any) -> dict[str, models.ToolsCallParameter]:
-    """Convert direct parameters to ToolsCallParameter format.
+def convert_to_tool_params(query: str) -> dict[str, Any]:
+    """Convert query to tool parameters format.
 
     Args:
-        **kwargs: Direct parameter values
+        query: The cleaned query string
 
     Returns:
-        Dictionary mapping parameter names to ToolsCallParameter objects
+        Dictionary of tool parameters
     """
-    return {key: models.ToolsCallParameter(name=key, value=value) for key, value in kwargs.items()}
+    return {"query": clean_query(query)}
 
 
 def run_tool(
     tool_display_name: str,
-    parameters: dict[str, models.ToolsCallParameter],
+    parameters: dict[str, Any],
 ) -> dict[str, Any]:
     """Execute a Glean stub tool and wrap the response.
-    
+
     Args:
         tool_display_name: Display name for the tool
         parameters: Tool parameters
+
+    Returns:
+        Tool execution result wrapped in success/error format
     """
     try:
         # Clean query if it exists

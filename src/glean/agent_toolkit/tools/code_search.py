@@ -28,8 +28,9 @@ def code_search(
         str,
         Field(
             description=(
-                "Code search query with optional filters. Supports function names, class names, "
-                "file paths, and various search filters - the API will determine which filters are valid"
+                "Code search query with optional filters. Supports function names, "
+                "class names, file paths, and various search filters - "
+                "the API will determine which filters are valid"
             ),
             examples=[
                 "function login validation",
