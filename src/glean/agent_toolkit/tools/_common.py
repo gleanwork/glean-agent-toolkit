@@ -28,31 +28,28 @@ def clean_query(query: str) -> str:
 
     Returns:
         Cleaned query string
-
-    Raises:
-        ValueError: If query is empty
     """
-    if not query or not query.strip():
-        raise ValueError("Query cannot be empty")
+    if query is None:
+        return ""
 
     return query.strip()
 
 
-def convert_to_tool_params(query: str) -> dict[str, Any]:
-    """Convert query to tool parameters format.
+def convert_to_tool_params(**kwargs: Any) -> dict[str, models.ToolsCallParameter]:
+    """Convert direct parameters to ToolsCallParameter format.
 
     Args:
-        query: The cleaned query string
+        **kwargs: Direct parameter values
 
     Returns:
-        Dictionary of tool parameters
+        Dictionary mapping parameter names to ToolsCallParameter objects
     """
-    return {"query": clean_query(query)}
+    return {key: models.ToolsCallParameter(name=key, value=value) for key, value in kwargs.items()}
 
 
 def run_tool(
     tool_display_name: str,
-    parameters: dict[str, Any],
+    parameters: dict[str, models.ToolsCallParameter],
 ) -> dict[str, Any]:
     """Execute a Glean stub tool and wrap the response.
 
@@ -64,13 +61,6 @@ def run_tool(
         Tool execution result wrapped in success/error format
     """
     try:
-        # Clean query if it exists
-        if "query" in parameters:
-            query_param = parameters["query"]
-            if hasattr(query_param, "value"):
-                cleaned_query = clean_query(query_param.value)
-                parameters["query"] = models.ToolsCallParameter(name="query", value=cleaned_query)
-
         with api_client() as g_client:
             result = g_client.client.tools.run(
                 name=tool_display_name,
@@ -78,7 +68,11 @@ def run_tool(
             )
 
             return {"result": result}
-    except ValueError as ve:
-        return {"error": f"Parameter validation error: {str(ve)}", "result": None}
-    except Exception as exc:
-        return {"error": str(exc), "result": None}
+
+    except ValueError as e:
+        # Handle API client creation errors (missing credentials, etc.)
+        return {"error": f"Parameter validation error: {str(e)}", "result": None}
+
+    except Exception as e:
+        # Handle other errors (API errors, connection errors, etc.)
+        return {"error": str(e), "result": None}
