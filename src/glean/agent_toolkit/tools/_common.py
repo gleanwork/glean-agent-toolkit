@@ -34,13 +34,13 @@ def clean_query(query: str) -> str:
     """
     if not query or not query.strip():
         raise ValueError("Query cannot be empty")
-    
+
     # Basic cleanup only
     query = query.strip()
-    
+
     # Remove multiple spaces
     query = re.sub(r'\s+', ' ', query)
-    
+
     return query
 
 
@@ -73,7 +73,7 @@ def run_tool(
             if hasattr(query_param, "value"):
                 cleaned_query = clean_query(query_param.value)
                 parameters["query"] = models.ToolsCallParameter(name="query", value=cleaned_query)
-        
+
         with api_client() as g_client:
             result = g_client.client.tools.run(
                 name=tool_display_name,

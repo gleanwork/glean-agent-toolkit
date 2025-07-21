@@ -59,8 +59,12 @@ class TestSchemaGeneration:
             return str(value)
 
         schema = test_func.tool_spec.input_schema
-        # Union types default to string in our current implementation
-        assert schema["properties"]["value"]["type"] == "string"
+        # Union types now properly generate anyOf schemas
+        assert "anyOf" in schema["properties"]["value"]
+        union_types = schema["properties"]["value"]["anyOf"]
+        assert len(union_types) == 2
+        assert {"type": "string"} in union_types
+        assert {"type": "integer"} in union_types
 
     def test_default_values(self) -> None:
         """Test schema generation with various default values."""
@@ -158,8 +162,8 @@ class TestSchemaGeneration:
             return str(config)
 
         schema = test_func.tool_spec.input_schema
-        # Dict types currently fall back to string in our implementation
-        assert schema["properties"]["config"]["type"] == "string"
+        # Dict types now properly return object type
+        assert schema["properties"]["config"]["type"] == "object"
 
     def test_mixed_parameter_types(self) -> None:
         """Test schema generation with mixed parameter types."""
@@ -184,8 +188,13 @@ class TestSchemaGeneration:
         # List types are now correctly identified as arrays
         assert schema["properties"]["items"]["type"] == "array"
         assert schema["properties"]["items"]["items"]["type"] == "string"
-        # Optional types also fall back to string
-        assert schema["properties"]["optional_num"]["type"] == "string"
+        # Optional types now properly generate anyOf schemas with null
+        assert "anyOf" in schema["properties"]["optional_num"]
+        optional_types = schema["properties"]["optional_num"]["anyOf"]
+        assert len(optional_types) == 2
+        assert {"type": "integer"} in optional_types
+        assert {"type": "null"} in optional_types
+        assert schema["properties"]["optional_num"]["default"] is None
         
         # Only required parameters should be in the required list
         required_params = set(schema["required"])

@@ -144,4 +144,4 @@ class TestRunTool:
             # The run_tool function should catch the ValueError and return an error dict
             result = run_tool("Test Tool", parameters)
 
-            assert result == {"error": "Missing credentials", "result": None} 
+            assert result == {"error": "Parameter validation error: Missing credentials", "result": None} 

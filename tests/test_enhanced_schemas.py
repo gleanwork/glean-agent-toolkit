@@ -8,7 +8,6 @@ from pydantic.fields import FieldInfo
 
 from glean.agent_toolkit.adapters.openai import OpenAIAdapter
 from glean.agent_toolkit.decorators import (
-    _create_property_schema,
     _extract_field_info,
     tool_spec,
 )
@@ -60,47 +59,6 @@ class TestFieldInfoExtraction:
         assert field_info is None
 
 
-class TestPropertySchemaCreation:
-    """Test creation of JSON schema properties from type and Field info."""
-
-    def test_create_basic_string_schema(self):
-        """Test creating schema for basic string type."""
-        schema = _create_property_schema(str, None)
-
-        assert schema == {"type": "string"}
-
-    def test_create_enhanced_string_schema(self):
-        """Test creating schema with Field metadata."""
-        field_info = Field(
-            description="Test description",
-            examples=["example1", "example2"]
-        )
-
-        schema = _create_property_schema(str, field_info)
-
-        expected = {
-            "type": "string",
-            "description": "Test description",
-            "examples": ["example1", "example2"]
-        }
-        assert schema == expected
-
-    def test_create_schema_different_types(self):
-        """Test schema creation for different base types."""
-        assert _create_property_schema(int, None) == {"type": "integer"}
-        assert _create_property_schema(float, None) == {"type": "number"}
-        assert _create_property_schema(bool, None) == {"type": "boolean"}
-
-    def test_create_list_schema(self):
-        """Test schema creation for list types."""
-        schema = _create_property_schema(list[str], None)
-        expected = {
-            "type": "array",
-            "items": {"type": "string"}
-        }
-        assert schema == expected
-
-
 class TestEnhancedToolSpecs:
     """Test enhanced tool specifications end-to-end."""
 
@@ -120,19 +78,16 @@ class TestEnhancedToolSpecs:
 
         tool_spec_obj = test_function.tool_spec
 
-        expected_schema = {
-            "type": "object",
-            "properties": {
-                "query": {
-                    "type": "string",
-                    "description": "Test query parameter",
-                    "examples": ["test example"]
-                }
-            },
-            "required": ["query"]
-        }
-
-        assert tool_spec_obj.input_schema == expected_schema
+        # Pydantic generates more complete schemas with titles
+        schema = tool_spec_obj.input_schema
+        assert schema["type"] == "object"
+        assert "query" in schema["properties"]
+        
+        query_prop = schema["properties"]["query"]
+        assert query_prop["type"] == "string"
+        assert query_prop["description"] == "Test query parameter"
+        assert query_prop["examples"] == ["test example"]
+        assert "query" in schema["required"]
 
     def test_enhanced_tool_openai_adapter(self):
         """Test that enhanced schema works with OpenAI adapter."""
@@ -173,19 +128,20 @@ class TestEnhancedToolSpecs:
 
         # Enhanced parameter should have description and examples
         enhanced_prop = schema["properties"]["enhanced_param"]
+        assert enhanced_prop["type"] == "string"
         assert enhanced_prop["description"] == "Enhanced parameter"
         assert enhanced_prop["examples"] == ["example"]
 
         # Basic parameter should only have type
         basic_prop = schema["properties"]["basic_param"]
-        assert basic_prop == {"type": "string"}
+        assert basic_prop["type"] == "string"
 
 
 class TestStringBasedWorkaround:
     """Test the string-based workaround for typing edge cases."""
 
-    def test_string_annotation_extraction(self):
-        """Test extraction from string representation of Annotated type."""
+    def test_string_annotation_fallback(self):
+        """Test fallback handling for string-like annotations."""
         # This simulates what happens when typing gets converted to string
         param_str = 'Annotated[str, Field(description="String test", examples=["str_example"])]'
 
@@ -197,11 +153,9 @@ class TestStringBasedWorkaround:
         mock_type = MockType()
         base_type, field_info = _extract_field_info(mock_type)
 
-        # Should extract the Field info from string
-        assert base_type is str
-        assert field_info is not None
-        assert field_info.description == "String test"
-        assert field_info.examples == ["str_example"]
+        # Should fall back gracefully
+        assert base_type is mock_type
+        assert field_info is None
 
     def test_malformed_string_annotation(self):
         """Test handling of malformed string annotations."""

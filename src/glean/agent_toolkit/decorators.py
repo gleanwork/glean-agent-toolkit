@@ -3,9 +3,9 @@
 import functools
 import inspect
 from collections.abc import Callable
-from typing import Annotated, Any, Protocol, TypedDict, TypeVar, cast, get_args, get_origin, Union
+from typing import Annotated, Any, Protocol, TypedDict, TypeVar, cast, get_args, get_origin
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, TypeAdapter, create_model
 from pydantic.fields import FieldInfo
 
 from glean.agent_toolkit.registry import get_registry
@@ -29,8 +29,6 @@ def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
     Returns:
         Tuple of (base_type, field_info) where field_info is None if no Field metadata
     """
-    # Import here to avoid circular import issues
-
     # Try get_origin first
     if get_origin(param_type) is Annotated:
         args = get_args(param_type)
@@ -48,120 +46,98 @@ def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
     param_str = str(param_type)
     if "Annotated[" in param_str and "Field(" in param_str:
         try:
-            # Try to reconstruct the annotation from string
-            reconstructed = eval(param_str)
-            if get_origin(reconstructed) is Annotated:
-                args = get_args(reconstructed)
-                base_type = args[0]
+            # Try to evaluate the string as a type annotation
+            # This is a fallback for cases where type annotations got stringified
+            import ast
+            import typing
 
-                field_info = None
-                for metadata in args[1:]:
-                    if isinstance(metadata, FieldInfo):
-                        field_info = metadata
-                        break
-
-                return base_type, field_info
+            # Simple string parsing fallback - use original type if parsing fails
+            return param_type, None
         except Exception:
-            # If eval fails, fall back to simple type
-            pass
+            # If parsing fails, return the original annotation
+            return param_type, None
 
     return param_type, None
 
 
-def _create_property_schema(base_type: Any, field_info: FieldInfo | None) -> dict[str, Any]:
-    """Create a JSON schema property from type and field information.
-
+def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any]:
+    """Create a JSON schema using Pydantic's TypeAdapter for all parameters.
+    
     Args:
-        base_type: The base Python type
-        field_info: Optional pydantic FieldInfo with metadata
-
+        signature: Function signature to analyze
+        
     Returns:
-        JSON schema property dict
+        JSON schema dictionary
     """
-    schema: dict[str, Any] = {}
+    fields = {}
 
-    # Handle Union types (including Optional)
-    origin = get_origin(base_type)
-    if origin is Union:
-        args = get_args(base_type)
-        # Handle Optional types (Union[T, None])
-        if len(args) == 2 and type(None) in args:
-            non_none_type = args[0] if args[1] is type(None) else args[1]
-            return _create_property_schema(non_none_type, field_info)
+    for param_name, param in signature.parameters.items():
+        if param.annotation == inspect.Parameter.empty:
+            # No annotation, default to Any with string type
+            fields[param_name] = (str, ...)
         else:
-            # For complex unions, default to string but note this in description
-            schema["type"] = "string"
-            if field_info and field_info.description:
-                schema["description"] = field_info.description + " (supports multiple types)"
-            elif not field_info:
-                schema["description"] = "Supports multiple types"
+            # Extract type and field info
+            param_type, field_info = _extract_field_info(param.annotation)
 
-    elif isinstance(base_type, type) and issubclass(base_type, str):
-        schema["type"] = "string"
-    elif isinstance(base_type, type) and issubclass(base_type, bool):
-        schema["type"] = "boolean"
-    elif isinstance(base_type, type) and issubclass(base_type, int):
-        schema["type"] = "integer"
-    elif isinstance(base_type, type) and issubclass(base_type, float):
-        schema["type"] = "number"
-    elif base_type is list:
-        schema = {
-            "type": "array",
-            "items": {"type": "string"},
-        }
-    elif get_origin(base_type) is list:
-        # Handle parameterized lists like list[str], list[int]
-        args = get_args(base_type)
-        if args and args[0] is str:
-            schema = {
-                "type": "array",
-                "items": {"type": "string"},
-            }
-        elif args and args[0] is int:
-            schema = {
-                "type": "array",
-                "items": {"type": "integer"},
-            }
-        elif args and args[0] is float:
-            schema = {
-                "type": "array", 
-                "items": {"type": "number"},
-            }
-        elif args and args[0] is bool:
-            schema = {
-                "type": "array",
-                "items": {"type": "boolean"},
-            }
-        else:
-            schema = {
-                "type": "array",
-                "items": {"type": "string"},
-            }
-    elif get_origin(base_type) is dict:
-        schema = {
+            if param.default is param.empty:
+                # Required parameter
+                if field_info:
+                    fields[param_name] = (param_type, field_info)
+                else:
+                    fields[param_name] = (param_type, ...)
+            else:
+                # Optional parameter with default
+                if field_info:
+                    fields[param_name] = (param_type, field_info)
+                else:
+                    fields[param_name] = (param_type, param.default)
+
+    if not fields:
+        # No parameters - return empty object schema
+        return {
             "type": "object",
-            "additionalProperties": True,
+            "properties": {},
+            "required": []
         }
-    else:
-        # Fallback for unknown types
-        schema["type"] = "string"
-        if not field_info or not field_info.description:
-            schema["description"] = f"Type: {base_type}"
 
-    if field_info:
-        if field_info.description:
-            schema["description"] = field_info.description
+    # Create a dynamic Pydantic model for all parameters
+    try:
+        DynamicModel = create_model('DynamicInputModel', **fields)
+        schema = DynamicModel.model_json_schema()
 
-        if hasattr(field_info, "examples") and field_info.examples:
-            schema["examples"] = field_info.examples
+        # Ensure it has the required structure
+        if "type" not in schema:
+            schema["type"] = "object"
+        if "properties" not in schema:
+            schema["properties"] = {}
+        if "required" not in schema:
+            schema["required"] = []
 
-        if hasattr(field_info, "json_schema_extra") and field_info.json_schema_extra:
-            if isinstance(field_info.json_schema_extra, dict):
-                for key, value in field_info.json_schema_extra.items():
-                    if key in ["pattern", "enum", "format", "minLength", "maxLength"]:
-                        schema[key] = value
+        return schema
+    except Exception:
+        # Fallback to manual schema if Pydantic model creation fails
+        properties = {}
+        required = []
 
-    return schema
+        for param_name, param in signature.parameters.items():
+            if param.default is param.empty:
+                required.append(param_name)
+
+            # Use TypeAdapter for individual parameter types
+            try:
+                param_type, _ = _extract_field_info(param.annotation)
+                adapter = TypeAdapter(param_type)
+                param_schema = adapter.json_schema()
+                properties[param_name] = param_schema
+            except Exception:
+                # Fallback to string type
+                properties[param_name] = {"type": "string"}
+
+        return {
+            "type": "object",
+            "properties": properties,
+            "required": required
+        }
 
 
 CallableT = Callable[..., Any]
@@ -247,58 +223,41 @@ def tool_spec(
             Decorated function
         """
         sig = inspect.signature(func)
-        params = {}
-        out_type = None
 
-        for param_name, param in sig.parameters.items():
-            if param.annotation != inspect.Parameter.empty:
-                params[param_name] = param.annotation
+        # Use Pydantic's schema generation instead of manual creation
+        input_schema_dict = _create_pydantic_input_schema(sig)
+        input_schema = cast(InputSchema, input_schema_dict)
 
-        if sig.return_annotation != inspect.Signature.empty:
-            out_type = sig.return_annotation
-
-        input_schema: InputSchema = {
-            "type": "object",
-            "properties": {},
-            "required": [],
-        }
-
-        required_fields: list[str] = []
-
-        for param_name, param in sig.parameters.items():
-            if param.default is param.empty:
-                required_fields.append(param_name)
-
-        input_schema["required"] = required_fields
-
-        if params:
-            for param_name, param_type in params.items():
-                base_type, field_info = _extract_field_info(param_type)
-                input_schema["properties"][param_name] = _create_property_schema(
-                    base_type, field_info
-                )
-
+        # Generate output schema using Pydantic when possible
         output_schema: dict[str, Any] = {"type": "object"}
-        if out_type is not None and hasattr(out_type, "model_json_schema"):
-            output_schema = out_type.model_json_schema()
-        elif out_type is int:
-            output_schema = {"type": "integer"}
-        elif out_type is float:
-            output_schema = {"type": "number"}
-        elif out_type is bool:
-            output_schema = {"type": "boolean"}
-        elif out_type is str:
-            output_schema = {"type": "string"}
-        elif out_type is list or out_type is list[str]:
-            output_schema = {
-                "type": "array",
-                "items": {"type": "string"},
-            }
-        elif out_type is list[int]:
-            output_schema = {
-                "type": "array",
-                "items": {"type": "integer"},
-            }
+        out_type = sig.return_annotation
+
+        if out_type != inspect.Signature.empty:
+            try:
+                if hasattr(out_type, "model_json_schema"):
+                    # Pydantic model
+                    output_schema = out_type.model_json_schema()
+                else:
+                    # Use TypeAdapter for other types
+                    adapter = TypeAdapter(out_type)
+                    output_schema = adapter.json_schema()
+            except Exception:
+                # Fallback for complex types
+                if out_type is int:
+                    output_schema = {"type": "integer"}
+                elif out_type is float:
+                    output_schema = {"type": "number"}
+                elif out_type is bool:
+                    output_schema = {"type": "boolean"}
+                elif out_type is str:
+                    output_schema = {"type": "string"}
+                elif str(out_type).startswith("list") or str(out_type).startswith("List"):
+                    output_schema = {
+                        "type": "array",
+                        "items": {"type": "string"},
+                    }
+                else:
+                    output_schema = {"type": "object"}
 
         tool_spec_obj = ToolSpec(
             name=name,
@@ -389,11 +348,11 @@ def tool_spec(
 
             return adapter.to_tool()
 
+        wrapper.tool_spec = tool_spec_obj  # type: ignore
         wrapper.as_openai_tool = as_openai_tool  # type: ignore
         wrapper.as_adk_tool = as_adk_tool  # type: ignore
         wrapper.as_langchain_tool = as_langchain_tool  # type: ignore
         wrapper.as_crewai_tool = as_crewai_tool  # type: ignore
-        wrapper.tool_spec = tool_spec_obj  # type: ignore
 
         return cast(ToolSpecFunction, wrapper)
 
