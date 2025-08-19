@@ -78,7 +78,7 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
         if not HAS_LANGCHAIN:
             raise ImportError(
                 "LangChain package is required for LangChain adapter. "
-                "Install it with `pip install agent_toolkit[langchain]`."
+                "Install it with `pip install glean-agent-toolkit[langchain]`."
             )
 
     def to_tool(self) -> Any:
