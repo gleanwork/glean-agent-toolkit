@@ -61,7 +61,8 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
         if not HAS_ADK:
             raise ImportError(
                 "Google Agent Development Kit (ADK) is required for ADK adapter. "
-                "Install it with `pip install agent_toolkit[adk]` or `pip install google-adk`."
+                "Install it with `pip install glean-agent-toolkit[adk]` or "
+                "`pip install google-adk`."
             )
 
     def to_tool(self) -> "AdkFunctionTool":

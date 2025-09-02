@@ -124,7 +124,7 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
         if not HAS_CREWAI:
             raise ImportError(
                 "CrewAI package is required for CrewAI adapter. "
-                "Install it with `pip install agent_toolkit[crewai]`. "
+                "Install it with `pip install glean-agent-toolkit[crewai]`. "
                 "Note: CrewAI requires Python 3.10 or higher."
             )
 
