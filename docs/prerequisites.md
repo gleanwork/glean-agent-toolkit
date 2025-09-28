@@ -18,37 +18,31 @@ This guide summarizes requirements for your organization's Glean instance to use
 
 - Connectors: Any content sources your organization has connected to Glean
 - Admin toggles: Client API enabled
-- Permissions: Users must have view access to content surfaced
 
 ### `employee_search`
 
 - Connectors: Directory/HR sources (e.g., Google Workspace Directory, Azure AD, HRIS if applicable)
 - Admin toggles: People/Directory data available to Client API
-- Permissions: Users can view directory profiles per org policy
 
 ### `calendar_search`
 
 - Connectors: Google Calendar and/or Microsoft 365 Calendar
 - Admin toggles: Calendar search enabled for Client API
-- Permissions: Users can view event metadata per calendar sharing rules; transcripts require recording/ingestion being enabled where applicable
 
 ### `gmail_search`
 
 - Connectors: Google Workspace Gmail
 - Admin toggles: Gmail search enabled for Client API
-- Permissions: Users can search only their mailbox per Gmail/Glean policies
 
 ### `outlook_search`
 
 - Connectors: Microsoft 365 (Outlook Mail)
 - Admin toggles: Outlook search enabled for Client API
-- Permissions: Users can search only their mailbox per M365/Glean policies
 
 ### `code_search`
 
 - Connectors: One or more code hosts (GitHub, GitLab, Bitbucket, Azure Repos)
 - Admin toggles: Code Search enabled for your organization's Glean instance and available to Client API
-- Permissions: Users must have read access to repositories/organizations
 
 ## Verification checklist
 
