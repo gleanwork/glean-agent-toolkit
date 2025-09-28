@@ -7,7 +7,7 @@ This project contains the **Glean Agent Toolkit**, a Python package used to inte
 1. Install the prerequisites:
    - [uv](https://github.com/astral-sh/uv)
    - [mise](https://mise.jdx.dev/)
-2. Run `mise run setup` to create the `.venv` and install all development, test, lint and typing dependencies via `uv`.
+ 2. Run `mise run setup` to create the `.venv` and install all development, test, lint and typing dependencies via `uv`.
 
 Environment variables `GLEAN_API_TOKEN` and `GLEAN_INSTANCE` must be set to interact with Glean or regenerate VCR cassettes.
 
