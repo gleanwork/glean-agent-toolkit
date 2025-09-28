@@ -1,6 +1,6 @@
 # Glean Agent Toolkit: Glean Instance Prerequisites
 
-This guide summarizes requirements for your organization's Glean instance (tenant) to use the built-in tools. Ensure your Glean Admin has enabled the relevant features and connectors for your tenant.
+This guide summarizes requirements for your organization's Glean instance to use the built-in tools. Ensure your Glean Admin has enabled the relevant features and connectors.
 
 ## Global requirements
 
