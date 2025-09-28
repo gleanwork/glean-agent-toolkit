@@ -17,13 +17,13 @@ This guide summarizes requirements for your organization's Glean instance to use
 ### `glean_search`
 
 - Connectors: Any content sources your organization has connected to Glean
-- Admin toggles: Search and Client API enabled
+- Admin toggles: Client API enabled
 - Permissions: Users must have view access to content surfaced
 
 ### `employee_search`
 
 - Connectors: Directory/HR sources (e.g., Google Workspace Directory, Azure AD, HRIS if applicable)
-- Admin toggles: People/Directory data available to Search and Client API
+- Admin toggles: People/Directory data available to Client API
 - Permissions: Users can view directory profiles per org policy
 
 ### `calendar_search`
