@@ -7,7 +7,7 @@ Thank you for your interest in contributing to the Glean Agent Toolkit! This gui
 ```sh
 src/
 ├─ glean/
-│  ├─ __init__.py        
+│  ├─ __init__.py
 │  └─ agent_toolkit/     # exposes `glean.agent_toolkit`
 │     ├─ __init__.py
 │     ├─ decorators.py
@@ -22,64 +22,64 @@ src/
 
 ## Development environment
 
-The repository relies on [uv](https://github.com/astral-sh/uv) and [go-task](https://taskfile.dev/) for reproducible workflows.
+The repository relies on [uv](https://github.com/astral-sh/uv) and [mise](https://mise.jdx.dev/) for reproducible workflows and task orchestration.
 
 ### Prerequisites
 
 1. uv
 
-    ```bash
-    pip install uv
-    ```
+   ```bash
+   pip install uv
+   ```
 
-2. go-task
+2. mise
 
-    ```bash
-    brew install go-task
-    ```
+   ```bash
+   brew install mise
+   ```
 
 ### One-time setup
 
 ```bash
-task setup
+mise run setup
 ```
 
 The command creates `.venv/` and installs all dev/test dependencies via uv.
 
 ## Development Tasks
 
-The project uses [go-task](https://taskfile.dev/) to manage development tasks. Here are the available tasks:
+The project uses `mise` to manage development tasks. Here are the available tasks:
 
 ### Testing
 
-| Task | Description |
-|------|-------------|
-| `task test` | Run unit tests |
-| `task test:watch` | Run tests in watch mode |
-| `task test:cov` | Run tests with coverage |
-| `task test:all` | Run all tests and lint fixes |
+| Task                  | Description                  |
+| --------------------- | ---------------------------- |
+| `mise run test`       | Run unit tests               |
+| `mise run test:watch` | Run tests in watch mode      |
+| `mise run test:cov`   | Run tests with coverage      |
+| `mise run test:all`   | Run all tests and lint fixes |
 
 ### Linting and formatting
 
-| Task | Description |
-|------|-------------|
-| `task lint` | Run Ruff, pyright and formatting checks |
-| `task lint:diff` | Same as above but only on changed files |
-| `task lint:package` | Lint only `glean/toolkit` |
-| `task lint:tests` | Lint only `tests` |
-| `task lint:fix` | Autofix style issues |
-| `task format` | Apply Ruff formatter |
-| `task format:diff` | Format only changed files |
+| Task                    | Description                             |
+| ----------------------- | --------------------------------------- |
+| `mise run lint`         | Run Ruff, pyright and formatting checks |
+| `mise run lint:diff`    | Same as above but only on changed files |
+| `mise run lint:package` | Lint only `glean/toolkit`               |
+| `mise run lint:tests`   | Lint only `tests`                       |
+| `mise run lint:fix`     | Autofix style issues                    |
+| `mise run format`       | Apply Ruff formatter                    |
+| `mise run format:diff`  | Format only changed files               |
 
 ### Examples and Utilities
 
-| Task | Description |
-|------|-------------|
-| `task spell:check` | Check spelling |
-| `task spell:fix` | Fix spelling |
-| `task clean` | Clean build artifacts |
-| `task build` | Build the package |
-| `task release` | Create a new release (version bump + changelog) |
+| Task                   | Description                                     |
+| ---------------------- | ----------------------------------------------- |
+| `mise run spell:check` | Check spelling                                  |
+| `mise run spell:fix`   | Fix spelling                                    |
+| `mise run clean`       | Clean build artifacts                           |
+| `mise run build`       | Build the package                               |
+| `mise run release`     | Create a new release (version bump + changelog) |
 
 ## Pull Request Process
 
@@ -90,4 +90,4 @@ The project uses [go-task](https://taskfile.dev/) to manage development tasks. H
 
 ## Code of Conduct
 
-Please be respectful and considerate of others when contributing to this project. 
+Please be respectful and considerate of others when contributing to this project.

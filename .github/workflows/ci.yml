@@ -22,13 +22,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup development environment
-        run: task setup
+        run: mise run setup
 
       - name: Run linters
-        run: task lint
+        run: mise run lint
 
       - name: Build package
-        run: task build
+        run: mise run build
 
   test:
     name: Test Python ${{ matrix.python-version }}
@@ -44,23 +44,21 @@ jobs:
         uses: jdx/mise-action@v2
         with:
           cache: true
-          mise_toml: |
-            [tools]
-            python = "${{ matrix.python-version }}"
-            task = "latest"
-            uv = "latest"
 
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup development environment
-        run: task setup
+        run: mise use -g python@${{ matrix.python-version }} uv@latest && mise install
+
+      - name: Initialize dev environment
+        run: mise run setup
 
       - name: Run tests
-        run: task test
+        run: mise run test
 
       - name: Test package installation
         run: |
-          task build
+          mise run build
           uv run pip install dist/*.whl
           uv run python -c "import glean.agent_toolkit; print('Package installed successfully')"
