@@ -1,0 +1,63 @@
+# Glean Agent Toolkit: Instance Prerequisites
+
+This guide summarizes instance-level requirements to use the built-in tools. Ensure your Glean Admin has enabled the relevant features and connectors for your tenant.
+
+## Global requirements
+
+- Environment variables
+  - `GLEAN_API_TOKEN`
+  - `GLEAN_INSTANCE`
+
+- Instance access
+  - Tools API enabled for your tenant
+  - Users have access to underlying content/apps (authorization enforced by Glean)
+
+## Tool-specific requirements
+
+### `glean_search`
+
+- Connectors: Google Workspace and/or Microsoft 365 content sources (Docs/Drive, SharePoint/OneDrive, etc.) as applicable
+- Admin toggles: Search/Tools API enabled
+- Permissions: Users must have view access to content surfaced
+
+### `employee_search`
+
+- Connectors: Directory/HR sources (e.g., Google Workspace Directory, Azure AD, HRIS if applicable)
+- Admin toggles: People/Directory data available to Search/Tools
+- Permissions: Users can view directory profiles per org policy
+
+### `calendar_search`
+
+- Connectors: Google Calendar and/or Microsoft 365 Calendar
+- Admin toggles: Calendar search enabled for Tools API
+- Permissions: Users can view event metadata per calendar sharing rules; transcripts require recording/ingestion being enabled where applicable
+
+### `gmail_search`
+
+- Connectors: Google Workspace Gmail
+- Admin toggles: Gmail search enabled for Tools API
+- Permissions: Users can search only their mailbox per Gmail/Glean policies
+
+### `outlook_search`
+
+- Connectors: Microsoft 365 (Outlook Mail)
+- Admin toggles: Outlook search enabled for Tools API
+- Permissions: Users can search only their mailbox per M365/Glean policies
+
+### `code_search`
+
+- Connectors: One or more code hosts (GitHub, GitLab, Bitbucket, Azure Repos)
+- Admin toggles: Code Search enabled for your tenant and available to Tools API
+- Permissions: Users must have read access to repositories/organizations
+
+## Verification checklist
+
+- Confirm Tools API access with a simple `glean_search` call
+- Verify each connector is authorized and indexed in Admin
+- Test per-user scoping by running a tool with a least-privilege account
+
+## Troubleshooting
+
+- 401/403 errors: validate `GLEAN_API_TOKEN`, `GLEAN_INSTANCE`, and user permissions
+- Empty results: confirm connector indexing status and that the feature is enabled for Tools
+- Code search gaps: ensure all relevant orgs/repos are connected and indexing completed
