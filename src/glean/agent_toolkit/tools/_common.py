@@ -7,6 +7,7 @@ import re
 from typing import Any
 
 from glean.api_client import Glean, models
+from glean.api_client.utils import BackoffStrategy, RetryConfig
 
 
 def api_client() -> Glean:
@@ -17,7 +18,7 @@ def api_client() -> Glean:
     if not api_token or not instance:
         raise ValueError("GLEAN_API_TOKEN and GLEAN_INSTANCE environment variables are required")
 
-    return Glean(api_token=api_token, instance=instance)
+    return Glean(api_token=api_token, instance=instance, retry_config=_build_retry_config())
 
 
 def clean_query(query: str) -> str:
@@ -47,6 +48,45 @@ def convert_to_tool_params(**kwargs: Any) -> dict[str, models.ToolsCallParameter
     return {key: models.ToolsCallParameter(name=key, value=value) for key, value in kwargs.items()}
 
 
+def _parse_retry_env_float(name: str, default: float) -> float:
+    value = os.getenv(name)
+    if not value:
+        return default
+    try:
+        return float(value)
+    except Exception:
+        return default
+
+
+def _parse_retry_env_int(name: str, default: int) -> int:
+    value = os.getenv(name)
+    if not value:
+        return default
+    try:
+        return int(value)
+    except Exception:
+        return default
+
+
+def _build_retry_config() -> RetryConfig:
+    initial = _parse_retry_env_float("GLEAN_RETRY_INITIAL", 1.0)
+    maximum = _parse_retry_env_float("GLEAN_RETRY_MAX", 50.0)
+    multiplier = _parse_retry_env_float("GLEAN_RETRY_MULTIPLIER", 1.1)
+    jitter_ms = _parse_retry_env_int("GLEAN_RETRY_JITTER_MS", 100)
+    retry_on_rate_limit = os.getenv("GLEAN_RETRY_ON_RATE_LIMIT", "true").lower() != "false"
+
+    return RetryConfig(
+        strategy="backoff",
+        backoff_strategy=BackoffStrategy(
+            initial=initial,
+            maximum=maximum,
+            multiplier=multiplier,
+            jitter=jitter_ms,
+        ),
+        retry_on_rate_limit=retry_on_rate_limit,
+    )
+
+
 def run_tool(
     tool_display_name: str,
     parameters: dict[str, models.ToolsCallParameter],
@@ -66,13 +106,8 @@ def run_tool(
                 name=tool_display_name,
                 parameters=parameters,
             )
-
-            return {"result": result}
-
+        return {"result": result}
     except ValueError as e:
-        # Handle API client creation errors (missing credentials, etc.)
         return {"error": f"Parameter validation error: {str(e)}", "result": None}
-
     except Exception as e:
-        # Handle other errors (API errors, connection errors, etc.)
         return {"error": str(e), "result": None}

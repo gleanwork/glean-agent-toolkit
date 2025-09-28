@@ -10,7 +10,10 @@ readme = "README.md"
 authors = [{ name = "Steve Calvert", email = "steve.calvert@glean.com" }]
 license = { text = "MIT" }
 requires-python = ">=3.10,<4.0"
-dependencies = ["pydantic>=2.7,<3.0", "glean-api-client>=0.6.0,<1.0"]
+dependencies = [
+  "pydantic>=2.7,<3.0",
+  "glean-api-client>=0.6.0,<1.0",
+]
 
 [project.optional-dependencies]
 dev = [

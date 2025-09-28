@@ -98,6 +98,8 @@ class TestRunTool:
             result = run_tool("Test Tool", parameters)
 
             assert result == {"error": "API Error", "result": None}
+            # should have retried; at least 1 call attempted
+            assert mock_client.client.tools.run.call_count >= 1
 
     def test_run_tool_connection_error(self) -> None:
         """Test tool execution with connection error."""
@@ -113,6 +115,26 @@ class TestRunTool:
             result = run_tool("Test Tool", parameters)
 
             assert result == {"error": "Network error", "result": None}
+            # with retries, multiple attempts likely
+            assert mock_client.client.tools.run.call_count >= 2
+
+    def test_run_tool_transient_then_success(self) -> None:
+        parameters = {
+            "query": models.ToolsCallParameter(name="query", value="test query")
+        }
+
+        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
+            mock_client = mock.MagicMock()
+            mock_client.client.tools.run.side_effect = [
+                Exception("temporary 500"),
+                {"ok": True},
+            ]
+            mock_api_client.return_value.__enter__.return_value = mock_client
+
+            result = run_tool("Test Tool", parameters)
+
+            assert result == {"result": {"ok": True}}
+            assert mock_client.client.tools.run.call_count == 2
 
     def test_run_tool_empty_parameters(self) -> None:
         """Test tool execution with empty parameters."""
@@ -147,4 +169,4 @@ class TestRunTool:
             assert result == {
                 "error": "Parameter validation error: Missing credentials",
                 "result": None
-            } 
+            }
