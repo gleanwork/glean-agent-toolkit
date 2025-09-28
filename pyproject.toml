@@ -52,7 +52,7 @@ packages = ["src/glean"]
 include = ["src", "tests"]
 exclude = ["**/__pycache__", ".venv/"]
 venvPath = "."
-pythonVersion = "3.13"
+pythonVersion = "3.10"
 reportMissingImports = "warning"
 reportUnusedVariable = "warning"
 
