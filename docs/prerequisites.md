@@ -16,7 +16,7 @@ This guide summarizes requirements for your organization's Glean instance to use
 
 ### `glean_search`
 
-- Connectors: Google Workspace and/or Microsoft 365 content sources (Docs/Drive, SharePoint/OneDrive, etc.) as applicable
+- Connectors: Any content sources your organization has connected to Glean
 - Admin toggles: Search/Tools API enabled
 - Permissions: Users must have view access to content surfaced
 
