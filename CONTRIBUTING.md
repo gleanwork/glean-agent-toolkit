@@ -80,6 +80,7 @@ The project uses `mise` to manage development tasks. Here are the available task
 | `mise run clean`       | Clean build artifacts                           |
 | `mise run build`       | Build the package                               |
 | `mise run release`     | Create a new release (version bump + changelog) |
+| `mise run security:audit` | Run dependency vulnerability audit (pip-audit) |
 
 ## Pull Request Process
 

@@ -190,6 +190,10 @@ run = "uv run pre-commit run"
 description = "Update pre-commit hooks"
 run = "uv run pre-commit autoupdate"
 
+[tasks."security:audit"]
+description = "Run dependency vulnerability audit (pip-audit)"
+run = "uvx pip-audit"
+
 [tasks.release]
 description = "Bump version and create a new tag (use DRY_RUN=true for preview)"
 run = [
