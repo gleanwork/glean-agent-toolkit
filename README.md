@@ -4,9 +4,9 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 ## Key Features
 
-* **Production-Ready Glean Tools:** Instantly add capabilities like enterprise search, employee lookup, calendar search, Gmail search, and more to your agents.
-* **Framework Adapters:** Seamlessly convert Glean tools into formats compatible with major agent SDKs.
-* **Custom Tool Creation:** Define your own tools once using the `@tool_spec` decorator and use them across any supported framework.
+- **Production-Ready Glean Tools:** Instantly add capabilities like enterprise search, employee lookup, calendar search, Gmail search, and more to your agents.
+- **Framework Adapters:** Seamlessly convert Glean tools into formats compatible with major agent SDKs.
+- **Custom Tool Creation:** Define your own tools once using the `@tool_spec` decorator and use them across any supported framework.
 
 ## Installation
 
@@ -136,12 +136,12 @@ cd company_assistant/
 
 Once set up, your Company Assistant can handle requests like:
 
-- *"Find our security guidelines for handling customer data"*
-- *"Who's the product manager for the mobile app team?"*
-- *"Show me emails about the budget planning meeting from last week"*
-- *"I need the engineering team's architecture docs for the payment system"*
-- *"Find all the design review meetings scheduled for this month"*
-- *"Who worked on the API authentication project? I need to ask them some questions"*
+- _"Find our security guidelines for handling customer data"_
+- _"Who's the product manager for the mobile app team?"_
+- _"Show me emails about the budget planning meeting from last week"_
+- _"I need the engineering team's architecture docs for the payment system"_
+- _"Find all the design review meetings scheduled for this month"_
+- _"Who worked on the API authentication project? I need to ask them some questions"_
 
 This type of assistant can dramatically improve employee productivity by making company knowledge instantly accessible through natural conversation.
 
@@ -149,14 +149,14 @@ This type of assistant can dramatically improve employee productivity by making 
 
 The toolkit comes with a suite of production-ready tools that connect to various Glean functionalities:
 
-* **`glean_search`**: Search your company's knowledge base for relevant documents and information
-* **`web_search`**: Search the public web for up-to-date external information
-* **`ai_web_search`**: Query Google Gemini for AI-powered web information
-* **`calendar_search`**: Find meetings and calendar events
-* **`employee_search`**: Search for employees by name, team, department, or expertise
-* **`code_search`**: Search your company's source code repositories
-* **`gmail_search`**: Search Gmail messages and conversations
-* **`outlook_search`**: Search Outlook mail and calendar items
+- **`glean_search`**: Search your company's knowledge base for relevant documents and information
+- **`web_search`**: Search the public web for up-to-date external information
+- **`ai_web_search`**: Query Google Gemini for AI-powered web information
+- **`calendar_search`**: Find meetings and calendar events
+- **`employee_search`**: Search for employees by name, team, department, or expertise
+- **`code_search`**: Search your company's source code repositories
+- **`gmail_search`**: Search Gmail messages and conversations
+- **`outlook_search`**: Search Outlook mail and calendar items
 
 ## Quick Start Examples
 
@@ -389,4 +389,4 @@ Interested in contributing? Check out our [Contributing Guide](CONTRIBUTING.md) 
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE). 
+This project is licensed under the [MIT License](LICENSE).

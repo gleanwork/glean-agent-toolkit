@@ -25,7 +25,7 @@ Examples:
 
 ```bash
 # Install all dependencies including pre-commit
-task setup
+mise run setup
 ```
 
 This will:
@@ -37,7 +37,7 @@ This will:
 
 ```bash
 # Install pre-commit hooks
-task pre-commit:install
+mise run pre-commit:install
 ```
 
 ## Available Tools
@@ -54,13 +54,13 @@ Pre-commit hooks run automatically before each commit and will:
 
 ```bash
 # Run pre-commit hooks on all files
-task pre-commit:run
+mise run pre-commit:run
 
 # Run pre-commit hooks on changed files only
-task pre-commit:run:diff
+mise run pre-commit:run:diff
 
 # Update pre-commit hooks to latest versions
-task pre-commit:update
+mise run pre-commit:update
 ```
 
 ## Making Commits

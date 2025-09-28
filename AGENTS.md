@@ -6,34 +6,34 @@ This project contains the **Glean Agent Toolkit**, a Python package used to inte
 
 1. Install the prerequisites:
    - [uv](https://github.com/astral-sh/uv)
-   - [go-task](https://taskfile.dev/)
-2. Run `task setup` to create the `.venv` and install all development, test, lint and typing dependencies via `uv`.
+   - [mise](https://mise.jdx.dev/)
+2. Run `mise run setup` to create the `.venv` and install all development, test, lint and typing dependencies via `uv`.
 
 Environment variables `GLEAN_API_TOKEN` and `GLEAN_INSTANCE` must be set to interact with Glean or regenerate VCR cassettes.
 
 ## Development Tasks
 
-The repository uses **go-task**. Key commands from `Taskfile.yml` include:
+The repository uses **mise**. Key commands include:
 
 | Task | Description |
 |------|-------------|
-| `task test` | Run unit tests |
-| `task test:watch` | Run tests in watch mode |
-| `task test:cov` | Run tests with coverage |
-| `task test:all` | Run tests, apply lint fixes, and run pyright |
-| `task lint` | Run Ruff, formatting checks and pyright |
-| `task lint:diff` | Lint only changed files |
-| `task lint:fix` | Apply Ruff fixes and formatting |
-| `task format` | Format code using Ruff formatter |
-| `task spell:check` | Check spelling |
-| `task clean` | Remove build artifacts |
-| `task build` | Build the package |
-| `task release` | Bump version and generate the changelog |
+| `mise run test` | Run unit tests |
+| `mise run test:watch` | Run tests in watch mode |
+| `mise run test:cov` | Run tests with coverage |
+| `mise run test:all` | Run tests, apply lint fixes, and run pyright |
+| `mise run lint` | Run Ruff, formatting checks and pyright |
+| `mise run lint:diff` | Lint only changed files |
+| `mise run lint:fix` | Apply Ruff fixes and formatting |
+| `mise run format` | Format code using Ruff formatter |
+| `mise run spell:check` | Check spelling |
+| `mise run clean` | Remove build artifacts |
+| `mise run build` | Build the package |
+| `mise run release` | Bump version and generate the changelog |
 
 Special tasks exist to manage VCR cassettes used in tests:
 
-- `task test:vcr:regenerate` – Re-record all HTTP interactions (requires `GLEAN_API_TOKEN` and `GLEAN_INSTANCE`).
-- `task test:vcr:clean` – Delete cassettes so the next test run regenerates them.
+- `mise run test:vcr:regenerate` – Re-record all HTTP interactions (requires `GLEAN_API_TOKEN` and `GLEAN_INSTANCE`).
+- `mise run test:vcr:clean` – Delete cassettes so the next test run regenerates them.
 
 ## Coding Guidelines
 
@@ -45,7 +45,7 @@ Special tasks exist to manage VCR cassettes used in tests:
 ## Contribution Process
 
 1. Fork the repository and create a branch from `main`.
-2. Make your changes and ensure all tasks run cleanly (`task test` and `task lint`).
+2. Make your changes and ensure all tasks run cleanly (`mise run test` and `mise run lint`).
 3. Update or add documentation when necessary.
 4. Submit a pull request.
 5. Be respectful and follow the project's code of conduct.

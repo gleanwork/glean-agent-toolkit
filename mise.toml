@@ -1,4 +1,197 @@
 [tools]
 python = "3.10"
-task = "latest"
 uv = "latest"
+node = "22"
+
+[tasks]
+
+[tasks.setup]
+description = "Set up local environment (install dependencies, etc.)"
+run = [
+  "uv venv .venv",
+  "uv pip install -e .[dev,test,lint,typing,codespell]",
+  "uv run pre-commit install",
+  "uv run pre-commit install --hook-type commit-msg",
+]
+
+[tasks."test:all"]
+description = "Run all tests and lint fixes"
+run = [
+  "mise run test",
+  "mise run lint:fix",
+  "mise run lint:pyright",
+]
+
+[tasks.test]
+description = "Run unit tests"
+run = "uv run pytest -v --tb=auto -rA --durations=10 -p no:logging tests/"
+
+[tasks."test:watch"]
+description = "Run tests in watch mode"
+run = "uv run ptw --now . -- -vv --tb=auto -rA --durations=10 -p no:logging tests/"
+
+[tasks."test:cov"]
+description = "Run tests with coverage"
+run = "uv run pytest --cov=glean --cov-report=term --cov-report=html -v tests/"
+
+[tasks."test:vcr:regenerate"]
+description = "Regenerate all VCR cassettes by re-recording HTTP interactions"
+run = [
+  "bash -lc '[ -n \"$GLEAN_API_TOKEN\" ] || { echo \"GLEAN_API_TOKEN environment variable is required for recording\"; exit 1; }'",
+  "bash -lc '[ -n \"$GLEAN_INSTANCE\" ] || { echo \"GLEAN_INSTANCE environment variable is required for recording\"; exit 1; }'",
+  "uv run pytest -v tests/ --tb=auto -rA",
+]
+[tasks."test:vcr:regenerate".env]
+VCR_REGENERATE = "true"
+
+[tasks."test:vcr:clean"]
+description = "Delete all VCR cassettes to force regeneration on next test run"
+run = [
+  "rm -rf tests/cassettes/*",
+  "echo Deleted all VCR cassettes",
+]
+
+[tasks.lint]
+description = "Run all linters"
+run = [
+  "mise run lint:ruff",
+  "mise run lint:format:check",
+  "mise run lint:pyright",
+  "mise run lint:readme",
+]
+
+[tasks."lint:diff"]
+description = "Run linters on changed files"
+run = [
+  "bash -lc \"PYTHON_FILES=$(git diff --name-only --diff-filter=d main | grep -E '.*\\.(py|ipynb)$' || true); [ -z \\\"$PYTHON_FILES\\\" ] || uv run ruff check $PYTHON_FILES\"",
+  "bash -lc \"PYTHON_FILES=$(git diff --name-only --diff-filter=d main | grep -E '.*\\.(py|ipynb)$' || true); [ -z \\\"$PYTHON_FILES\\\" ] || uv run ruff format $PYTHON_FILES --diff\"",
+  "bash -lc \"PYTHON_FILES=$(git diff --name-only --diff-filter=d main | grep -E '.*\\.(py|ipynb)$' || true); if [ -z \\\"$PYTHON_FILES\\\" ]; then uv run pyright; else uv run pyright $PYTHON_FILES; fi\"",
+]
+
+[tasks."lint:package"]
+description = "Run linters on package files"
+run = [
+  "uv run ruff check src/glean/toolkit",
+  "uv run ruff format src/glean/toolkit --diff",
+  "uv run pyright src/glean/toolkit",
+]
+
+[tasks."lint:tests"]
+description = "Run linters on test files"
+run = [
+  "uv run ruff check tests",
+  "uv run ruff format tests --diff",
+  "uv run pyright tests",
+]
+
+[tasks."lint:fix"]
+description = "Run the lint autofixers"
+run = [
+  "mise run lint:fix:ruff",
+  "mise run format",
+]
+
+[tasks."lint:fix:diff"]
+description = "Run lint autofixers on changed files"
+run = [
+  "bash -lc \"PYTHON_FILES=$(git diff --name-only --diff-filter=d main | grep -E '.*\\.(py|ipynb)$' || true); [ -z \\\"$PYTHON_FILES\\\" ] || uv run ruff check $PYTHON_FILES --fix\"",
+  "mise run format:diff",
+]
+
+[tasks."lint:fix:package"]
+description = "Run lint autofixers on package files"
+run = [
+  "uv run ruff check src/glean/toolkit --fix",
+  "mise run format",
+]
+
+[tasks."lint:fix:ruff"]
+description = "Run Ruff autofixer"
+run = "uv run ruff check . --fix --exclude .venv/ --exclude **/site-packages/"
+
+[tasks."lint:ruff"]
+description = "Run Ruff linter"
+run = "uv run ruff check . --exclude .venv/ --exclude **/site-packages/"
+
+[tasks."lint:format:check"]
+description = "Check code formatting"
+run = "uv run ruff format . --diff"
+
+[tasks."lint:pyright"]
+description = "Run Pyright type checker"
+run = "uv run pyright"
+
+[tasks."lint:readme"]
+description = "Lint the README.md file"
+run = "npx -y markdown-code check"
+
+[tasks."lint:readme:fix"]
+description = "Fix the README.md file"
+run = "npx -y markdown-code sync"
+
+[tasks.format]
+description = "Run code formatters"
+run = [
+  "mise run format:ruff",
+  "mise run format:imports",
+]
+
+[tasks."format:diff"]
+description = "Run formatters on changed files"
+run = [
+  "bash -lc \"PYTHON_FILES=$(git diff --name-only --diff-filter=d main | grep -E '.*\\.(py|ipynb)$' || true); [ -z \\\"$PYTHON_FILES\\\" ] || uv run ruff format $PYTHON_FILES\"",
+  "bash -lc \"PYTHON_FILES=$(git diff --name-only --diff-filter=d main | grep -E '.*\\.(py|ipynb)$' || true); [ -z \\\"$PYTHON_FILES\\\" ] || uv run ruff check --select I --fix $PYTHON_FILES\"",
+]
+
+[tasks."format:ruff"]
+description = "Run Ruff formatter"
+run = "uv run ruff format ."
+
+[tasks."format:imports"]
+description = "Fix imports"
+run = "uv run ruff check --select I --fix ."
+
+[tasks."spell:check"]
+description = "Check spelling"
+run = "uv run codespell --toml pyproject.toml --skip=docs/"
+
+[tasks."spell:fix"]
+description = "Fix spelling"
+run = "uv run codespell --toml pyproject.toml -w --skip=docs/"
+
+[tasks.clean]
+description = "Clean build artifacts"
+run = [
+  "rm -rf dist .venv build **/*.egg-info .pytest_cache .coverage htmlcov .ruff_cache",
+  "find . -name \"*.pyc\" -delete",
+  "find . -name \"__pycache__\" -delete",
+]
+
+[tasks.build]
+description = "Build the package"
+run = "uv run python -m build"
+
+[tasks."pre-commit:install"]
+description = "Install pre-commit hooks"
+run = [
+  "uv run pre-commit install",
+  "uv run pre-commit install --hook-type commit-msg",
+]
+
+[tasks."pre-commit:run"]
+description = "Run pre-commit hooks on all files"
+run = "uv run pre-commit run --all-files"
+
+[tasks."pre-commit:run:diff"]
+description = "Run pre-commit hooks on changed files"
+run = "uv run pre-commit run"
+
+[tasks."pre-commit:update"]
+description = "Update pre-commit hooks"
+run = "uv run pre-commit autoupdate"
+
+[tasks.release]
+description = "Bump version and create a new tag (use DRY_RUN=true for preview)"
+run = [
+  "bash -lc 'if [ \"$DRY_RUN\" = \"true\" ]; then uv run python -m commitizen bump --dry-run && uv run python -m commitizen changelog --dry-run; else uv run python -m commitizen bump --yes && uv run python -m commitizen changelog; fi'",
+]
