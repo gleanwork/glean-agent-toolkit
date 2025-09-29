@@ -17,7 +17,7 @@ llm = ChatOpenAI(model="gpt-4", temperature=0)
 tools = [langchain_tool]
 
 prompt_template = """You are a helpful assistant with access to company knowledge.
-Use the glean_search tool to find relevant information when users ask questions.
+Use the search tool to find relevant information when users ask questions.
 
 Tools available:
 {tools}
