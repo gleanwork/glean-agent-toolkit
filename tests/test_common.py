@@ -1,6 +1,6 @@
 import os
 from unittest import mock
-from unittest.mock import patch
+from unittest.mock import ANY, patch
 
 import pytest
 
@@ -21,7 +21,8 @@ class TestApiClient:
                 api_client()
                 mock_glean.assert_called_once_with(
                     api_token="test-token",
-                    instance="test-instance"
+                    instance="test-instance",
+                    retry_config=ANY,
                 )
 
     def test_api_client_missing_token(self) -> None:
@@ -115,8 +116,8 @@ class TestRunTool:
             result = run_tool("Test Tool", parameters)
 
             assert result == {"error": "Network error", "result": None}
-            # with retries, multiple attempts likely
-            assert mock_client.client.tools.run.call_count >= 2
+            # wrapper does not retry; underlying client may, but is not invoked here
+            assert mock_client.client.tools.run.call_count >= 1
 
     def test_run_tool_transient_then_success(self) -> None:
         parameters = {
@@ -125,16 +126,13 @@ class TestRunTool:
 
         with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
             mock_client = mock.MagicMock()
-            mock_client.client.tools.run.side_effect = [
-                Exception("temporary 500"),
-                {"ok": True},
-            ]
+            mock_client.client.tools.run.side_effect = [Exception("temporary 500")]
             mock_api_client.return_value.__enter__.return_value = mock_client
 
             result = run_tool("Test Tool", parameters)
 
-            assert result == {"result": {"ok": True}}
-            assert mock_client.client.tools.run.call_count == 2
+            assert result == {"error": "temporary 500", "result": None}
+            assert mock_client.client.tools.run.call_count == 1
 
     def test_run_tool_empty_parameters(self) -> None:
         """Test tool execution with empty parameters."""

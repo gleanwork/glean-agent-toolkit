@@ -71,19 +71,22 @@ def _parse_retry_env_int(name: str, default: int) -> int:
 def _build_retry_config() -> RetryConfig:
     initial = _parse_retry_env_float("GLEAN_RETRY_INITIAL", 1.0)
     maximum = _parse_retry_env_float("GLEAN_RETRY_MAX", 50.0)
-    multiplier = _parse_retry_env_float("GLEAN_RETRY_MULTIPLIER", 1.1)
-    jitter_ms = _parse_retry_env_int("GLEAN_RETRY_JITTER_MS", 100)
-    retry_on_rate_limit = os.getenv("GLEAN_RETRY_ON_RATE_LIMIT", "true").lower() != "false"
+    exponent = _parse_retry_env_float("GLEAN_RETRY_MULTIPLIER", 1.1)
+    max_elapsed = _parse_retry_env_float("GLEAN_RETRY_MAX_ELAPSED", 60.0)
+
+    initial_interval = int(initial)
+    max_interval = int(maximum)
+    max_elapsed_time = int(max_elapsed)
 
     return RetryConfig(
         strategy="backoff",
-        backoff_strategy=BackoffStrategy(
-            initial=initial,
-            maximum=maximum,
-            multiplier=multiplier,
-            jitter=jitter_ms,
+        backoff=BackoffStrategy(
+            initial_interval=initial_interval,
+            max_interval=max_interval,
+            exponent=exponent,
+            max_elapsed_time=max_elapsed_time,
         ),
-        retry_on_rate_limit=retry_on_rate_limit,
+        retry_connection_errors=True,
     )
 
 
