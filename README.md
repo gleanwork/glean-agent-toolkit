@@ -45,6 +45,8 @@ Before using any Glean tools, you'll need:
    export GLEAN_INSTANCE="your-instance-name"
    ```
 
+See `docs/prerequisites.md` for instance-level connector and Admin settings required per tool.
+
 ## Quickstart Example: Company Assistant with Google ADK
 
 Here's a complete example that demonstrates the power of the Glean Agent Toolkit. We'll build a "Company Assistant" using Google's Agent Development Kit (ADK) that can help employees find information, discover colleagues, and search company resources.
