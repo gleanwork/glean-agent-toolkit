@@ -96,7 +96,7 @@ import os
 
 from google.adk.agents import Agent
 
-from glean.agent_toolkit.tools import calendar_search, employee_search, search, gmail_search
+from glean.agent_toolkit.tools import calendar_search, employee_search, gmail_search, search
 
 # Ensure environment variables are set
 required_env_vars = ["GLEAN_API_TOKEN", "GLEAN_INSTANCE"]
