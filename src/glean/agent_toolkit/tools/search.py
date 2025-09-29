@@ -1,4 +1,4 @@
-"""Glean Search tool for searching company documents and data."""
+"""Enterprise Search tool for searching company documents and data."""
 
 from __future__ import annotations
 

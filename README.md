@@ -96,7 +96,7 @@ import os
 
 from google.adk.agents import Agent
 
-from glean.agent_toolkit.tools import calendar_search, employee_search, glean_search, gmail_search
+from glean.agent_toolkit.tools import calendar_search, employee_search, search, gmail_search
 
 # Ensure environment variables are set
 required_env_vars = ["GLEAN_API_TOKEN", "GLEAN_INSTANCE"]
@@ -110,7 +110,7 @@ if not os.getenv("GOOGLE_API_KEY") and not os.getenv("GOOGLE_CLOUD_PROJECT"):
     raise ValueError("Either GOOGLE_API_KEY or GOOGLE_CLOUD_PROJECT must be set for ADK")
 
 # Convert Glean tools to Google ADK format
-company_search = glean_search.as_adk_tool()
+company_search = search.as_adk_tool()
 people_finder = employee_search.as_adk_tool()
 meeting_search = calendar_search.as_adk_tool()
 email_search = gmail_search.as_adk_tool()
@@ -124,7 +124,7 @@ root_agent = Agent(
     instruction="""You are a helpful company assistant that helps employees find information,
     people, and resources within the organization. You have access to:
 
-    - Company knowledge base and documents (use glean_search)
+    - Company knowledge base and documents (use search)
     - Employee directory and contact information (use employee_search)
     - Calendar and meeting information (use calendar_search)
     - Email search capabilities (use gmail_search)
@@ -189,7 +189,7 @@ The toolkit comes with a suite of production-ready tools that connect to various
 
 ## Quick Start Examples
 
-### Using `glean_search` with Different Frameworks
+### Using `search` with Different Frameworks
 
 #### OpenAI Agents SDK
 
@@ -198,7 +198,7 @@ import os
 
 from agents import Agent, Runner
 
-from glean.agent_toolkit.tools import glean_search
+from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
@@ -210,7 +210,7 @@ agent = Agent(
     name="KnowledgeAssistant",
     instructions="""You help users find information from the company knowledge base using
     Glean search.""",
-    tools=[glean_search],  # Use the tool function directly
+    tools=[search],  # Use the tool function directly
 )
 
 # Run a search query
@@ -227,20 +227,20 @@ from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
-from glean.agent_toolkit.tools import glean_search
+from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
 assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
 
 # Convert to LangChain tool format
-langchain_tool = glean_search.as_langchain_tool()
+langchain_tool = search.as_langchain_tool()
 
 llm = ChatOpenAI(model="gpt-4", temperature=0)
 tools = [langchain_tool]
 
 prompt_template = """You are a helpful assistant with access to company knowledge.
-Use the glean_search tool to find relevant information when users ask questions.
+Use the search tool to find relevant information when users ask questions.
 
 Tools available:
 {tools}
@@ -273,14 +273,14 @@ import os
 
 from crewai import Agent, Crew, Task
 
-from glean.agent_toolkit.tools import glean_search
+from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
 assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
 
 # Convert to CrewAI tool format
-crewai_tool = glean_search.as_crewai_tool()
+crewai_tool = search.as_crewai_tool()
 
 # Create a research agent
 researcher = Agent(

@@ -4,14 +4,14 @@ from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
 
-from glean.agent_toolkit.tools import glean_search
+from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
 assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
 
 # Convert to LangChain tool format
-langchain_tool = glean_search.as_langchain_tool()
+langchain_tool = search.as_langchain_tool()
 
 llm = ChatOpenAI(model="gpt-4", temperature=0)
 tools = [langchain_tool]
