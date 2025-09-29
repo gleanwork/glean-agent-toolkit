@@ -5,6 +5,7 @@ This guide summarizes requirements for your organization's Glean instance to use
 ## Global requirements
 
 - Environment variables
+
   - `GLEAN_API_TOKEN`
   - `GLEAN_INSTANCE`
 
