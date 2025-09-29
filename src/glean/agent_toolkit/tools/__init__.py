@@ -17,6 +17,7 @@ _tool_modules: list[str] = [
     "code_search",
     "gmail_search",
     "outlook_search",
+    "read_document",
 ]
 
 for _mod in _tool_modules:
@@ -28,6 +29,7 @@ from .code_search import code_search  # noqa: E402
 from .employee_search import employee_search  # noqa: E402
 from .gmail_search import gmail_search  # noqa: E402
 from .outlook_search import outlook_search  # noqa: E402
+from .read_document import read_document  # noqa: E402
 from .search import search  # noqa: E402
 from .web_search import web_search  # noqa: E402
 
@@ -40,4 +42,5 @@ __all__: list[str] = [
     "code_search",
     "gmail_search",
     "outlook_search",
+    "read_document",
 ]
