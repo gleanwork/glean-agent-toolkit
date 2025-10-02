@@ -178,16 +178,29 @@ This type of assistant can dramatically improve employee productivity by making 
 
 The toolkit comes with a suite of production-ready tools that connect to various Glean functionalities:
 
-- **`search`**: Search your company's knowledge base for relevant documents and information
+- `search`: Search your company's knowledge base for relevant documents and information
 - **`read_document`**: Read full content of a specific document by ID or URL (requires
   config settings `queryapi.getDocuments.enabled` and `queryapi.getDocuments.content.enabled`)
 - **`web_search`**: Search the public web for up-to-date external information
-- **`ai_web_search`**: Query Google Gemini for AI-powered web information
-- **`calendar_search`**: Find meetings and calendar events
-- **`employee_search`**: Search for employees by name, team, department, or expertise
-- **`code_search`**: Search your company's source code repositories
-- **`gmail_search`**: Search Gmail messages and conversations
-- **`outlook_search`**: Search Outlook mail and calendar items
+- `calendar_search`: Find meetings and calendar events
+- `employee_search`: Search for employees by name, team, department, or expertise
+- `code_search`: Search your company's source code repositories
+- `gmail_search`: Search Gmail messages and conversations
+- `outlook_search`: Search Outlook mail and calendar items
+
+### Web Research with Context
+
+```python snippet=readme/snippet-09.py
+from glean.agent_toolkit.tools import web_search
+
+# External information gathering
+web_tool = web_search.as_langchain_tool()
+
+# Example queries:
+# "Latest industry trends in machine learning"
+# "Current market analysis for SaaS companies"
+# "Recent news about our competitors"
+```
 
 ## Quick Start Examples
 
@@ -352,21 +365,6 @@ calendar_tool = calendar_search.as_langchain_tool()
 # "Find emails about the product launch from last month"
 # "Show me my meetings with the design team this week"
 # "Search for messages containing budget discussions"
-```
-
-#### Web Research with Context
-
-```python snippet=readme/snippet-09.py
-from glean.agent_toolkit.tools import ai_web_search, web_search
-
-# External information gathering
-web_tool = web_search.as_langchain_tool()
-ai_web_tool = ai_web_search.as_langchain_tool()
-
-# Example queries:
-# "Latest industry trends in machine learning"
-# "Current market analysis for SaaS companies"
-# "Recent news about our competitors"
 ```
 
 ## Creating Custom Tools with `@tool_spec`
