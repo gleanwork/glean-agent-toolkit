@@ -15,7 +15,7 @@ This guide summarizes requirements for your organization's Glean instance to use
 
 ## Tool-specific requirements
 
-### `glean_search`
+### `search`
 
 - Connectors: Any content sources your organization has connected to Glean
 - Admin toggles: Client API enabled

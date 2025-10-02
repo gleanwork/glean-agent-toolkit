@@ -2,7 +2,7 @@ import os
 
 from google.adk.agents import Agent
 
-from glean.agent_toolkit.tools import calendar_search, employee_search, glean_search, gmail_search
+from glean.agent_toolkit.tools import calendar_search, employee_search, gmail_search, search
 
 # Ensure environment variables are set
 required_env_vars = ["GLEAN_API_TOKEN", "GLEAN_INSTANCE"]
@@ -16,7 +16,7 @@ if not os.getenv("GOOGLE_API_KEY") and not os.getenv("GOOGLE_CLOUD_PROJECT"):
     raise ValueError("Either GOOGLE_API_KEY or GOOGLE_CLOUD_PROJECT must be set for ADK")
 
 # Convert Glean tools to Google ADK format
-company_search = glean_search.as_adk_tool()
+company_search = search.as_adk_tool()
 people_finder = employee_search.as_adk_tool()
 meeting_search = calendar_search.as_adk_tool()
 email_search = gmail_search.as_adk_tool()
@@ -30,7 +30,7 @@ root_agent = Agent(
     instruction="""You are a helpful company assistant that helps employees find information,
     people, and resources within the organization. You have access to:
 
-    - Company knowledge base and documents (use glean_search)
+    - Company knowledge base and documents (use search)
     - Employee directory and contact information (use employee_search)
     - Calendar and meeting information (use calendar_search)
     - Email search capabilities (use gmail_search)

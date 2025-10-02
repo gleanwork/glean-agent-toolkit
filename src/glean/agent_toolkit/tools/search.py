@@ -1,4 +1,4 @@
-"""Glean Search tool for searching company documents and data."""
+"""Enterprise Search tool for searching company documents and data."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
 
 
 @tool_spec(
-    name="glean_search",
+    name="search",
     description=(
         "Finds relevant documents in the company.\n"
         "INSTRUCTIONS:\n"
@@ -22,7 +22,7 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
         "field in the output."
     ),
 )
-def glean_search(
+def search(
     query: Annotated[
         str,
         Field(

@@ -2,14 +2,14 @@ import os
 
 from crewai import Agent, Crew, Task
 
-from glean.agent_toolkit.tools import glean_search
+from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
 assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
 
 # Convert to CrewAI tool format
-crewai_tool = glean_search.as_crewai_tool()
+crewai_tool = search.as_crewai_tool()
 
 # Create a research agent
 researcher = Agent(
