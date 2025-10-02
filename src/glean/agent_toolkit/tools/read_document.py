@@ -59,7 +59,7 @@ def read_document(
     One of document_id or url must be provided. If both or neither are provided,
     an error will be returned.
     """
-    if bool(document_id) == bool(url):
+    if (document_id and url) or (not document_id and not url):
         return {
             "error": "Provide exactly one of document_id or url",
             "result": None,
