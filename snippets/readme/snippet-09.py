@@ -1,8 +1,7 @@
-from glean.agent_toolkit.tools import ai_web_search, web_search
+from glean.agent_toolkit.tools import web_search
 
 # External information gathering
 web_tool = web_search.as_langchain_tool()
-ai_web_tool = ai_web_search.as_langchain_tool()
 
 # Example queries:
 # "Latest industry trends in machine learning"
