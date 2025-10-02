@@ -72,7 +72,7 @@ def read_document(
             include_fields = [models.GetDocumentsRequestIncludeField.DOCUMENT_CONTENT]
 
             if document_id:
-                did = common.clean_query(document_id)
+                document_id = document_id  # Use document ID directly without cleaning
                 request = models.GetDocumentsRequest(
                     document_specs=[models.DocumentSpec2(id=did)],
                     include_fields=include_fields,
