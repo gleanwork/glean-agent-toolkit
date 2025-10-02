@@ -16,13 +16,13 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 ### Retry configuration (env vars)
 
-| Variable | Default | Description | Example |
-| --- | --- | --- | --- |
-| `GLEAN_RETRY_INITIAL` | `1.0` | Initial backoff in seconds | `0.5` |
-| `GLEAN_RETRY_MAX` | `50.0` | Maximum backoff in seconds | `8` |
-| `GLEAN_RETRY_MULTIPLIER` | `1.1` | Exponential backoff multiplier | `2.0` |
-| `GLEAN_RETRY_JITTER_MS` | `100` | Random jitter in milliseconds | `250` |
-| `GLEAN_RETRY_ON_RATE_LIMIT` | `true` | Retry on HTTP 429 rate limits | `true` |
+| Variable                    | Default | Description                    | Example |
+| --------------------------- | ------- | ------------------------------ | ------- |
+| `GLEAN_RETRY_INITIAL`       | `1.0`   | Initial backoff in seconds     | `0.5`   |
+| `GLEAN_RETRY_MAX`           | `50.0`  | Maximum backoff in seconds     | `8`     |
+| `GLEAN_RETRY_MULTIPLIER`    | `1.1`   | Exponential backoff multiplier | `2.0`   |
+| `GLEAN_RETRY_JITTER_MS`     | `100`   | Random jitter in milliseconds  | `250`   |
+| `GLEAN_RETRY_ON_RATE_LIMIT` | `true`  | Retry on HTTP 429 rate limits  | `true`  |
 
 Retries cover transient failures such as HTTP 429/5xx and connection timeouts. Set these before constructing any Glean client usage.
 
@@ -178,7 +178,9 @@ This type of assistant can dramatically improve employee productivity by making 
 
 The toolkit comes with a suite of production-ready tools that connect to various Glean functionalities:
 
-- **`glean_search`**: Search your company's knowledge base for relevant documents and information
+- **`search`**: Search your company's knowledge base for relevant documents and information
+- **`read_document`**: Read full content of a specific document by ID or URL (requires
+  config settings `queryapi.getDocuments.enabled` and `queryapi.getDocuments.content.enabled`)
 - **`web_search`**: Search the public web for up-to-date external information
 - **`ai_web_search`**: Query Google Gemini for AI-powered web information
 - **`calendar_search`**: Find meetings and calendar events

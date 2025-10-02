@@ -47,9 +47,16 @@ This guide summarizes requirements for your organization's Glean instance to use
 
 ## Verification checklist
 
-- Confirm Client API access with a simple `glean_search` call
+- Confirm Client API access with a simple `search` call
 - Verify each connector is authorized and indexed in Admin
 - Test per-user scoping by running a tool with a least-privilege account
+
+### `read_document`
+
+- Config settings (must be enabled):
+  - `queryapi.getDocuments.enabled`
+  - `queryapi.getDocuments.content.enabled`
+  - These enable the `documents.read_document` API to return full content
 
 ## Troubleshooting
 
