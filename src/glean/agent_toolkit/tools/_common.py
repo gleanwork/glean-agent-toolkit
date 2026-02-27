@@ -115,8 +115,34 @@ def run_tool(
                 name=tool_display_name,
                 parameters=parameters,
             )
-        return {"result": result}
+        return {"result": serialize_tool_result(result)}
     except ValueError as e:
         return {"error": f"Parameter validation error: {str(e)}", "result": None}
     except Exception as e:
         return {"error": str(e), "result": None}
+
+
+def serialize_tool_result(value: Any) -> Any:
+    """Normalize SDK response payloads into JSON-like data.
+
+    This keeps field aliases (for example ``camelCase``) so downstream adapters
+    that rely on plain dictionaries do not drop values.
+    """
+    if value is None:
+        return None
+
+    model_dump = getattr(value, "model_dump", None)
+    if callable(model_dump):
+        try:
+            dumped = model_dump(by_alias=True)
+        except TypeError:
+            dumped = model_dump()
+        return serialize_tool_result(dumped)
+
+    if isinstance(value, dict):
+        return {key: serialize_tool_result(item) for key, item in value.items()}
+
+    if isinstance(value, (list, tuple, set)):
+        return [serialize_tool_result(item) for item in value]
+
+    return value
