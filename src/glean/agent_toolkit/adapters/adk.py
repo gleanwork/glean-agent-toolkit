@@ -7,7 +7,7 @@ from glean.agent_toolkit.adapters.base import BaseAdapter
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
-    from google.adk.tools import FunctionTool as _RealAdkFunctionTool
+    from google.adk.tools.function_tool import FunctionTool as _RealAdkFunctionTool
 else:
     _RealAdkFunctionTool = Any  # type: ignore
 
@@ -37,7 +37,7 @@ class _FallbackAdkFunctionTool:
 
 
 try:
-    from google.adk.tools import FunctionTool as _RuntimeAdkFunctionTool
+    from google.adk.tools.function_tool import FunctionTool as _RuntimeAdkFunctionTool
 
     HAS_ADK = True
 except ImportError:  # pragma: no cover
