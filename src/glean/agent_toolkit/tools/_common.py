@@ -20,15 +20,11 @@ def api_client() -> Glean:
         raise ValueError("GLEAN_API_TOKEN environment variable is required")
 
     if server_url:
-        return Glean(
-            api_token=api_token, server_url=server_url, retry_config=_build_retry_config()
-        )
+        return Glean(api_token=api_token, server_url=server_url, retry_config=_build_retry_config())
     elif instance:
         return Glean(api_token=api_token, instance=instance, retry_config=_build_retry_config())
     else:
-        raise ValueError(
-            "GLEAN_SERVER_URL or GLEAN_INSTANCE environment variable is required"
-        )
+        raise ValueError("GLEAN_SERVER_URL or GLEAN_INSTANCE environment variable is required")
 
 
 def clean_query(query: str) -> str:
