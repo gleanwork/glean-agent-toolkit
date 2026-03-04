@@ -8,4 +8,4 @@ GOOGLE_API_KEY=your-google-ai-studio-api-key
 
 # Glean credentials
 GLEAN_API_TOKEN=your-glean-api-token
-GLEAN_INSTANCE=your-glean-instance
+GLEAN_SERVER_URL=https://your-company-be.glean.com

@@ -12,13 +12,23 @@ from glean.api_client.utils import BackoffStrategy, RetryConfig
 
 def api_client() -> Glean:
     """Get the Glean API client."""
-    instance = os.getenv("GLEAN_INSTANCE")
     api_token = os.getenv("GLEAN_API_TOKEN")
+    server_url = os.getenv("GLEAN_SERVER_URL")
+    instance = os.getenv("GLEAN_INSTANCE")
 
-    if not api_token or not instance:
-        raise ValueError("GLEAN_API_TOKEN and GLEAN_INSTANCE environment variables are required")
+    if not api_token:
+        raise ValueError("GLEAN_API_TOKEN environment variable is required")
 
-    return Glean(api_token=api_token, instance=instance, retry_config=_build_retry_config())
+    if server_url:
+        return Glean(
+            api_token=api_token, server_url=server_url, retry_config=_build_retry_config()
+        )
+    elif instance:
+        return Glean(api_token=api_token, instance=instance, retry_config=_build_retry_config())
+    else:
+        raise ValueError(
+            "GLEAN_SERVER_URL or GLEAN_INSTANCE environment variable is required"
+        )
 
 
 def clean_query(query: str) -> str:

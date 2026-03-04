@@ -7,7 +7,7 @@ This guide summarizes requirements for your organization's Glean instance to use
 - Environment variables
 
   - `GLEAN_API_TOKEN`
-  - `GLEAN_INSTANCE`
+  - `GLEAN_SERVER_URL` (or `GLEAN_INSTANCE`)
 
 - Glean instance access
   - Client API and Tools enabled
@@ -60,6 +60,6 @@ This guide summarizes requirements for your organization's Glean instance to use
 
 ## Troubleshooting
 
-- 401/403 errors: validate `GLEAN_API_TOKEN`, `GLEAN_INSTANCE`, and user permissions
+- 401/403 errors: validate `GLEAN_API_TOKEN`, `GLEAN_SERVER_URL` (or `GLEAN_INSTANCE`), and user permissions
 - Empty results: confirm connector indexing status and that the feature is enabled for Client API
 - Code search gaps: ensure all relevant orgs/repos are connected and indexing completed

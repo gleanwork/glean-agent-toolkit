@@ -11,12 +11,26 @@ from glean.api_client import models
 class TestApiClient:
     """Test api_client function."""
 
-    def test_api_client_success(self) -> None:
-        """Test successful API client creation."""
+    def test_api_client_with_server_url(self) -> None:
+        """Test API client creation with GLEAN_SERVER_URL."""
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "test-token",
-            "GLEAN_INSTANCE": "test-instance"
-        }):
+            "GLEAN_SERVER_URL": "https://example-be.glean.com",
+        }, clear=True):
+            with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
+                api_client()
+                mock_glean.assert_called_once_with(
+                    api_token="test-token",
+                    server_url="https://example-be.glean.com",
+                    retry_config=ANY,
+                )
+
+    def test_api_client_with_instance(self) -> None:
+        """Test API client creation with GLEAN_INSTANCE."""
+        with patch.dict(os.environ, {
+            "GLEAN_API_TOKEN": "test-token",
+            "GLEAN_INSTANCE": "test-instance",
+        }, clear=True):
             with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
                 api_client()
                 mock_glean.assert_called_once_with(
@@ -25,22 +39,37 @@ class TestApiClient:
                     retry_config=ANY,
                 )
 
+    def test_api_client_server_url_takes_precedence(self) -> None:
+        """Test that GLEAN_SERVER_URL takes precedence over GLEAN_INSTANCE."""
+        with patch.dict(os.environ, {
+            "GLEAN_API_TOKEN": "test-token",
+            "GLEAN_SERVER_URL": "https://example-be.glean.com",
+            "GLEAN_INSTANCE": "test-instance",
+        }, clear=True):
+            with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
+                api_client()
+                mock_glean.assert_called_once_with(
+                    api_token="test-token",
+                    server_url="https://example-be.glean.com",
+                    retry_config=ANY,
+                )
+
     def test_api_client_missing_token(self) -> None:
         """Test API client creation with missing token."""
         with patch.dict(os.environ, {"GLEAN_INSTANCE": "test-instance"}, clear=True):
-            with pytest.raises(ValueError, match="GLEAN_API_TOKEN and GLEAN_INSTANCE"):
+            with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
                 api_client()
 
-    def test_api_client_missing_instance(self) -> None:
-        """Test API client creation with missing instance."""
+    def test_api_client_missing_server_url_and_instance(self) -> None:
+        """Test API client creation with missing server URL and instance."""
         with patch.dict(os.environ, {"GLEAN_API_TOKEN": "test-token"}, clear=True):
-            with pytest.raises(ValueError, match="GLEAN_API_TOKEN and GLEAN_INSTANCE"):
+            with pytest.raises(ValueError, match="GLEAN_SERVER_URL or GLEAN_INSTANCE"):
                 api_client()
 
-    def test_api_client_missing_both(self) -> None:
+    def test_api_client_missing_all(self) -> None:
         """Test API client creation with missing credentials."""
         with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(ValueError, match="GLEAN_API_TOKEN and GLEAN_INSTANCE"):
+            with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
                 api_client()
 
     def test_api_client_empty_token(self) -> None:
@@ -48,18 +77,24 @@ class TestApiClient:
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "",
             "GLEAN_INSTANCE": "test-instance"
-        }):
-            with pytest.raises(ValueError, match="GLEAN_API_TOKEN and GLEAN_INSTANCE"):
+        }, clear=True):
+            with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
                 api_client()
 
-    def test_api_client_empty_instance(self) -> None:
-        """Test API client creation with empty instance."""
+    def test_api_client_empty_server_url_falls_back_to_instance(self) -> None:
+        """Test that empty GLEAN_SERVER_URL falls back to GLEAN_INSTANCE."""
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "test-token",
-            "GLEAN_INSTANCE": ""
-        }):
-            with pytest.raises(ValueError, match="GLEAN_API_TOKEN and GLEAN_INSTANCE"):
+            "GLEAN_SERVER_URL": "",
+            "GLEAN_INSTANCE": "test-instance",
+        }, clear=True):
+            with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
                 api_client()
+                mock_glean.assert_called_once_with(
+                    api_token="test-token",
+                    instance="test-instance",
+                    retry_config=ANY,
+                )
 
 
 class TestRunTool:

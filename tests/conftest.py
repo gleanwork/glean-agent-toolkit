@@ -139,7 +139,7 @@ def mock_glean_env_vars() -> Generator[None, None, None]:
     # This ensures the API client can be created properly while VCR handles the HTTP calls
     with patch.dict(os.environ, {
         "GLEAN_API_TOKEN": "fake_token_for_vcr_testing",
-        "GLEAN_INSTANCE": "test-instance"  # Matches the cassette hostname format
+        "GLEAN_SERVER_URL": "https://test-instance-be.glean.com",
     }):
         yield
 
