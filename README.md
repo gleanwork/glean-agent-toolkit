@@ -12,7 +12,7 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 - Requires Python 3.10+
 - Built-in retries are enabled via the Python client’s `RetryConfig`.
-- See `docs/prerequisites.md` for instance-level configuration and connector requirements.
+- See `docs/prerequisites.md` for server-level configuration and connector requirements.
 
 ### Retry configuration (env vars)
 
