@@ -38,7 +38,7 @@ run = "uv run pytest --cov=glean --cov-report=term --cov-report=html -v tests/"
 description = "Regenerate all VCR cassettes by re-recording HTTP interactions"
 run = [
   "bash -lc '[ -n \"$GLEAN_API_TOKEN\" ] || { echo \"GLEAN_API_TOKEN environment variable is required for recording\"; exit 1; }'",
-  "bash -lc '[ -n \"$GLEAN_INSTANCE\" ] || { echo \"GLEAN_INSTANCE environment variable is required for recording\"; exit 1; }'",
+  "bash -lc '[ -n \"$GLEAN_SERVER_URL\" ] || [ -n \"$GLEAN_INSTANCE\" ] || { echo \"GLEAN_SERVER_URL (or deprecated GLEAN_INSTANCE) environment variable is required for recording\"; exit 1; }'",
   "uv run pytest -v tests/ --tb=auto -rA",
 ]
 [tasks."test:vcr:regenerate".env]
