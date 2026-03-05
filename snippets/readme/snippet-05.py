@@ -6,7 +6,7 @@ from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
-assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
+assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
 
 # Convert to CrewAI tool format
 crewai_tool = search.as_crewai_tool()

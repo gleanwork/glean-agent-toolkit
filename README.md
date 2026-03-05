@@ -12,7 +12,7 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 - Requires Python 3.10+
 - Built-in retries are enabled via the Python client’s `RetryConfig`.
-- See `docs/prerequisites.md` for instance-level configuration and connector requirements.
+- See `docs/prerequisites.md` for server-level configuration and connector requirements.
 
 ### Retry configuration (env vars)
 
@@ -69,7 +69,7 @@ Before using any Glean tools, you'll need:
 
    ```bash
    export GLEAN_API_TOKEN="your-api-token"
-   export GLEAN_INSTANCE="your-instance-name"
+   export GLEAN_SERVER_URL="https://your-company-be.glean.com"
    ```
 
 See `docs/prerequisites.md` for instance-level connector and Admin settings required per tool.
@@ -84,7 +84,7 @@ First, create the project structure:
 
 ```bash snippet=readme/snippet-04.bash
 export GLEAN_API_TOKEN="your-api-token"
-export GLEAN_INSTANCE="your-instance-name"
+export GLEAN_SERVER_URL="https://your-company-be.glean.com"
 ```
 
 ### Step 2: Create the Agent File
@@ -99,7 +99,7 @@ from google.adk.agents import Agent
 from glean.agent_toolkit.tools import calendar_search, employee_search, gmail_search, search
 
 # Ensure environment variables are set
-required_env_vars = ["GLEAN_API_TOKEN", "GLEAN_INSTANCE"]
+required_env_vars = ["GLEAN_API_TOKEN", "GLEAN_SERVER_URL"]
 for var in required_env_vars:
     if not os.getenv(var):
         raise ValueError(f"{var} environment variable must be set")
@@ -149,7 +149,7 @@ Create `company_assistant/.env` with your credentials:
 
 ```bash snippet=readme/snippet-05.bash
 export GLEAN_API_TOKEN="your-api-token"
-export GLEAN_INSTANCE="your-instance-name"
+export GLEAN_SERVER_URL="https://your-company-be.glean.com"
 ```
 
 ### Step 5: Run Your Agent
@@ -217,7 +217,7 @@ from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
-assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
+assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
 assert os.getenv("OPENAI_API_KEY"), "OPENAI_API_KEY must be set"
 
 # Create an agent with the Glean search tool
@@ -246,7 +246,7 @@ from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
-assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
+assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
 
 # Convert to LangChain tool format
 langchain_tool = search.as_langchain_tool()
@@ -292,7 +292,7 @@ from glean.agent_toolkit.tools import search
 
 # Ensure environment variables are set
 assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
-assert os.getenv("GLEAN_INSTANCE"), "GLEAN_INSTANCE must be set"
+assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
 
 # Convert to CrewAI tool format
 crewai_tool = search.as_crewai_tool()
