@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import re
 from typing import Any
 
 from glean.api_client import Glean, models
@@ -81,9 +80,9 @@ def _build_retry_config() -> RetryConfig:
     exponent = _parse_retry_env_float("GLEAN_RETRY_MULTIPLIER", 1.1)
     max_elapsed = _parse_retry_env_float("GLEAN_RETRY_MAX_ELAPSED", 60.0)
 
-    initial_interval = int(initial)
-    max_interval = int(maximum)
-    max_elapsed_time = int(max_elapsed)
+    initial_interval = round(initial)
+    max_interval = round(maximum)
+    max_elapsed_time = round(max_elapsed)
 
     return RetryConfig(
         strategy="backoff",
