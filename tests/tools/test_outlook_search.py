@@ -1,23 +1,25 @@
 import pytest
+from unittest.mock import MagicMock, patch
 
 from glean.agent_toolkit.tools.outlook_search import outlook_search
 from glean.api_client import models
 
 
-@pytest.mark.skip(reason="Skipping test_outlook_search_success")
-def test_outlook_search_success(vcr_cassette):
-    """Test successful Outlook Search tool execution with VCR recording/replay."""
-    query_text = "quarterly planning meeting"
+def test_outlook_search_success():
+    """Test successful Outlook Search tool execution using a mocked API client."""
+    mock_result = MagicMock()
+    mock_context = MagicMock()
+    mock_context.__enter__ = MagicMock(return_value=mock_context)
+    mock_context.__exit__ = MagicMock(return_value=False)
+    mock_context.client.tools.run.return_value = mock_result
 
-    result = outlook_search(query=query_text)
+    with patch("glean.agent_toolkit.tools._common.api_client", return_value=mock_context):
+        result = outlook_search(query="quarterly planning meeting")
 
     assert result is not None
     assert "result" in result
     assert result.get("error") is None
-
-    if result["result"] and hasattr(result["result"], "result"):
-        response_data = result["result"].result
-        assert response_data is not None
+    assert result["result"] is mock_result
 
 
 def test_outlook_search_api_error(vcr_cassette):
