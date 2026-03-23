@@ -1,3 +1,15 @@
+## 0.4.0 (2026-03-05)
+
+### Feat
+
+- Add `read_document` tool for fetching full document content by URL or document ID
+- Add `GLEAN_SERVER_URL` environment variable support; `GLEAN_INSTANCE` is retained as a deprecated fallback
+- Add retry backoff configuration via environment variables (`GLEAN_RETRY_INITIAL`, `GLEAN_RETRY_MAX`, `GLEAN_RETRY_MULTIPLIER`, `GLEAN_RETRY_MAX_ELAPSED`)
+
+### Changed
+
+- Rename `glean_search` tool to `search` across all adapters, tests, docs, and snippets
+
 ## 0.3.0 (2025-07-21)
 
 ### Feat
