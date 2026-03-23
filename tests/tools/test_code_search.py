@@ -1,7 +1,8 @@
 """Tests for the Code Search tool."""
 
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from glean.agent_toolkit.tools.code_search import code_search
 

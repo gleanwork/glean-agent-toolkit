@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from glean.agent_toolkit.tools.gmail_search import gmail_search
 

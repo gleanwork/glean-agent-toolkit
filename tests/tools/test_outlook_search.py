@@ -1,5 +1,6 @@
-import pytest
 from unittest.mock import MagicMock, patch
+
+import pytest
 
 from glean.agent_toolkit.tools.outlook_search import outlook_search
 from glean.api_client import models
