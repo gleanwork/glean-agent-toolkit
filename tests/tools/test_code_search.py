@@ -1,24 +1,27 @@
 """Tests for the Code Search tool."""
 
+from unittest.mock import MagicMock, patch
+
 import pytest
 
 from glean.agent_toolkit.tools.code_search import code_search
 
 
-@pytest.mark.skip(reason="Skipping test_code_search_success")
-def test_code_search_success(vcr_cassette):
-    """Test successful Code Search tool execution with VCR recording/replay."""
-    query_text = "function authenticate user"
+def test_code_search_success():
+    """Test successful Code Search tool execution using a mocked API client."""
+    mock_result = MagicMock()
+    mock_context = MagicMock()
+    mock_context.__enter__ = MagicMock(return_value=mock_context)
+    mock_context.__exit__ = MagicMock(return_value=False)
+    mock_context.client.tools.run.return_value = mock_result
 
-    result = code_search(query=query_text)
+    with patch("glean.agent_toolkit.tools._common.api_client", return_value=mock_context):
+        result = code_search(query="function authenticate user")
 
     assert result is not None
     assert "result" in result
     assert result.get("error") is None
-
-    if result["result"] and hasattr(result["result"], "result"):
-        response_data = result["result"].result
-        assert response_data is not None
+    assert result["result"] is mock_result
 
 
 def test_code_search_api_error(vcr_cassette):
