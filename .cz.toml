@@ -4,5 +4,4 @@ version = "0.4.0"
 tag_format = "$version"
 version_files = [
   "pyproject.toml:version",
-  "glean/toolkit/__init__.py:__version__",
 ]
