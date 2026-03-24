@@ -3,11 +3,30 @@ name: Publish to PyPI
 on:
   push:
     tags:
-      - '*.*.*'
+      - 'v[0-9]*.[0-9]*.[0-9]*'
   workflow_dispatch:
 
 jobs:
-  deploy:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+        with:
+          cache: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Initialize dev environment
+        run: mise run setup
+
+      - name: Run tests
+        run: mise run test
+
+  build-and-publish:
+    needs: test
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
@@ -18,14 +37,14 @@ jobs:
     - uses: actions/checkout@v4
       with:
         fetch-depth: 0   # Needed for changelog generation
-    
+
     - name: Set up mise
       uses: jdx/mise-action@v2
       with:
         cache: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
+
     - name: Build package
       run: uv build
 
@@ -34,10 +53,10 @@ jobs:
       run: |
         # Get latest tag for both push and manual triggers
         LATEST_TAG=$(git describe --tags --abbrev=0)
-        
+
         echo "LATEST_TAG=${LATEST_TAG}" >> $GITHUB_OUTPUT
         echo "CHANGELOG<<EOF" >> $GITHUB_OUTPUT
-        
+
         # Try to get previous tag
         if PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null); then
           # If we have a previous tag, show changes between tags
@@ -47,12 +66,12 @@ jobs:
           uvx --from commitizen cz changelog --dry-run >> $GITHUB_OUTPUT
         fi
         echo "EOF" >> $GITHUB_OUTPUT
-      
+
     - name: Create GitHub Release
       uses: softprops/action-gh-release@v1
       with:
         tag_name: ${{ steps.CHANGELOG.outputs.LATEST_TAG }}
         body: ${{ steps.CHANGELOG.outputs.CHANGELOG }}
-        
+
     - name: Publish package to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
