@@ -8,7 +8,7 @@ import logging
 from importlib.metadata import PackageNotFoundError, version
 
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.registry import get_registry
+from glean.agent_toolkit.registry import Registry, get_registry
 from glean.agent_toolkit.spec import ToolSpec
 
 from . import adapters
@@ -16,6 +16,7 @@ from . import adapters
 __all__ = [
     "tool_spec",
     "get_registry",
+    "Registry",
     "ToolSpec",
     "adapters",
     "__version__",
