@@ -5,6 +5,8 @@ from __future__ import annotations
 import os
 from typing import Any
 
+from pydantic import BaseModel
+
 from glean.api_client import Glean, models
 from glean.api_client.utils import BackoffStrategy, RetryConfig
 
@@ -115,8 +117,20 @@ def run_tool(
                 name=tool_display_name,
                 parameters=parameters,
             )
-        return {"result": result}
+        return {"result": serialize_tool_result(result)}
     except ValueError as e:
         return {"error": f"Parameter validation error: {str(e)}", "result": None}
     except Exception as e:
         return {"error": str(e), "result": None}
+
+
+def serialize_tool_result(value: Any) -> Any:
+    """Normalize SDK response payloads into plain dicts.
+
+    Calls ``model_dump(by_alias=True)`` on Pydantic models so downstream
+    adapters receive plain dicts with camelCase field aliases preserved.
+    Pydantic handles recursive serialization of nested models natively.
+    """
+    if isinstance(value, BaseModel):
+        return value.model_dump(by_alias=True)
+    return value

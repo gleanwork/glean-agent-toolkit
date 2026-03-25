@@ -143,6 +143,17 @@ def test_adk_adapter_integration() -> None:
     assert hasattr(tool, "schema")
 
 
+@pytest.mark.skipif(not HAS_ADK, reason="Google ADK not installed")
+def test_read_document_as_adk_tool() -> None:
+    """Ensure read_document can be adapted for ADK function calling."""
+    from glean.agent_toolkit.tools.read_document import read_document
+
+    tool = read_document.as_adk_tool()
+
+    assert getattr(tool, "name", "") == "read_document"
+    assert callable(getattr(tool, "func", lambda: None))
+
+
 def test_langchain_adapter_import_error() -> None:
     """Test LangChain adapter import error only when LangChain is not available."""
     if HAS_LANGCHAIN:

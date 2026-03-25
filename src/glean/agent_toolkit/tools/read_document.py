@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, TypedDict
+from typing import Annotated, Any
 
 from pydantic import Field
 
@@ -10,19 +10,6 @@ import glean.agent_toolkit.tools._common as common
 from glean.agent_toolkit.decorators import tool_spec
 from glean.api_client import models
 from glean.api_client.client_documents import ClientDocuments
-
-
-class ReadDocumentSuccess(TypedDict):
-    """Successful read document result payload."""
-
-    result: models.GetDocumentsResponse
-
-
-class ReadDocumentError(TypedDict):
-    """Error result payload for read document."""
-
-    error: str
-    result: None
 
 
 @tool_spec(
@@ -53,7 +40,7 @@ def read_document(
             ],
         ),
     ] = None,
-) -> ReadDocumentSuccess | ReadDocumentError:
+) -> dict[str, Any]:
     """Fetch full document content using the Glean Client API.
 
     One of document_id or url must be provided. If both or neither are provided,
@@ -84,6 +71,6 @@ def read_document(
 
             result = documents_client.retrieve(request=request)
 
-        return {"result": result}
+        return {"result": common.serialize_tool_result(result)}
     except Exception as e:
         return {"error": str(e), "result": None}

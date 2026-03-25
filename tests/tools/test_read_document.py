@@ -68,3 +68,23 @@ def test_read_document_api_exception() -> None:
         result = read_document(url="https://unknown.example.com/abc")
         assert result["error"] == "API Error"
         assert result["result"] is None
+
+
+def test_read_document_serializes_model_with_aliases() -> None:
+    from pydantic import BaseModel, ConfigDict, Field
+
+    class FakeResponse(BaseModel):
+        model_config = ConfigDict(populate_by_name=True)
+        full_text_list: list[str] = Field(alias="fullTextList")
+
+    with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
+        mock_client = MagicMock()
+        mock_client.client.documents.retrieve.return_value = FakeResponse(
+            fullTextList=["hello"]
+        )
+        mock_api_client.return_value.__enter__.return_value = mock_client
+
+        result = read_document(document_id="glean_123")
+
+        assert result.get("error") is None
+        assert result["result"] == {"fullTextList": ["hello"]}
