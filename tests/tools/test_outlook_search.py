@@ -9,7 +9,9 @@ def _mock_context(return_value: object = None) -> MagicMock:
     ctx = MagicMock()
     ctx.__enter__ = MagicMock(return_value=ctx)
     ctx.__exit__ = MagicMock(return_value=False)
-    ctx.client.tools.run.return_value = return_value if return_value is not None else {"data": "mock"}
+    ctx.client.tools.run.return_value = (
+        return_value if return_value is not None else {"data": "mock"}
+    )
     return ctx
 
 
