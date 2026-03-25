@@ -3,33 +3,42 @@ from unittest.mock import MagicMock, patch
 import pytest
 
 from glean.agent_toolkit.tools.outlook_search import outlook_search
-from glean.api_client import models
+
+
+def _mock_context(return_value: object = None) -> MagicMock:
+    ctx = MagicMock()
+    ctx.__enter__ = MagicMock(return_value=ctx)
+    ctx.__exit__ = MagicMock(return_value=False)
+    ctx.client.tools.run.return_value = return_value if return_value is not None else {"data": "mock"}
+    return ctx
 
 
 def test_outlook_search_success():
     """Test successful Outlook Search tool execution using a mocked API client."""
-    mock_result = MagicMock()
-    mock_context = MagicMock()
-    mock_context.__enter__ = MagicMock(return_value=mock_context)
-    mock_context.__exit__ = MagicMock(return_value=False)
-    mock_context.client.tools.run.return_value = mock_result
-
-    with patch("glean.agent_toolkit.tools._common.api_client", return_value=mock_context):
+    mock_result = {"data": "mock"}
+    ctx = _mock_context(mock_result)
+    with patch("glean.agent_toolkit.tools._common.api_client", return_value=ctx):
         result = outlook_search(query="quarterly planning meeting")
 
     assert result is not None
     assert "result" in result
     assert result.get("error") is None
-    assert result["result"] is mock_result
+    assert result["result"] == mock_result
 
 
-def test_outlook_search_api_error(vcr_cassette):
-    """Test Outlook Search tool with API error response."""
-    query_text = "invalid query that causes error"
+def test_outlook_search_api_error():
+    """Test Outlook Search tool returns error dict when API raises."""
+    ctx = MagicMock()
+    ctx.__enter__ = MagicMock(return_value=ctx)
+    ctx.__exit__ = MagicMock(return_value=False)
+    ctx.client.tools.run.side_effect = Exception("API Error")
 
-    result = outlook_search(query=query_text)
+    with patch("glean.agent_toolkit.tools._common.api_client", return_value=ctx):
+        result = outlook_search(query="invalid query that causes error")
 
     assert result is not None
+    assert "error" in result
+    assert result["result"] is None
 
 
 @pytest.mark.parametrize("query", [
@@ -39,27 +48,27 @@ def test_outlook_search_api_error(vcr_cassette):
     "all-hands meeting",
     "project deadline reminder",
 ])
-def test_outlook_search_various_queries(vcr_cassette, query: str):
+def test_outlook_search_various_queries(query: str):
     """Test Outlook Search tool with various calendar/email queries."""
-    result = outlook_search(query=query)
+    with patch("glean.agent_toolkit.tools._common.api_client", return_value=_mock_context()):
+        result = outlook_search(query=query)
 
     assert result is not None
     assert "result" in result
+    assert result.get("error") is None
 
 
-def test_outlook_search_calendar_events(vcr_cassette):
+def test_outlook_search_calendar_events():
     """Test Outlook Search tool for calendar events."""
-    query_text = "meetings this week"
-
-    result = outlook_search(query=query_text)
+    with patch("glean.agent_toolkit.tools._common.api_client", return_value=_mock_context()):
+        result = outlook_search(query="meetings this week")
 
     assert result is not None
 
 
-def test_outlook_search_no_results(vcr_cassette):
+def test_outlook_search_no_results():
     """Test Outlook Search tool when no results are found."""
-    query_text = "nonexistent meeting xyz"
-
-    result = outlook_search(query=query_text)
+    with patch("glean.agent_toolkit.tools._common.api_client", return_value=_mock_context()):
+        result = outlook_search(query="nonexistent meeting xyz")
 
     assert result is not None
