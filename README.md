@@ -80,9 +80,9 @@ Here's a complete example that demonstrates the power of the Glean Agent Toolkit
 
 First, create the project structure:
 
-```bash snippet=readme/snippet-04.bash
-export GLEAN_API_TOKEN="your-api-token"
-export GLEAN_SERVER_URL="https://your-company-be.glean.com"
+```bash snippet=readme/snippet-06.bash
+mkdir company_assistant/
+cd company_assistant/
 ```
 
 ### Step 2: Create the Agent File
@@ -145,18 +145,26 @@ from . import agent
 
 Create `company_assistant/.env` with your credentials:
 
-```bash snippet=readme/snippet-05.bash
-export GLEAN_API_TOKEN="your-api-token"
-export GLEAN_SERVER_URL="https://your-company-be.glean.com"
+```bash snippet=readme/snippet-07.bash
+# company_assistant/.env
+
+# Authentication for Google ADK (choose one)
+GOOGLE_API_KEY=your-google-ai-studio-api-key
+# OR for Vertex AI:
+# GOOGLE_CLOUD_PROJECT=your-project-id
+# GOOGLE_CLOUD_LOCATION=us-central1
+
+# Glean credentials
+GLEAN_API_TOKEN=your-glean-api-token
+GLEAN_SERVER_URL=https://your-company-be.glean.com
 ```
 
 ### Step 5: Run Your Agent
 
 From the parent directory (outside `company_assistant/`), run your Company Assistant:
 
-```bash snippet=readme/snippet-06.bash
-mkdir company_assistant/
-cd company_assistant/
+```bash
+adk web
 ```
 
 ### Real-World Queries You Can Handle
