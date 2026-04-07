@@ -14,12 +14,14 @@ if TYPE_CHECKING:
 
 
 @tool_spec(
-    name="gmail_search",
+    name="glean_gmail_search",
     description=(
-        "Search Gmail for emails with advanced filtering capabilities.\n"
-        "- Only use this tool if the user asks for email.\n"
-        "- Results returned are not exhaustive; we can only return the top 10 emails sorted by "
-        "recency (most recent first)."
+        "Search Gmail emails by sender, recipient, subject, date, or content. "
+        "Use only when the user asks about email in a Google Workspace environment. "
+        "For Outlook/Microsoft email, use glean_outlook_search instead.\n"
+        "INSTRUCTIONS:\n"
+        "- Returns up to 10 emails sorted by recency.\n"
+        "- Supports filters: from, to, subject, has:attachment, is:unread, date ranges."
     ),
 )
 def gmail_search(

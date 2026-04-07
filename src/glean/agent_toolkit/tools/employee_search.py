@@ -14,22 +14,15 @@ if TYPE_CHECKING:
 
 
 @tool_spec(
-    name="employee_search",
+    name="glean_employee_search",
     description=(
-        "Find people at the company based on their personal information.\n"
+        "Find current employees and their contact info, role, department, and org structure. "
+        'Use for "who" questions about people inside the company.\n'
         "INSTRUCTIONS:\n"
-        "- Only use this when the user explicitly wants to find people in the company (e.g.,"
-        ' "who" questions) or for aggregation queries on people.\n'
-        "- You can also use this tool to find personal information about employees (e.g., what is "
-        "person X's phone number or email address).\n"
-        "- Do not use this when the user wants to find people outside of the company, or people "
-        "who are no longer at the company.\n"
-        "- You can find people based on details such as name, email, title, department, and "
-        "location.\n"
-        "- The results returned are not exhaustive; we only return the top few most relevant "
-        "people to a query.\n"
-        '- For analytics questions such as "how many people..." use the "statistics" field '
-        "in the output."
+        "- Search by name, email, title, department, or location.\n"
+        "- Only for current employees; not for external or former people.\n"
+        "- Returns top results, not exhaustive.\n"
+        '- For count queries ("how many people..."), use the "statistics" field in the output.'
     ),
 )
 def employee_search(

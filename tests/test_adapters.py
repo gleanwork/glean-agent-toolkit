@@ -150,7 +150,7 @@ def test_read_document_as_adk_tool() -> None:
 
     tool = read_document.as_adk_tool()
 
-    assert getattr(tool, "name", "") == "read_document"
+    assert getattr(tool, "name", "") == "glean_read_document"
     assert callable(getattr(tool, "func", lambda: None))
 
 
