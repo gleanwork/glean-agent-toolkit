@@ -14,8 +14,7 @@ src/
 │     ├─ registry.py
 │     ├─ spec.py
 │     ├─ adapters/
-│     ├─ tools/
-│     └─ cli.py
+│     └─ tools/
 ├─ tests/
 └─ docs/
 ```

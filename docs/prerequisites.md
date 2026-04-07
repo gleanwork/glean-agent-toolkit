@@ -45,6 +45,11 @@ This guide summarizes requirements for your organization's Glean instance to use
 - Connectors: One or more code hosts (GitHub, GitLab, Bitbucket, Azure Repos)
 - Admin toggles: Code Search enabled for your organization's Glean instance and available to Client API
 
+### `web_search`
+
+- No connector required — searches the public web via Glean's web search capability
+- Admin toggles: Web search enabled for Client API
+
 ## Verification checklist
 
 - Confirm Client API access with a simple `search` call
