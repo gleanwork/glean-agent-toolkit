@@ -42,7 +42,7 @@ def test_search_with_datasource(vcr_cassette):
 
 def test_search_without_datasource_passes_only_query():
     """Test that calling search without datasource only passes query to the API."""
-    with patch("glean.agent_toolkit.tools.search.run_tool") as mock_run:
+    with patch("glean.agent_toolkit.tools._common.run_tool") as mock_run:
         mock_run.return_value = {"result": {}}
         search(query="test query")
 
@@ -54,7 +54,7 @@ def test_search_without_datasource_passes_only_query():
 
 def test_search_with_datasource_passes_both_params():
     """Test that calling search with datasource passes both query and datasource."""
-    with patch("glean.agent_toolkit.tools.search.run_tool") as mock_run:
+    with patch("glean.agent_toolkit.tools._common.run_tool") as mock_run:
         mock_run.return_value = {"result": {}}
         search(query="test query", datasource="confluence")
 
