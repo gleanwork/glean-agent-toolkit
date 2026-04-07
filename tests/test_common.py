@@ -114,7 +114,11 @@ class TestRunTool:
 
             result = run_tool("Test Tool", parameters)
 
-            assert result == {"result": mock_result}
+            assert result["status"] == "ok"
+            assert result["result"] == mock_result
+            assert result["error"] is None
+            assert result["error_type"] is None
+            assert result["suggested_action"] is None
             mock_client.client.tools.run.assert_called_once_with(
                 name="Test Tool",
                 parameters=parameters
@@ -133,8 +137,11 @@ class TestRunTool:
 
             result = run_tool("Test Tool", parameters)
 
-            assert result == {"error": "API Error", "result": None}
-            # should have retried; at least 1 call attempted
+            assert result["status"] == "error"
+            assert result["error"] == "API Error"
+            assert result["result"] is None
+            assert result["error_type"] == "api"
+            assert result["suggested_action"] == "retry"
             assert mock_client.client.tools.run.call_count >= 1
 
     def test_run_tool_connection_error(self) -> None:
@@ -150,8 +157,10 @@ class TestRunTool:
 
             result = run_tool("Test Tool", parameters)
 
-            assert result == {"error": "Network error", "result": None}
-            # wrapper does not retry; underlying client may, but is not invoked here
+            assert result["status"] == "error"
+            assert result["error"] == "Network error"
+            assert result["error_type"] == "api"
+            assert result["suggested_action"] == "retry"
             assert mock_client.client.tools.run.call_count >= 1
 
     def test_run_tool_transient_then_success(self) -> None:
@@ -166,7 +175,8 @@ class TestRunTool:
 
             result = run_tool("Test Tool", parameters)
 
-            assert result == {"error": "temporary 500", "result": None}
+            assert result["status"] == "error"
+            assert result["error"] == "temporary 500"
             assert mock_client.client.tools.run.call_count == 1
 
     def test_run_tool_empty_parameters(self) -> None:
@@ -181,7 +191,8 @@ class TestRunTool:
 
             result = run_tool("Test Tool", parameters)
 
-            assert result == {"result": mock_result}
+            assert result["status"] == "ok"
+            assert result["result"] == mock_result
             mock_client.client.tools.run.assert_called_once_with(
                 name="Test Tool",
                 parameters={}
@@ -196,10 +207,43 @@ class TestRunTool:
         with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
             mock_api_client.side_effect = ValueError("Missing credentials")
 
-            # Simulate error
             result = run_tool("Test Tool", parameters)
 
-            assert result == {
-                "error": "Parameter validation error: Missing credentials",
-                "result": None
-            }
+            assert result["status"] == "error"
+            assert result["error"] == "Missing credentials"
+            assert result["error_type"] == "validation"
+            assert result["suggested_action"] == "rephrase_query"
+
+    def test_run_tool_auth_error(self) -> None:
+        """Test tool execution with authentication error."""
+        parameters = {
+            "query": models.ToolsCallParameter(name="query", value="test query")
+        }
+
+        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
+            mock_client = mock.MagicMock()
+            mock_client.client.tools.run.side_effect = Exception("HTTP 401 Unauthorized")
+            mock_api_client.return_value.__enter__.return_value = mock_client
+
+            result = run_tool("Test Tool", parameters)
+
+            assert result["status"] == "error"
+            assert result["error_type"] == "auth"
+            assert result["suggested_action"] == "check_credentials"
+
+    def test_run_tool_timeout_error(self) -> None:
+        """Test tool execution with timeout error."""
+        parameters = {
+            "query": models.ToolsCallParameter(name="query", value="test query")
+        }
+
+        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
+            mock_client = mock.MagicMock()
+            mock_client.client.tools.run.side_effect = TimeoutError("request timed out")
+            mock_api_client.return_value.__enter__.return_value = mock_client
+
+            result = run_tool("Test Tool", parameters)
+
+            assert result["status"] == "error"
+            assert result["error_type"] == "timeout"
+            assert result["suggested_action"] == "retry"

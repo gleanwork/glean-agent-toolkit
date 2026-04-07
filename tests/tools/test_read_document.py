@@ -1,7 +1,4 @@
-from unittest import mock
 from unittest.mock import MagicMock, patch
-
-import pytest
 
 from glean.agent_toolkit.tools.read_document import read_document
 from glean.api_client import models
@@ -17,7 +14,9 @@ def test_read_document_by_id_success() -> None:
 
         result = read_document(document_id="glean_123")
 
-        assert result == {"result": mock_result}
+        assert result["status"] == "ok"
+        assert result["result"] == mock_result
+        assert result["error"] is None
         mock_client.client.documents.retrieve.assert_called_once()
         sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]
         assert isinstance(sent, models.GetDocumentsRequest)
@@ -39,7 +38,9 @@ def test_read_document_by_url_success() -> None:
 
         result = read_document(url="https://docs.google.com/document/d/REDACTED")
 
-        assert result == {"result": mock_result}
+        assert result["status"] == "ok"
+        assert result["result"] == mock_result
+        assert result["error"] is None
         mock_client.client.documents.retrieve.assert_called_once()
         sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]
         assert isinstance(sent, models.GetDocumentsRequest)
@@ -53,10 +54,15 @@ def test_read_document_by_url_success() -> None:
 
 def test_read_document_invalid_params() -> None:
     result = read_document()
+    assert result["status"] == "error"
     assert result["error"].startswith("Provide exactly one")
+    assert result["error_type"] == "validation"
+    assert result["suggested_action"] == "rephrase_query"
 
     result = read_document(document_id="glean_1", url="https://example.com")
+    assert result["status"] == "error"
     assert result["error"].startswith("Provide exactly one")
+    assert result["error_type"] == "validation"
 
 
 def test_read_document_api_exception() -> None:
@@ -66,8 +72,11 @@ def test_read_document_api_exception() -> None:
         mock_api_client.return_value.__enter__.return_value = mock_client
 
         result = read_document(url="https://unknown.example.com/abc")
+        assert result["status"] == "error"
         assert result["error"] == "API Error"
         assert result["result"] is None
+        assert result["error_type"] == "api"
+        assert result["suggested_action"] == "retry"
 
 
 def test_read_document_serializes_model_with_aliases() -> None:
@@ -86,5 +95,6 @@ def test_read_document_serializes_model_with_aliases() -> None:
 
         result = read_document(document_id="glean_123")
 
+        assert result["status"] == "ok"
         assert result.get("error") is None
         assert result["result"] == {"fullTextList": ["hello"]}

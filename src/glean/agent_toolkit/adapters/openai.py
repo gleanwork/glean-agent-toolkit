@@ -118,14 +118,27 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
         """
         original_func = self.tool_spec.function
 
-        async def on_invoke_tool(ctx: Any, input_str: str) -> Any:
-            """Function that invokes the tool with parameters."""
+        async def on_invoke_tool(ctx: Any, input_str: str) -> str:
+            """Function that invokes the tool with parameters.
+
+            The OpenAI Agents SDK expects string returns from tool invocations.
+            """
             try:
                 params = json.loads(input_str) if input_str else {}
                 result = original_func(**params)
-                return result
+                if isinstance(result, str):
+                    return result
+                return json.dumps(result, default=str)
             except Exception as e:
-                return f"Error executing tool: {str(e)}"
+                return json.dumps(
+                    {
+                        "status": "error",
+                        "result": None,
+                        "error": str(e),
+                        "error_type": "api",
+                        "suggested_action": "retry",
+                    }
+                )
 
         params_json_schema_dict = (
             self.tool_spec.input_schema

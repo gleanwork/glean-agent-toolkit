@@ -8,6 +8,7 @@ from pydantic import Field
 
 import glean.agent_toolkit.tools._common as common
 from glean.agent_toolkit.decorators import tool_spec
+from glean.agent_toolkit.tools._common import ToolResult, _classify_error, make_error, make_ok
 from glean.api_client import models
 from glean.api_client.client_documents import ClientDocuments
 
@@ -40,17 +41,18 @@ def read_document(
             ],
         ),
     ] = None,
-) -> dict[str, Any]:
+) -> ToolResult:
     """Fetch full document content using the Glean Client API.
 
     One of document_id or url must be provided. If both or neither are provided,
     an error will be returned.
     """
     if (document_id is not None and url is not None) or (document_id is None and url is None):
-        return {
-            "error": "Provide exactly one of document_id or url",
-            "result": None,
-        }
+        return make_error(
+            "Provide exactly one of document_id or url",
+            error_type="validation",
+            suggested_action="rephrase_query",
+        )
 
     try:
         with common.api_client() as g_client:
@@ -71,6 +73,7 @@ def read_document(
 
             result = documents_client.retrieve(request=request)
 
-        return {"result": common.serialize_tool_result(result)}
+        return make_ok(common.serialize_tool_result(result))
     except Exception as e:
-        return {"error": str(e), "result": None}
+        error_type, suggested_action = _classify_error(e)
+        return make_error(str(e), error_type, suggested_action)

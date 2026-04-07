@@ -1,5 +1,6 @@
 """CrewAI adapter for converting tool specifications."""
 
+import json
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Union, cast
 
@@ -96,16 +97,21 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
 
         object.__setattr__(self, "_tool_spec_ref", None)
 
-    def _run(self, **kwargs: Any) -> Any:
+    def _run(self, **kwargs: Any) -> str:
         """Run the tool with the given arguments.
+
+        CrewAI expects string returns from tools.
 
         Args:
             **kwargs: The arguments to pass to the function
 
         Returns:
-            The result of calling the function
+            JSON-serialized string result
         """
-        return self._function(**kwargs)
+        result = self._function(**kwargs)
+        if isinstance(result, str):
+            return result
+        return json.dumps(result, default=str)
 
 
 CrewAIToolType = CrewBaseTool | BaseTool  # type: ignore[valid-type]
