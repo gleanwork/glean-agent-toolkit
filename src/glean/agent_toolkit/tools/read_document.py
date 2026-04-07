@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 from pydantic import Field
 
@@ -11,6 +11,9 @@ from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import ToolResult, _classify_error, make_error, make_ok
 from glean.api_client import models
 from glean.api_client.client_documents import ClientDocuments
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 
 @tool_spec(
@@ -24,6 +27,8 @@ from glean.api_client.client_documents import ClientDocuments
     ),
 )
 def read_document(
+    ctx: GleanContext | None = None,
+    *,
     document_id: Annotated[
         str | None,
         Field(
@@ -46,6 +51,11 @@ def read_document(
 
     One of document_id or url must be provided. If both or neither are provided,
     an error will be returned.
+
+    Args:
+        ctx: Optional Glean context for client injection.
+        document_id: Glean document ID.
+        url: Document URL to resolve and read.
     """
     if (document_id is not None and url is not None) or (document_id is None and url is None):
         return make_error(
@@ -54,8 +64,13 @@ def read_document(
             suggested_action="rephrase_query",
         )
 
+    from glean.agent_toolkit.context import GleanContext
+
+    ctx = ctx or GleanContext()
+    client = ctx.get_client()
+
     try:
-        with common.api_client() as g_client:
+        with client as g_client:
             documents_client: ClientDocuments = g_client.client.documents
 
             include_fields = [models.GetDocumentsRequestIncludeField.DOCUMENT_CONTENT]

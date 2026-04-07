@@ -1,30 +1,47 @@
+"""Tests for the Calendar Search tool."""
+
+from unittest.mock import MagicMock
+
 import pytest
 
+from glean.agent_toolkit.context import GleanContext
 from glean.agent_toolkit.tools.calendar_search import calendar_search
 
 
-def test_calendar_search_success(vcr_cassette):
-    """Test successful Calendar Search tool execution with VCR recording/replay."""
-    query_text = "team standup meetings next week"
-
-    result = calendar_search(query=query_text)
-
-    assert result is not None
-    assert "result" in result
-    assert result.get("error") is None
-
-    if result["result"] and hasattr(result["result"], "result"):
-        response_data = result["result"].result
-        assert response_data is not None
+def _make_ctx(return_value: object = None) -> GleanContext:
+    mock_client = MagicMock()
+    mock_client.__enter__ = MagicMock(return_value=mock_client)
+    mock_client.__exit__ = MagicMock(return_value=False)
+    mock_client.client.tools.run.return_value = (
+        return_value if return_value is not None else {"data": "mock"}
+    )
+    return GleanContext(client=mock_client)
 
 
-def test_calendar_search_api_error(vcr_cassette):
-    """Test Calendar Search tool with API error response."""
-    query_text = "invalid query that causes error"
+def test_calendar_search_success() -> None:
+    mock_result = {"data": "mock"}
+    ctx = _make_ctx(mock_result)
 
-    result = calendar_search(query=query_text)
+    result = calendar_search(ctx, query="team standup meetings next week")
 
     assert result is not None
+    assert result["status"] == "ok"
+    assert result["result"] == mock_result
+    assert result["error"] is None
+
+
+def test_calendar_search_api_error() -> None:
+    mock_client = MagicMock()
+    mock_client.__enter__ = MagicMock(return_value=mock_client)
+    mock_client.__exit__ = MagicMock(return_value=False)
+    mock_client.client.tools.run.side_effect = Exception("API Error")
+    ctx = GleanContext(client=mock_client)
+
+    result = calendar_search(ctx, query="invalid query that causes error")
+
+    assert result is not None
+    assert result["status"] == "error"
+    assert result["result"] is None
 
 
 @pytest.mark.parametrize("query", [
@@ -34,36 +51,11 @@ def test_calendar_search_api_error(vcr_cassette):
     "one-on-one meetings",
     "conference room bookings",
 ])
-def test_calendar_search_various_queries(vcr_cassette, query: str):
-    """Test Calendar Search tool with various meeting types."""
-    result = calendar_search(query=query)
+def test_calendar_search_various_queries(query: str) -> None:
+    ctx = _make_ctx()
+
+    result = calendar_search(ctx, query=query)
 
     assert result is not None
-    assert "result" in result
-
-
-def test_calendar_search_by_date_range(vcr_cassette):
-    """Test Calendar Search tool with date range filtering."""
-    query_text = "meetings this week"
-
-    result = calendar_search(query=query_text)
-
-    assert result is not None
-
-
-def test_calendar_search_by_attendee(vcr_cassette):
-    """Test Calendar Search tool with specific attendee."""
-    query_text = "meetings with John Smith"
-
-    result = calendar_search(query=query_text)
-
-    assert result is not None
-
-
-def test_calendar_search_no_results(vcr_cassette):
-    """Test Calendar Search tool when no meetings are found."""
-    query_text = "nonexistent meeting xyz123"
-
-    result = calendar_search(query=query_text)
-
-    assert result is not None
+    assert result["status"] == "ok"
+    assert result["error"] is None

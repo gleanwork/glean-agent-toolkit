@@ -1,5 +1,8 @@
 """CrewAI adapter for converting tool specifications."""
 
+from __future__ import annotations
+
+import functools
 import json
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Union, cast
@@ -8,6 +11,9 @@ from pydantic import BaseModel
 
 from glean.agent_toolkit.adapters.base import BaseAdapter
 from glean.agent_toolkit.spec import ToolSpec
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 if TYPE_CHECKING:
     from crewai.tools import BaseTool as CrewBaseTool
@@ -120,13 +126,14 @@ CrewAIToolType = CrewBaseTool | BaseTool  # type: ignore[valid-type]
 class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
     """Adapter for CrewAI tools."""
 
-    def __init__(self, tool_spec: ToolSpec) -> None:
+    def __init__(self, tool_spec: ToolSpec, ctx: GleanContext | None = None) -> None:
         """Initialize the adapter.
 
         Args:
             tool_spec: The tool specification
+            ctx: Optional GleanContext to bind into tool invocations.
         """
-        super().__init__(tool_spec)
+        super().__init__(tool_spec, ctx)
         if not HAS_CREWAI:
             raise ImportError(
                 "CrewAI package is required for CrewAI adapter. "
@@ -143,10 +150,14 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
         # Create and configure the tool
         created_args_schema = self._create_args_schema()
 
+        func = self.tool_spec.function
+        if self.ctx is not None:
+            func = functools.partial(func, self.ctx)
+
         tool = GleanCrewAITool(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
-            function=self.tool_spec.function,
+            function=func,
             args_schema=created_args_schema,
         )
 
