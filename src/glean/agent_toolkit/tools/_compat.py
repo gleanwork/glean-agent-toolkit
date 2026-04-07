@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import warnings
 from importlib.metadata import PackageNotFoundError, version
+from typing import Any
 
 
 def get_api_client_version() -> str | None:
@@ -40,7 +41,7 @@ def check_api_client_compatibility() -> None:
             )
 
 
-def resolve_method(obj: object, preferred: str, *fallbacks: str) -> object:
+def resolve_method(obj: object, preferred: str, *fallbacks: str) -> Any:
     """Look up a method by name with fallback alternatives.
 
     Tries *preferred* first, then each name in *fallbacks*.  If a fallback is
