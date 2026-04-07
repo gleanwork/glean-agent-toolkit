@@ -2,13 +2,83 @@
 
 from __future__ import annotations
 
+import json
 import os
-from typing import Any
+from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel
 
 from glean.api_client import Glean, models
 from glean.api_client.utils import BackoffStrategy, RetryConfig
+
+ErrorType = Literal["auth", "validation", "api", "timeout", "not_found"]
+SuggestedAction = Literal["retry", "check_credentials", "rephrase_query"]
+
+
+class ToolResult(TypedDict):
+    """Structured result returned by every tool invocation.
+
+    Attributes:
+        status: ``"ok"`` on success, ``"error"`` on failure.
+        result: The payload on success, ``None`` on failure.
+        error: Human-readable error message, ``None`` on success.
+        error_type: Classification of the error, ``None`` on success.
+        suggested_action: Hint for the caller/LLM, ``None`` on success.
+    """
+
+    status: Literal["ok", "error"]
+    result: Any | None
+    error: str | None
+    error_type: ErrorType | None
+    suggested_action: SuggestedAction | None
+
+
+def _classify_error(exc: Exception) -> tuple[ErrorType, SuggestedAction]:
+    """Classify an exception into an error type and suggested action."""
+    msg = str(exc).lower()
+
+    if isinstance(exc, TimeoutError) or "timeout" in msg or "timed out" in msg:
+        return "timeout", "retry"
+
+    if isinstance(exc, ValueError):
+        return "validation", "rephrase_query"
+
+    if "401" in msg or "403" in msg or "unauthorized" in msg or "forbidden" in msg:
+        return "auth", "check_credentials"
+
+    if "404" in msg or "not found" in msg:
+        return "not_found", "rephrase_query"
+
+    if isinstance(exc, OSError):
+        return "api", "retry"
+
+    return "api", "retry"
+
+
+def make_ok(result: Any) -> ToolResult:
+    """Build a success ``ToolResult``."""
+    return ToolResult(
+        status="ok",
+        result=result,
+        error=None,
+        error_type=None,
+        suggested_action=None,
+    )
+
+
+def make_error(
+    message: str,
+    error_type: ErrorType = "api",
+    suggested_action: SuggestedAction = "retry",
+) -> ToolResult:
+    """Build an error ``ToolResult``."""
+    return ToolResult(
+        status="error",
+        result=None,
+        error=message,
+        error_type=error_type,
+        suggested_action=suggested_action,
+    )
 
 
 def api_client() -> Glean:
@@ -101,7 +171,7 @@ def _build_retry_config() -> RetryConfig:
 def run_tool(
     tool_display_name: str,
     parameters: dict[str, models.ToolsCallParameter],
-) -> dict[str, Any]:
+) -> ToolResult:
     """Execute a Glean stub tool and wrap the response.
 
     Args:
@@ -109,7 +179,7 @@ def run_tool(
         parameters: Tool parameters
 
     Returns:
-        Tool execution result wrapped in success/error format
+        Structured ``ToolResult`` with status, result/error, and classification.
     """
     try:
         with api_client() as g_client:
@@ -117,11 +187,10 @@ def run_tool(
                 name=tool_display_name,
                 parameters=parameters,
             )
-        return {"result": serialize_tool_result(result)}
-    except ValueError as e:
-        return {"error": f"Parameter validation error: {str(e)}", "result": None}
+        return make_ok(serialize_tool_result(result))
     except Exception as e:
-        return {"error": str(e), "result": None}
+        error_type, suggested_action = _classify_error(e)
+        return make_error(str(e), error_type, suggested_action)
 
 
 def serialize_tool_result(value: Any) -> Any:

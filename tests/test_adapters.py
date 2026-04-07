@@ -209,7 +209,7 @@ def test_crewai_adapter_integration() -> None:
     # Reference the spec via the special attribute
     assert hasattr(tool, "_tool_spec_ref")
 
-    # Test the tool can be run if arguments match
+    # Test the tool can be run if arguments match — _run now returns str
     if hasattr(tool, "_run"):
         result = tool._run(a=3, b=5)
-        assert result == 8
+        assert result == "8"

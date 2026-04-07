@@ -22,6 +22,7 @@ _tool_modules: list[str] = [
 for _mod in _tool_modules:
     _import_module(f"{__name__}.{_mod}")
 
+from ._common import ToolResult  # noqa: E402
 from .calendar_search import calendar_search  # noqa: E402
 from .code_search import code_search  # noqa: E402
 from .employee_search import employee_search  # noqa: E402
@@ -32,6 +33,7 @@ from .search import search  # noqa: E402
 from .web_search import web_search  # noqa: E402
 
 __all__: list[str] = [
+    "ToolResult",
     "search",
     "web_search",
     "calendar_search",

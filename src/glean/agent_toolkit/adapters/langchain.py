@@ -1,5 +1,6 @@
 """LangChain adapter for converting tool specifications."""
 
+import json
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, TypeAlias, Union, cast
 
@@ -84,13 +85,24 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
     def to_tool(self) -> Any:
         """Convert to LangChain tool format.
 
+        LangChain's tool contract expects string returns.  The wrapper
+        JSON-serializes whatever the underlying function produces.
+
         Returns:
             LangChain Tool instance
         """
+        original_func = self.tool_spec.function
+
+        def _string_wrapper(**kwargs: Any) -> str:
+            result = original_func(**kwargs)
+            if isinstance(result, str):
+                return result
+            return json.dumps(result, default=str)
+
         return ToolClass(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
-            func=self.tool_spec.function,
+            func=_string_wrapper,
             args_schema=self._create_args_schema(),
         )
 
