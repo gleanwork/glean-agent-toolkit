@@ -9,7 +9,11 @@ from glean.agent_toolkit.tools.read_document import read_document
 from glean.api_client import models
 
 
-def _make_ctx(*, documents_return: object = None, documents_side_effect: Exception | None = None) -> GleanContext:
+def _make_ctx(
+    *,
+    documents_return: object = None,
+    documents_side_effect: Exception | None = None,
+) -> GleanContext:
     mock_client = MagicMock()
     mock_client.__enter__ = MagicMock(return_value=mock_client)
     mock_client.__exit__ = MagicMock(return_value=False)

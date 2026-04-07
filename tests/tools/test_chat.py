@@ -24,7 +24,10 @@ def _make_chat_response(
     return SimpleNamespace(messages=[msg])
 
 
-def _make_ctx(chat_return: object = None, chat_side_effect: Exception | None = None) -> GleanContext:
+def _make_ctx(
+    chat_return: object = None,
+    chat_side_effect: Exception | None = None,
+) -> GleanContext:
     mock_client = MagicMock()
     mock_client.__enter__ = MagicMock(return_value=mock_client)
     mock_client.__exit__ = MagicMock(return_value=False)
