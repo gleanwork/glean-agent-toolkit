@@ -30,10 +30,10 @@ root_agent = Agent(
     instruction="""You are a helpful company assistant that helps employees find information,
     people, and resources within the organization. You have access to:
 
-    - Company knowledge base and documents (use search)
-    - Employee directory and contact information (use employee_search)
-    - Calendar and meeting information (use calendar_search)
-    - Email search capabilities (use gmail_search)
+    - Company knowledge base and documents (use glean_search)
+    - Employee directory and contact information (use glean_employee_search)
+    - Calendar and meeting information (use glean_calendar_search)
+    - Email search capabilities (use glean_gmail_search)
 
     Always be helpful, professional, and respect privacy. When searching for people,
     only share appropriate business contact information.""",
