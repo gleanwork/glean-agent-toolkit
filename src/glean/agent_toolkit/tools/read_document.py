@@ -46,7 +46,7 @@ def read_document(
     One of document_id or url must be provided. If both or neither are provided,
     an error will be returned.
     """
-    if (document_id and url) or (not document_id and not url):
+    if (document_id is not None and url is not None) or (document_id is None and url is None):
         return {
             "error": "Provide exactly one of document_id or url",
             "result": None,
@@ -58,7 +58,7 @@ def read_document(
 
             include_fields = [models.GetDocumentsRequestIncludeField.DOCUMENT_CONTENT]
 
-            if document_id:
+            if document_id is not None:
                 request = models.GetDocumentsRequest(
                     document_specs=[models.DocumentSpec2(id=document_id)],
                     include_fields=include_fields,
