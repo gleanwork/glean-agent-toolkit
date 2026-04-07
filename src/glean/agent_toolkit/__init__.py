@@ -76,7 +76,7 @@ def get_tools(
 
     if adapter_method is None:
         raise ValueError(
-            f"Unknown framework {framework!r}. " f"Choose from: openai, langchain, crewai, adk"
+            f"Unknown framework {framework!r}. Choose from: openai, langchain, crewai, adk"
         )
 
     if api_token is not None or server_url is not None:
