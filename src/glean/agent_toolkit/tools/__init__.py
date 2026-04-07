@@ -17,12 +17,14 @@ _tool_modules: list[str] = [
     "gmail_search",
     "outlook_search",
     "read_document",
+    "chat",
 ]
 
 for _mod in _tool_modules:
     _import_module(f"{__name__}.{_mod}")
 
 from .calendar_search import calendar_search  # noqa: E402
+from .chat import chat  # noqa: E402
 from .code_search import code_search  # noqa: E402
 from .employee_search import employee_search  # noqa: E402
 from .gmail_search import gmail_search  # noqa: E402
@@ -40,4 +42,5 @@ __all__: list[str] = [
     "gmail_search",
     "outlook_search",
     "read_document",
+    "chat",
 ]
