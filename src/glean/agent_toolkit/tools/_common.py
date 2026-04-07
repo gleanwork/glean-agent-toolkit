@@ -192,7 +192,10 @@ def run_tool(
             client = GleanContext().get_client()
 
         with client as g_client:
-            result = g_client.client.tools.run(
+            from glean.agent_toolkit.tools._compat import resolve_method
+
+            run_fn = resolve_method(g_client.client.tools, "run", "execute")
+            result = run_fn(
                 name=tool_display_name,
                 parameters=parameters,
             )

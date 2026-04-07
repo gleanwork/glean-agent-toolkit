@@ -87,7 +87,10 @@ def read_document(
                     include_fields=include_fields,
                 )
 
-            result = documents_client.retrieve(request=request)
+            from glean.agent_toolkit.tools._compat import resolve_method
+
+            retrieve_fn = resolve_method(documents_client, "retrieve", "get")
+            result = retrieve_fn(request=request)
 
         return make_ok(common.serialize_tool_result(result))
     except Exception as e:
