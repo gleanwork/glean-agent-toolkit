@@ -94,13 +94,18 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
 
         LangChain's tool contract expects string returns.  The wrapper
         JSON-serializes whatever the underlying function produces.
+        When an async_function is available, passes it as ``coroutine``
+        so LangChain can ``await`` it natively.
 
         Returns:
             LangChain Tool instance
         """
         original_func = self.tool_spec.function
+        async_func = self.tool_spec.async_function
         if self.ctx is not None:
             original_func = functools.partial(original_func, self.ctx)
+            if async_func is not None:
+                async_func = functools.partial(async_func, self.ctx)
 
         def _string_wrapper(**kwargs: Any) -> str:
             result = original_func(**kwargs)
@@ -108,12 +113,22 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
                 return result
             return json.dumps(result, default=str)
 
-        return ToolClass(
-            name=self.tool_spec.name,
-            description=self.tool_spec.description,
-            func=_string_wrapper,
-            args_schema=self._create_args_schema(),
-        )
+        async def _async_string_wrapper(**kwargs: Any) -> str:
+            result = await async_func(**kwargs)  # type: ignore[misc]
+            if isinstance(result, str):
+                return result
+            return json.dumps(result, default=str)
+
+        tool_kwargs: dict[str, Any] = {
+            "name": self.tool_spec.name,
+            "description": self.tool_spec.description,
+            "func": _string_wrapper,
+            "args_schema": self._create_args_schema(),
+        }
+        if async_func is not None:
+            tool_kwargs["coroutine"] = _async_string_wrapper
+
+        return ToolClass(**tool_kwargs)
 
     def _create_args_schema(self) -> type[BaseModel] | None:
         """Create a Pydantic model for the arguments schema.

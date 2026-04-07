@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import TYPE_CHECKING, Annotated, Any
 
 from pydantic import Field
@@ -11,6 +12,35 @@ from glean.agent_toolkit.tools._common import ToolResult, convert_to_tool_params
 
 if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
+
+
+def _build_search_params(
+    query: str,
+    datasources: list[str] | None = None,
+    filters: list[dict[str, Any]] | None = None,
+    page_size: int = 10,
+) -> dict[str, Any]:
+    """Map high-level search parameters to ToolsCallParameter format.
+
+    Args:
+        query: The search query string.
+        datasources: Optional list of datasource names to restrict results.
+        filters: Optional structured filters ``[{field, values, exclude?}]``.
+        page_size: Number of results per page.
+
+    Returns:
+        Kwargs suitable for :func:`convert_to_tool_params`.
+    """
+    # TODO: Replace with POST /api/search when available — this mapping can be deleted.
+    params: dict[str, Any] = {"query": query, "pageSize": str(page_size)}
+
+    if datasources:
+        params["datasources"] = json.dumps(datasources)
+
+    if filters:
+        params["filters"] = json.dumps(filters)
+
+    return params
 
 
 @tool_spec(
@@ -45,16 +75,43 @@ def search(
             ],
         ),
     ],
+    datasources: Annotated[
+        list[str] | None,
+        Field(
+            description="Restrict results to specific datasources (e.g. ['confluence', 'gdrive']).",
+        ),
+    ] = None,
+    filters: Annotated[
+        list[dict[str, Any]] | None,
+        Field(
+            description=(
+                "Structured search filters. Each dict has 'field' (str), "
+                "'values' (list[str]), and optional 'exclude' (bool)."
+            ),
+        ),
+    ] = None,
+    page_size: Annotated[
+        int,
+        Field(
+            description="Number of results to return per page.",
+            ge=1,
+            le=100,
+        ),
+    ] = 10,
 ) -> ToolResult:
     """Search Glean for relevant documents using the query.
 
     Args:
         ctx: Optional Glean context for client injection.
-        query: Search query with optional filters - API will validate filter syntax
+        query: Search query with optional filters - API will validate filter syntax.
+        datasources: Optional list of datasource names to filter by.
+        filters: Optional structured filters ``[{field, values, exclude?}]``.
+        page_size: Number of results per page (default 10).
     """
     from glean.agent_toolkit.context import GleanContext
 
     ctx = ctx or GleanContext()
     client = ctx.get_client()
-    parameters = convert_to_tool_params(query=query)
+    raw_params = _build_search_params(query, datasources, filters, page_size)
+    parameters = convert_to_tool_params(**raw_params)
     return run_tool("Glean Search", parameters, client=client)

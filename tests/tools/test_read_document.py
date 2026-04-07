@@ -9,7 +9,11 @@ from glean.agent_toolkit.tools.read_document import read_document
 from glean.api_client import models
 
 
-def _make_ctx(*, documents_return: object = None, documents_side_effect: Exception | None = None) -> GleanContext:
+def _make_ctx(
+    *,
+    documents_return: object = None,
+    documents_side_effect: Exception | None = None,
+) -> GleanContext:
     mock_client = MagicMock()
     mock_client.__enter__ = MagicMock(return_value=mock_client)
     mock_client.__exit__ = MagicMock(return_value=False)
@@ -31,8 +35,8 @@ def test_read_document_by_id_success() -> None:
     assert result["error"] is None
 
     mock_client = ctx.get_client()
-    mock_client.client.documents.retrieve.assert_called_once()
-    sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]
+    mock_client.client.documents.retrieve.assert_called_once()  # type: ignore[union-attr]
+    sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]  # type: ignore[union-attr]
     assert isinstance(sent, models.GetDocumentsRequest)
     assert len(sent.document_specs) == 1
     assert isinstance(sent.document_specs[0], models.DocumentSpec2)
@@ -53,8 +57,8 @@ def test_read_document_by_url_success() -> None:
     assert result["error"] is None
 
     mock_client = ctx.get_client()
-    mock_client.client.documents.retrieve.assert_called_once()
-    sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]
+    mock_client.client.documents.retrieve.assert_called_once()  # type: ignore[union-attr]
+    sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]  # type: ignore[union-attr]
     assert isinstance(sent, models.GetDocumentsRequest)
     assert len(sent.document_specs) == 1
     assert isinstance(sent.document_specs[0], models.DocumentSpec1)

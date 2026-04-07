@@ -35,25 +35,33 @@ export GLEAN_RETRY_MAX_ELAPSED=30.0
 
 ## Installation
 
-Install the base toolkit:
+Install with all framework adapters (recommended):
+
+```bash snippet=readme/snippet-03.bash
+pip install "glean-agent-toolkit[all]"
+```
+
+Or install the base toolkit and add extras as needed:
 
 ```bash snippet=readme/snippet-01.bash
 pip install glean-agent-toolkit
 ```
 
-To include support for specific agent frameworks, install the relevant extras:
+### Extras reference
+
+| Extra        | Installs                      | Use case                         |
+| ------------ | ----------------------------- | -------------------------------- |
+| `[openai]`   | `openai`, `openai-agents`     | OpenAI Agents SDK / Assistants   |
+| `[langchain]`| `langchain-core`              | LangChain / LangGraph agents     |
+| `[crewai]`   | `crewai`                      | CrewAI multi-agent workflows     |
+| `[adk]`      | `google-adk`                  | Google Agent Development Kit     |
+| `[all]`      | All of the above              | Full framework support           |
 
 ```bash snippet=readme/snippet-02.bash
 pip install glean-agent-toolkit[openai]
 pip install glean-agent-toolkit[adk]
 pip install glean-agent-toolkit[langchain]
 pip install glean-agent-toolkit[crewai]
-```
-
-You can also install all extras:
-
-```bash snippet=readme/snippet-03.bash
-pip install glean-agent-toolkit[all]
 ```
 
 Note: The `[openai]` extra installs the standard `openai` Python library, used for direct API interactions like Chat Completions or the Assistants API. The example below for the "OpenAI Agents SDK" uses a separate library, `openai-agents`, which you'll need to install independently: `pip install openai-agents`.
@@ -182,17 +190,46 @@ This type of assistant can dramatically improve employee productivity by making 
 
 ## Available Tools
 
-The toolkit comes with a suite of production-ready tools that connect to various Glean functionalities:
+| Tool name                | Import name         | Description                                    |
+| ------------------------ | ------------------- | ---------------------------------------------- |
+| `glean_search`           | `search`            | Search internal documents and knowledge bases  |
+| `glean_chat`             | `glean_chat`        | Conversational Q&A with Glean Assistant        |
+| `glean_read_document`    | `read_document`     | Read full document content by ID or URL        |
+| `glean_web_search`       | `web_search`        | Search the public web for external information |
+| `glean_calendar_search`  | `calendar_search`   | Find meetings and calendar events              |
+| `glean_employee_search`  | `employee_search`   | Search employees by name, team, or department  |
+| `glean_code_search`      | `code_search`       | Search source code repositories                |
+| `glean_gmail_search`     | `gmail_search`      | Search Gmail messages and conversations        |
+| `glean_outlook_search`   | `outlook_search`    | Search Outlook mail and calendar items         |
 
-- `glean_search`: Search your company's knowledge base for relevant documents and information
-- **`glean_read_document`**: Read full content of a specific document by ID or URL (requires
-  config settings `queryapi.getDocuments.enabled` and `queryapi.getDocuments.content.enabled`)
-- **`glean_web_search`**: Search the public web for up-to-date external information
-- `glean_calendar_search`: Find meetings and calendar events
-- `glean_employee_search`: Search for employees by name, team, department, or expertise
-- `glean_code_search`: Search your company's source code repositories
-- `glean_gmail_search`: Search Gmail messages and conversations
-- `glean_outlook_search`: Search Outlook mail and calendar items
+### Explicit imports
+
+```python
+from glean.agent_toolkit.tools import search, glean_chat, read_document
+from glean.agent_toolkit.tools import web_search, calendar_search
+from glean.agent_toolkit.tools import employee_search, code_search
+from glean.agent_toolkit.tools import gmail_search, outlook_search
+```
+
+### Adapter methods
+
+Each tool function exposes adapter methods for framework conversion:
+
+| Method                | Returns                          | Framework           |
+| --------------------- | -------------------------------- | ------------------- |
+| `.as_openai_tool()`   | `FunctionTool` or `dict`         | OpenAI Agents SDK   |
+| `.as_langchain_tool()` | `langchain_core.tools.Tool`     | LangChain / LangGraph |
+| `.as_crewai_tool()`   | `CrewAI BaseTool`                | CrewAI              |
+| `.as_adk_tool()`      | `google.adk FunctionTool`        | Google ADK          |
+
+You can also use `get_tools()` to get all tools adapted for a framework at once:
+
+```python
+from glean.agent_toolkit import get_tools
+
+langchain_tools = get_tools("langchain")
+openai_tools = get_tools("openai", include=["glean_search", "glean_chat"])
+```
 
 ### Web Research with Context
 

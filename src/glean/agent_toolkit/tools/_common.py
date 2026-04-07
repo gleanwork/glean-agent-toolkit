@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 from typing import Any, Literal, TypedDict
@@ -192,7 +193,10 @@ def run_tool(
             client = GleanContext().get_client()
 
         with client as g_client:
-            result = g_client.client.tools.run(
+            from glean.agent_toolkit.tools._compat import resolve_method
+
+            run_fn = resolve_method(g_client.client.tools, "run", "execute")
+            result = run_fn(
                 name=tool_display_name,
                 parameters=parameters,
             )
@@ -200,6 +204,28 @@ def run_tool(
     except Exception as e:
         error_type, suggested_action = _classify_error(e)
         return make_error(str(e), error_type, suggested_action)
+
+
+async def arun_tool(
+    tool_display_name: str,
+    parameters: dict[str, models.ToolsCallParameter],
+    *,
+    client: Glean | None = None,
+) -> ToolResult:
+    """Async version of :func:`run_tool`.
+
+    Delegates to ``asyncio.to_thread`` because the Glean API client
+    has no native async support yet.
+
+    Args:
+        tool_display_name: Display name for the tool
+        parameters: Tool parameters
+        client: Optional pre-configured Glean client.
+
+    Returns:
+        Structured ``ToolResult`` with status, result/error, and classification.
+    """
+    return await asyncio.to_thread(run_tool, tool_display_name, parameters, client=client)
 
 
 def serialize_tool_result(value: Any) -> Any:

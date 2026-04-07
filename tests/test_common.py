@@ -261,5 +261,5 @@ class TestRunTool:
             result = run_tool("Test Tool", parameters)
 
         assert result["status"] == "error"
-        assert "GLEAN_API_TOKEN" in result["error"]
+        assert result["error"] is not None and "GLEAN_API_TOKEN" in result["error"]
         assert result["error_type"] == "validation"
