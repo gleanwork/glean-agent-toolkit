@@ -30,6 +30,7 @@ async def test_async_function_returns_same_as_sync() -> None:
     sync_result = search(ctx, query="test")
 
     ctx2 = GleanContext(client=_mock_client({"result": "async_test"}))
+    assert search.tool_spec.async_function is not None
     async_result = await search.tool_spec.async_function(ctx2, query="test")
 
     assert sync_result["status"] == "ok"

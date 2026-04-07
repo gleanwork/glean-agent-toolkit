@@ -50,7 +50,7 @@ def test_search_with_datasources() -> None:
 
     assert result["status"] == "ok"
     mock_client = ctx.get_client()
-    call_params = mock_client.client.tools.run.call_args.kwargs["parameters"]
+    call_params = mock_client.client.tools.run.call_args.kwargs["parameters"]  # type: ignore[union-attr]
     assert "datasources" in call_params
     assert json.loads(call_params["datasources"].value) == ["confluence", "gdrive"]
 
@@ -62,7 +62,7 @@ def test_search_with_filters() -> None:
 
     assert result["status"] == "ok"
     mock_client = ctx.get_client()
-    call_params = mock_client.client.tools.run.call_args.kwargs["parameters"]
+    call_params = mock_client.client.tools.run.call_args.kwargs["parameters"]  # type: ignore[union-attr]
     assert "filters" in call_params
     assert json.loads(call_params["filters"].value) == filters
 
@@ -73,7 +73,7 @@ def test_search_with_page_size() -> None:
 
     assert result["status"] == "ok"
     mock_client = ctx.get_client()
-    call_params = mock_client.client.tools.run.call_args.kwargs["parameters"]
+    call_params = mock_client.client.tools.run.call_args.kwargs["parameters"]  # type: ignore[union-attr]
     assert call_params["pageSize"].value == "25"
 
 
@@ -83,7 +83,7 @@ def test_search_default_page_size() -> None:
 
     assert result["status"] == "ok"
     mock_client = ctx.get_client()
-    call_params = mock_client.client.tools.run.call_args.kwargs["parameters"]
+    call_params = mock_client.client.tools.run.call_args.kwargs["parameters"]  # type: ignore[union-attr]
     assert call_params["pageSize"].value == "10"
 
 

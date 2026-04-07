@@ -35,8 +35,8 @@ def test_read_document_by_id_success() -> None:
     assert result["error"] is None
 
     mock_client = ctx.get_client()
-    mock_client.client.documents.retrieve.assert_called_once()
-    sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]
+    mock_client.client.documents.retrieve.assert_called_once()  # type: ignore[union-attr]
+    sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]  # type: ignore[union-attr]
     assert isinstance(sent, models.GetDocumentsRequest)
     assert len(sent.document_specs) == 1
     assert isinstance(sent.document_specs[0], models.DocumentSpec2)
@@ -57,8 +57,8 @@ def test_read_document_by_url_success() -> None:
     assert result["error"] is None
 
     mock_client = ctx.get_client()
-    mock_client.client.documents.retrieve.assert_called_once()
-    sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]
+    mock_client.client.documents.retrieve.assert_called_once()  # type: ignore[union-attr]
+    sent = mock_client.client.documents.retrieve.call_args.kwargs["request"]  # type: ignore[union-attr]
     assert isinstance(sent, models.GetDocumentsRequest)
     assert len(sent.document_specs) == 1
     assert isinstance(sent.document_specs[0], models.DocumentSpec1)
