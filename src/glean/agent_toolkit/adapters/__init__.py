@@ -1,7 +1,5 @@
 """Adapters for converting tool specifications to framework-specific formats."""
 
-from pydantic import BaseModel
-
 from glean.agent_toolkit.adapters.adk import ADKAdapter
 from glean.agent_toolkit.adapters.base import BaseAdapter
 from glean.agent_toolkit.adapters.crewai import CrewAIAdapter
@@ -20,5 +18,4 @@ __all__ = [
     "OpenAIAdapter",
     "OpenAIToolDef",
     "OpenAIFunctionDef",
-    "BaseModel",
 ]
