@@ -92,9 +92,8 @@ def test_spec_async_function_field() -> None:
 
 
 def test_all_registered_tools_have_async() -> None:
-    from glean.agent_toolkit.registry import get_registry
-
     import glean.agent_toolkit.tools  # noqa: F401
+    from glean.agent_toolkit.registry import get_registry
 
     for spec in get_registry().list():
         assert spec.async_function is not None, f"{spec.name} missing async_function"
