@@ -5,10 +5,11 @@ from __future__ import annotations
 import functools
 import json
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
+from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict
 
 from glean.agent_toolkit.adapters.base import BaseAdapter
 from glean.agent_toolkit.spec import ToolSpec
+from glean.agent_toolkit.tools._common import _classify_error, make_error
 
 if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
@@ -145,15 +146,8 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
                     return result
                 return json.dumps(result, default=str)
             except Exception as e:
-                return json.dumps(
-                    {
-                        "status": "error",
-                        "result": None,
-                        "error": str(e),
-                        "error_type": "api",
-                        "suggested_action": "retry",
-                    }
-                )
+                error_type, suggested_action = _classify_error(e)
+                return json.dumps(make_error(str(e), error_type, suggested_action))
 
         params_json_schema_dict = (
             self.tool_spec.input_schema

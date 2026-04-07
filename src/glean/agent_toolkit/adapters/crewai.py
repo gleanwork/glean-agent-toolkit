@@ -5,11 +5,11 @@ from __future__ import annotations
 import functools
 import json
 from collections.abc import Callable
-from typing import TYPE_CHECKING, Any, Union, cast
+from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel
 
-from glean.agent_toolkit.adapters.base import BaseAdapter
+from glean.agent_toolkit.adapters.base import BaseAdapter, get_field_type
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
@@ -182,7 +182,7 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
 
         field_defs: dict[str, tuple[type, Any]] = {}
         for name, schema in props.items():
-            field_type = self._get_field_type(schema)
+            field_type = get_field_type(schema)
             is_required = name in required
             description = schema.get("description", "")
             if is_required:
@@ -194,32 +194,3 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
         model = pydantic_create_model(model_name, **field_defs)  # type: ignore
 
         return cast(type[BaseModel], model)
-
-    def _get_field_type(self, schema: dict[str, Any]) -> type:
-        """Determine the Python type from JSON schema property.
-
-        Args:
-            schema: JSON schema property definition
-
-        Returns:
-            Appropriate Python type
-        """
-        if "enum" in schema:
-            return str
-
-        schema_type = schema.get("type", "string")
-
-        if schema_type == "string":
-            return str
-        elif schema_type == "integer":
-            return int
-        elif schema_type == "number":
-            return float
-        elif schema_type == "boolean":
-            return bool
-        elif schema_type == "array":
-            return list
-        elif schema_type == "object":
-            return dict
-        else:
-            return str

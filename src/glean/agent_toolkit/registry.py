@@ -37,6 +37,10 @@ class Registry:
         """
         return list(self._tools.values())
 
+    def clear(self) -> None:
+        """Remove all registered tools. Primarily for test isolation."""
+        self._tools.clear()
+
 
 _REGISTRY = Registry()
 

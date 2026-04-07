@@ -3,16 +3,13 @@
 from __future__ import annotations
 
 import asyncio
-import json
-import os
 from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel
 
 from glean.api_client import Glean, models
-from glean.api_client.utils import BackoffStrategy, RetryConfig
 
-ErrorType = Literal["auth", "validation", "api", "timeout", "not_found"]
+ErrorType = Literal["auth", "validation", "api", "timeout", "not_found", "rate_limit"]
 SuggestedAction = Literal["retry", "check_credentials", "rephrase_query"]
 
 
@@ -50,6 +47,9 @@ def _classify_error(exc: Exception) -> tuple[ErrorType, SuggestedAction]:
     if "404" in msg or "not found" in msg:
         return "not_found", "rephrase_query"
 
+    if "429" in msg or "rate limit" in msg or "too many requests" in msg:
+        return "rate_limit", "retry"
+
     if isinstance(exc, OSError):
         return "api", "retry"
 
@@ -82,22 +82,18 @@ def make_error(
     )
 
 
-def api_client() -> Glean:
-    """Get the Glean API client."""
-    api_token = os.getenv("GLEAN_API_TOKEN")
-    server_url = os.getenv("GLEAN_SERVER_URL")
-    # GLEAN_INSTANCE is deprecated/legacy — prefer GLEAN_SERVER_URL
-    instance = os.getenv("GLEAN_INSTANCE")
+def run_with_error_handling(fn: Any, *args: Any, **kwargs: Any) -> ToolResult:
+    """Call *fn* and wrap the outcome in a ``ToolResult``.
 
-    if not api_token:
-        raise ValueError("GLEAN_API_TOKEN environment variable is required")
-
-    if server_url:
-        return Glean(api_token=api_token, server_url=server_url, retry_config=_build_retry_config())
-    elif instance:
-        return Glean(api_token=api_token, instance=instance, retry_config=_build_retry_config())
-    else:
-        raise ValueError("GLEAN_SERVER_URL or GLEAN_INSTANCE environment variable is required")
+    On success the return value is passed through :func:`make_ok`.
+    On failure the exception is classified via :func:`_classify_error`.
+    """
+    try:
+        result = fn(*args, **kwargs)
+        return make_ok(result)
+    except Exception as e:
+        error_type, suggested_action = _classify_error(e)
+        return make_error(str(e), error_type, suggested_action)
 
 
 def clean_query(query: str) -> str:
@@ -125,48 +121,6 @@ def convert_to_tool_params(**kwargs: Any) -> dict[str, models.ToolsCallParameter
         Dictionary mapping parameter names to ToolsCallParameter objects
     """
     return {key: models.ToolsCallParameter(name=key, value=value) for key, value in kwargs.items()}
-
-
-def _parse_retry_env_float(name: str, default: float) -> float:
-    value = os.getenv(name)
-    if not value:
-        return default
-    try:
-        return float(value)
-    except Exception:
-        return default
-
-
-def _parse_retry_env_int(name: str, default: int) -> int:
-    value = os.getenv(name)
-    if not value:
-        return default
-    try:
-        return int(value)
-    except Exception:
-        return default
-
-
-def _build_retry_config() -> RetryConfig:
-    initial = _parse_retry_env_float("GLEAN_RETRY_INITIAL", 1.0)
-    maximum = _parse_retry_env_float("GLEAN_RETRY_MAX", 50.0)
-    exponent = _parse_retry_env_float("GLEAN_RETRY_MULTIPLIER", 1.1)
-    max_elapsed = _parse_retry_env_float("GLEAN_RETRY_MAX_ELAPSED", 60.0)
-
-    initial_interval = round(initial)
-    max_interval = round(maximum)
-    max_elapsed_time = round(max_elapsed)
-
-    return RetryConfig(
-        strategy="backoff",
-        backoff=BackoffStrategy(
-            initial_interval=initial_interval,
-            max_interval=max_interval,
-            exponent=exponent,
-            max_elapsed_time=max_elapsed_time,
-        ),
-        retry_connection_errors=True,
-    )
 
 
 def run_tool(

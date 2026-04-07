@@ -52,6 +52,7 @@ def get_tools(
     client: Any | None = None,
     api_token: str | None = None,
     server_url: str | None = None,
+    instance: str | None = None,
 ) -> list[Any]:
     """Return framework-adapted tools filtered by include/exclude.
 
@@ -62,6 +63,7 @@ def get_tools(
         client: Pre-configured :class:`~glean.api_client.Glean` instance.
         api_token: Glean API token (falls back to ``GLEAN_API_TOKEN``).
         server_url: Glean server URL (falls back to ``GLEAN_SERVER_URL``).
+        instance: Glean instance name (falls back to ``GLEAN_INSTANCE``).
 
     Returns:
         List of framework-specific tool objects.
@@ -77,7 +79,7 @@ def get_tools(
             f"Unknown framework {framework!r}. Choose from: {', '.join(sorted(_ADAPTER_CLASSES))}"
         )
 
-    ctx = GleanContext(client=client, api_token=api_token, server_url=server_url)
+    ctx = GleanContext(client=client, api_token=api_token, server_url=server_url, instance=instance)
 
     adapter_path = _ADAPTER_CLASSES[framework]
     module_path, class_name = adapter_path.rsplit(".", 1)
