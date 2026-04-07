@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 
 @tool_spec(
@@ -24,6 +27,8 @@ from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
     ),
 )
 def code_search(
+    ctx: GleanContext | None = None,
+    *,
     query: Annotated[
         str,
         Field(
@@ -45,7 +50,12 @@ def code_search(
     """Search code repositories based on the query.
 
     Args:
+        ctx: Glean context for client access
         query: Code search query with optional filters - API will validate filter syntax
     """
+    from glean.agent_toolkit.context import GleanContext
+
+    ctx = ctx or GleanContext()
     parameters = convert_to_tool_params(query=query)
-    return run_tool("Code Search", parameters)
+    client = ctx.get_client()
+    return run_tool("Code Search", parameters, client=client)

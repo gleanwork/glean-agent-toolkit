@@ -1,7 +1,8 @@
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from glean.agent_toolkit.context import GleanContext
 from glean.agent_toolkit.tools._common import run_tool, serialize_tool_result
 
 
@@ -30,12 +31,12 @@ def test_serialize_tool_result_passthrough() -> None:
 
 
 def test_run_tool_serializes_sdk_response() -> None:
-    with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-        mock_client = MagicMock()
-        mock_client.client.tools.run.return_value = _Item(camelCaseField="value")
-        mock_api_client.return_value.__enter__.return_value = mock_client
+    mock_client = MagicMock()
+    mock_client.__enter__ = MagicMock(return_value=mock_client)
+    mock_client.__exit__ = MagicMock(return_value=False)
+    mock_client.client.tools.run.return_value = _Item(camelCaseField="value")
 
-        result = run_tool("Glean Search", {})
+    result = run_tool("Glean Search", {}, client=mock_client)
 
-        assert result.get("error") is None
-        assert result["result"] == {"camelCaseField": "value"}
+    assert result.get("error") is None
+    assert result["result"] == {"camelCaseField": "value"}

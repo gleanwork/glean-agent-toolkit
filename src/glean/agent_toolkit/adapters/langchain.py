@@ -1,5 +1,8 @@
 """LangChain adapter for converting tool specifications."""
 
+from __future__ import annotations
+
+import functools
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, TypeAlias, Union, cast
 
@@ -10,6 +13,8 @@ from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
     from langchain.tools import Tool as LangchainTool  # pragma: no cover
+
+    from glean.agent_toolkit.context import GleanContext
 else:
     LangchainTool = Any  # type: ignore  # noqa: N816
 
@@ -81,16 +86,23 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
                 "Install it with `pip install glean-agent-toolkit[langchain]`."
             )
 
-    def to_tool(self) -> Any:
+    def to_tool(self, ctx: GleanContext | None = None) -> Any:
         """Convert to LangChain tool format.
+
+        Args:
+            ctx: Optional GleanContext to bind into the tool function.
 
         Returns:
             LangChain Tool instance
         """
+        func = self.tool_spec.function
+        if ctx is not None:
+            func = functools.partial(func, ctx)
+
         return ToolClass(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
-            func=self.tool_spec.function,
+            func=func,
             args_schema=self._create_args_schema(),
         )
 

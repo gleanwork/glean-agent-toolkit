@@ -3,7 +3,7 @@
 import functools
 import inspect
 from collections.abc import Callable
-from typing import Annotated, Any, Protocol, TypedDict, TypeVar, cast, get_args, get_origin
+from typing import Annotated, Any, Protocol, TypedDict, TypeVar, Union, cast, get_args, get_origin
 
 from pydantic import BaseModel, Field, TypeAdapter, create_model
 from pydantic.fields import FieldInfo
@@ -60,6 +60,30 @@ def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
     return param_type, None
 
 
+def _is_context_param(param: inspect.Parameter) -> bool:
+    """Check whether a parameter is a GleanContext injection point.
+
+    We detect this by checking the annotation's qualified name rather than
+    importing GleanContext directly, which avoids circular imports and keeps
+    the decorator module decoupled from the context module.
+    """
+    ann = param.annotation
+    if ann is inspect.Parameter.empty:
+        return False
+
+    # Handle string annotations (from __future__ annotations)
+    if isinstance(ann, str):
+        return "GleanContext" in ann
+
+    # Handle union types like GleanContext | None
+    origin = get_origin(ann)
+    if origin is Union:
+        args = get_args(ann)
+        return any(getattr(a, "__name__", "") == "GleanContext" for a in args)
+
+    return getattr(ann, "__name__", "") == "GleanContext"
+
+
 def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any]:
     """Create a JSON schema using Pydantic's TypeAdapter for all parameters.
 
@@ -72,6 +96,8 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
     fields = {}
 
     for param_name, param in signature.parameters.items():
+        if _is_context_param(param):
+            continue
         if param.annotation == inspect.Parameter.empty:
             fields[param_name] = (str, ...)
         else:
@@ -108,6 +134,8 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
         required = []
 
         for param_name, param in signature.parameters.items():
+            if _is_context_param(param):
+                continue
             if param.default is param.empty:
                 required.append(param_name)
 

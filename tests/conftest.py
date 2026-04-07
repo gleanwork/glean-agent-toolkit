@@ -17,109 +17,82 @@ CASSETTES_DIR = pathlib.Path(__file__).parent / "cassettes"
 
 def filter_request(request: Any) -> Any:
     """Scrub sensitive data from VCR requests."""
-    if hasattr(request, 'uri'):
+    if hasattr(request, "uri"):
         request.uri = re.sub(
-            r'https://[^/]*-be\.glean\.com',
-            'https://test-instance-be.glean.com',
-            request.uri
+            r"https://[^/]*-be\.glean\.com", "https://test-instance-be.glean.com", request.uri
         )
 
-    if hasattr(request, 'headers') and 'host' in request.headers:
-        request.headers['host'] = ['test-instance-be.glean.com']
+    if hasattr(request, "headers") and "host" in request.headers:
+        request.headers["host"] = ["test-instance-be.glean.com"]
 
     return request
 
 
 def filter_response(response: Any) -> Any:
     """Scrub sensitive data from VCR responses."""
-    if hasattr(response, 'body') and hasattr(response.body, 'string'):
+    if hasattr(response, "body") and hasattr(response.body, "string"):
         body_str = response.body.string
         if isinstance(body_str, str):
             body_str = re.sub(
-                r'https://[^/]*-be\.[^/]+\.com',
-                'https://test-instance-be.example.com',
-                body_str)
-            body_str = re.sub(r'[^/]*-be\.[^/]+\.com', 'test-instance-be.example.com', body_str)
+                r"https://[^/]*-be\.[^/]+\.com", "https://test-instance-be.example.com", body_str
+            )
+            body_str = re.sub(r"[^/]*-be\.[^/]+\.com", "test-instance-be.example.com", body_str)
 
-            body_str = re.sub(r'\b[a-zA-Z0-9_-]+-prod\b', 'test-instance', body_str)
-            body_str = re.sub(r'instance=[a-zA-Z0-9_-]+-prod', 'instance=test-instance', body_str)
-            body_str = re.sub(r'instance=[a-zA-Z0-9_-]+', 'instance=test-instance', body_str)
+            body_str = re.sub(r"\b[a-zA-Z0-9_-]+-prod\b", "test-instance", body_str)
+            body_str = re.sub(r"instance=[a-zA-Z0-9_-]+-prod", "instance=test-instance", body_str)
+            body_str = re.sub(r"instance=[a-zA-Z0-9_-]+", "instance=test-instance", body_str)
 
             body_str = re.sub(
                 r'https://docs\.google\.com/[^"]+',
-                'https://docs.google.com/document/d/REDACTED',
-                body_str
+                "https://docs.google.com/document/d/REDACTED",
+                body_str,
             )
             body_str = re.sub(
                 r'https://[^/]+\.slack\.com/[^"]+',
-                'https://test-company.slack.com/REDACTED',
-                body_str
+                "https://test-company.slack.com/REDACTED",
+                body_str,
             )
 
-            body_str = re.sub(r'@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}', '@company.com', body_str)
+            body_str = re.sub(r"@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}", "@company.com", body_str)
+
+            body_str = re.sub(r'"[A-Z][a-z]+ [A-Z][a-z]+"', '"Test User"', body_str)
 
             body_str = re.sub(
-                r'"[A-Z][a-z]+ [A-Z][a-z]+"',
-                '"Test User"',
-                body_str
+                r'("name"\s*:\s*")[A-Z][a-z]+ [A-Z][a-z]+(")', r"\1Test User\2", body_str
+            )
+            body_str = re.sub(
+                r'("displayName"\s*:\s*")[A-Z][a-z]+ [A-Z][a-z]+(")', r"\1Test User\2", body_str
+            )
+            body_str = re.sub(
+                r'("author"\s*:\s*")[A-Z][a-z]+ [A-Z][a-z]+(")', r"\1Test User\2", body_str
             )
 
-            body_str = re.sub(
-                r'("name"\s*:\s*")[A-Z][a-z]+ [A-Z][a-z]+(")',
-                r'\1Test User\2',
-                body_str
-            )
-            body_str = re.sub(
-                r'("displayName"\s*:\s*")[A-Z][a-z]+ [A-Z][a-z]+(")',
-                r'\1Test User\2',
-                body_str
-            )
-            body_str = re.sub(
-                r'("author"\s*:\s*")[A-Z][a-z]+ [A-Z][a-z]+(")',
-                r'\1Test User\2',
-                body_str
-            )
-
-            body_str = re.sub(
-                r'"[A-Z][a-z]+ [A-Z][a-z]+ [A-Z][a-z]+"',
-                '"Test User"',
-                body_str
-            )
+            body_str = re.sub(r'"[A-Z][a-z]+ [A-Z][a-z]+ [A-Z][a-z]+"', '"Test User"', body_str)
             body_str = re.sub(
                 r'("name"\s*:\s*")[A-Z][a-z]+ [A-Z][a-z]+ [A-Z][a-z]+(")',
-                r'\1Test User\2',
-                body_str
+                r"\1Test User\2",
+                body_str,
             )
 
             body_str = re.sub(
-                r'\b[A-Z][a-z]+ [A-Z][a-z]+\b(?=\s+(said|wrote|authored|created|updated))',
-                'Test User',
-                body_str
+                r"\b[A-Z][a-z]+ [A-Z][a-z]+\b(?=\s+(said|wrote|authored|created|updated))",
+                "Test User",
+                body_str,
             )
 
-            body_str = re.sub(
-                r'\b[A-Z][a-z]+ [A-Z][a-z]+\b(?=\s*<[^>]*@)',
-                'Test User',
-                body_str
-            )
+            body_str = re.sub(r"\b[A-Z][a-z]+ [A-Z][a-z]+\b(?=\s*<[^>]*@)", "Test User", body_str)
 
             body_str = re.sub(
-                r'"obfuscatedId":"[A-F0-9]{32}"',
-                '"obfuscatedId":"REDACTED_ID"',
-                body_str
+                r'"obfuscatedId":"[A-F0-9]{32}"', '"obfuscatedId":"REDACTED_ID"', body_str
             )
             body_str = re.sub(
-                r'"loggingId":"[A-F0-9]{32}"',
-                '"loggingId":"REDACTED_LOGGING_ID"',
-                body_str
+                r'"loggingId":"[A-F0-9]{32}"', '"loggingId":"REDACTED_LOGGING_ID"', body_str
             )
 
-            body_str = re.sub(r'[A-Z]+_[A-Za-z0-9_-]+', 'DOC_REDACTED', body_str)
+            body_str = re.sub(r"[A-Z]+_[A-Za-z0-9_-]+", "DOC_REDACTED", body_str)
 
             body_str = re.sub(
-                r'https://dev\.[^/]+\.com[^"]*',
-                'https://dev.example.com/REDACTED',
-                body_str
+                r'https://dev\.[^/]+\.com[^"]*', "https://dev.example.com/REDACTED", body_str
             )
 
             response.body.string = body_str
@@ -137,10 +110,13 @@ def mock_glean_env_vars() -> Generator[None, None, None]:
 
     # Use environment variables that match the VCR cassette format
     # This ensures the API client can be created properly while VCR handles the HTTP calls
-    with patch.dict(os.environ, {
-        "GLEAN_API_TOKEN": "fake_token_for_vcr_testing",
-        "GLEAN_SERVER_URL": "https://test-instance-be.glean.com",
-    }):
+    with patch.dict(
+        os.environ,
+        {
+            "GLEAN_API_TOKEN": "fake_token_for_vcr_testing",
+            "GLEAN_SERVER_URL": "https://test-instance-be.glean.com",
+        },
+    ):
         yield
 
 

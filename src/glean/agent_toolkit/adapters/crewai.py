@@ -1,5 +1,8 @@
 """CrewAI adapter for converting tool specifications."""
 
+from __future__ import annotations
+
+import functools
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, Union, cast
 
@@ -10,6 +13,8 @@ from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
     from crewai.tools import BaseTool as CrewBaseTool
+
+    from glean.agent_toolkit.context import GleanContext
 else:
     CrewBaseTool = Any  # type: ignore  # noqa: N816
 
@@ -63,10 +68,6 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
 
     name: str  # CrewAI BaseTool requires name and description
     description: str  # CrewAI BaseTool requires name and description
-    # Reuse BaseTool's built-in placeholder default for ``args_schema`` so that
-    # CrewAI can lazily infer a schema when one isn't supplied. We intentionally
-    # *do not* override the attribute here to avoid accidentally setting it to
-    # ``None`` and breaking CrewAI's internal description generation logic.
 
     _function: Callable[..., Any]
 
@@ -89,8 +90,6 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
 
         self._function = function
 
-        # Only override ``args_schema`` when we actually created one; otherwise
-        # leave the placeholder so CrewAI can lazily generate a schema.
         if args_schema is not None:
             self.args_schema = args_schema
 
@@ -128,23 +127,28 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
                 "Note: CrewAI requires Python 3.10 or higher."
             )
 
-    def to_tool(self) -> CrewAIToolType:
+    def to_tool(self, ctx: GleanContext | None = None) -> CrewAIToolType:
         """Convert to CrewAI tool format.
+
+        Args:
+            ctx: Optional GleanContext to bind into the tool function.
 
         Returns:
             A CrewAI BaseTool instance
         """
-        # Create and configure the tool
         created_args_schema = self._create_args_schema()
+
+        func = self.tool_spec.function
+        if ctx is not None:
+            func = functools.partial(func, ctx)
 
         tool = GleanCrewAITool(
             name=self.tool_spec.name,
             description=self.tool_spec.description,
-            function=self.tool_spec.function,
+            function=func,
             args_schema=created_args_schema,
         )
 
-        # Store the tool_spec reference for testing
         object.__setattr__(tool, "_tool_spec_ref", self.tool_spec)
 
         return tool

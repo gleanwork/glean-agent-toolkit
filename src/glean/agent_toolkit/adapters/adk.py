@@ -1,5 +1,8 @@
 """Google ADK adapter for converting tool specifications."""
 
+from __future__ import annotations
+
+import functools
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias
 
@@ -8,6 +11,8 @@ from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
     from google.adk.tools.function_tool import FunctionTool as _RealAdkFunctionTool
+
+    from glean.agent_toolkit.context import GleanContext
 else:
     _RealAdkFunctionTool = Any  # type: ignore
 
@@ -65,13 +70,19 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
                 "`pip install google-adk`."
             )
 
-    def to_tool(self) -> "AdkFunctionTool":
+    def to_tool(self, ctx: GleanContext | None = None) -> AdkFunctionTool:
         """Convert to Google ADK FunctionTool format.
+
+        Args:
+            ctx: Optional GleanContext to bind into the tool function.
 
         Returns:
             An ADK FunctionTool instance
         """
         func = self.tool_spec.function
+        if ctx is not None:
+            func = functools.partial(func, ctx)
+
         if not func.__doc__:
             func.__doc__ = self.tool_spec.description
 

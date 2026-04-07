@@ -27,13 +27,16 @@ def test_calendar_search_api_error(vcr_cassette):
     assert result is not None
 
 
-@pytest.mark.parametrize("query", [
-    "sprint planning meeting",
-    "quarterly business review",
-    "client demo presentation",
-    "one-on-one meetings",
-    "conference room bookings",
-])
+@pytest.mark.parametrize(
+    "query",
+    [
+        "sprint planning meeting",
+        "quarterly business review",
+        "client demo presentation",
+        "one-on-one meetings",
+        "conference room bookings",
+    ],
+)
 def test_calendar_search_various_queries(vcr_cassette, query: str):
     """Test Calendar Search tool with various meeting types."""
     result = calendar_search(query=query)

@@ -29,13 +29,16 @@ def test_employee_search_api_error(vcr_cassette):
     assert result is not None
 
 
-@pytest.mark.parametrize("query", [
-    "Sarah Johnson product manager",
-    "data scientist machine learning",
-    "frontend developer React",
-    "security engineer DevOps",
-    "UX designer mobile apps",
-])
+@pytest.mark.parametrize(
+    "query",
+    [
+        "Sarah Johnson product manager",
+        "data scientist machine learning",
+        "frontend developer React",
+        "security engineer DevOps",
+        "UX designer mobile apps",
+    ],
+)
 def test_employee_search_various_queries(vcr_cassette, query: str):
     """Test Employee Search tool with various employee search queries."""
     result = employee_search(query=query)

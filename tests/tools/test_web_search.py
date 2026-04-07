@@ -27,13 +27,16 @@ def test_web_search_api_error(vcr_cassette):
     assert result is not None
 
 
-@pytest.mark.parametrize("query", [
-    "JavaScript frameworks comparison",
-    "Docker container deployment",
-    "API design patterns",
-    "database optimization techniques",
-    "mobile app development",
-])
+@pytest.mark.parametrize(
+    "query",
+    [
+        "JavaScript frameworks comparison",
+        "Docker container deployment",
+        "API design patterns",
+        "database optimization techniques",
+        "mobile app development",
+    ],
+)
 def test_web_search_various_queries(vcr_cassette, query: str):
     """Test Web Search tool with various technical queries."""
     result = web_search(query=query)

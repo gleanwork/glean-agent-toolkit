@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 from pydantic import Field
 
@@ -10,6 +10,9 @@ import glean.agent_toolkit.tools._common as common
 from glean.agent_toolkit.decorators import tool_spec
 from glean.api_client import models
 from glean.api_client.client_documents import ClientDocuments
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 
 @tool_spec(
@@ -23,6 +26,8 @@ from glean.api_client.client_documents import ClientDocuments
     ),
 )
 def read_document(
+    ctx: GleanContext | None = None,
+    *,
     document_id: Annotated[
         str | None,
         Field(
@@ -46,14 +51,18 @@ def read_document(
     One of document_id or url must be provided. If both or neither are provided,
     an error will be returned.
     """
+    from glean.agent_toolkit.context import GleanContext
+
     if (document_id is not None and url is not None) or (document_id is None and url is None):
         return {
             "error": "Provide exactly one of document_id or url",
             "result": None,
         }
 
+    ctx = ctx or GleanContext()
+
     try:
-        with common.api_client() as g_client:
+        with ctx.get_client() as g_client:
             documents_client: ClientDocuments = g_client.client.documents
 
             include_fields = [models.GetDocumentsRequestIncludeField.DOCUMENT_CONTENT]

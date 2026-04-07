@@ -1,5 +1,8 @@
 """OpenAI adapter for converting tool specifications."""
 
+from __future__ import annotations
+
+import functools
 import json
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
@@ -9,6 +12,8 @@ from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
     from agents.tool import FunctionTool as _RealOpenAIFunctionTool
+
+    from glean.agent_toolkit.context import GleanContext
 else:
     _RealOpenAIFunctionTool = Any  # type: ignore
 
@@ -75,17 +80,20 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
                 "Install it with `pip install glean-agent-toolkit[openai]`."
             )
 
-    def to_tool(self) -> Any:
+    def to_tool(self, ctx: GleanContext | None = None) -> Any:
         """Convert to OpenAI tool format.
 
         This method tries to use the OpenAI Agents SDK if available,
         falling back to the standard OpenAI function calling format if not.
 
+        Args:
+            ctx: Optional GleanContext to bind into the tool function.
+
         Returns:
             OpenAI tool specification or Agents SDK FunctionTool
         """
         if HAS_OPENAI and _RuntimeOpenAIFunctionTool is not _FallbackOpenAIFunctionTool:
-            return self.to_agents_tool()
+            return self.to_agents_tool(ctx=ctx)
         else:
             return self.to_standard_tool()
 
@@ -110,19 +118,26 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
             },
         }
 
-    def to_agents_tool(self) -> OpenAIFunctionTool:
+    def to_agents_tool(self, ctx: GleanContext | None = None) -> OpenAIFunctionTool:
         """Convert to OpenAI Agents SDK FunctionTool.
+
+        Args:
+            ctx: Optional GleanContext to bind into the tool function.
 
         Returns:
             An OpenAI Agents SDK FunctionTool
         """
         original_func = self.tool_spec.function
+        if ctx is not None:
+            bound_func = functools.partial(original_func, ctx)
+        else:
+            bound_func = original_func
 
-        async def on_invoke_tool(ctx: Any, input_str: str) -> Any:
+        async def on_invoke_tool(agent_ctx: Any, input_str: str) -> Any:
             """Function that invokes the tool with parameters."""
             try:
                 params = json.loads(input_str) if input_str else {}
-                result = original_func(**params)
+                result = bound_func(**params)
                 return result
             except Exception as e:
                 return f"Error executing tool: {str(e)}"

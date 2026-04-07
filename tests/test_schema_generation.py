@@ -74,7 +74,7 @@ class TestSchemaGeneration:
             text: str = "default",
             number: int = 42,
             flag: bool = False,
-            items: list[str] | None = None
+            items: list[str] | None = None,
         ) -> str:
             return f"{text}-{number}-{flag}-{len(items or [])}"
 
@@ -85,17 +85,10 @@ class TestSchemaGeneration:
         """Test schema generation with complex output model."""
 
         @tool_spec(
-            name="test_complex_output", 
-            description="Test complex output",
-            output_model=ComplexModel
+            name="test_complex_output", description="Test complex output", output_model=ComplexModel
         )
         def test_func(name: str) -> ComplexModel:
-            return ComplexModel(
-                id=1,
-                name=name,
-                tags=["test"],
-                metadata={"source": "test"}
-            )
+            return ComplexModel(id=1, name=name, tags=["test"], metadata={"source": "test"})
 
         output_schema = test_func.tool_spec.output_schema
         assert "properties" in output_schema
@@ -108,19 +101,11 @@ class TestSchemaGeneration:
         """Test schema generation with nested model output."""
 
         @tool_spec(
-            name="test_nested_output",
-            description="Test nested output",
-            output_model=NestedModel
+            name="test_nested_output", description="Test nested output", output_model=NestedModel
         )
         def test_func(value: int) -> NestedModel:
             return NestedModel(
-                value=value,
-                complex=ComplexModel(
-                    id=1,
-                    name="test",
-                    tags=[],
-                    metadata={}
-                )
+                value=value, complex=ComplexModel(id=1, name="test", tags=[], metadata={})
             )
 
         output_schema = test_func.tool_spec.output_schema
@@ -175,7 +160,7 @@ class TestSchemaGeneration:
             decimal: float,
             flag: bool,
             items: list[str],
-            optional_num: int | None = None
+            optional_num: int | None = None,
         ) -> str:
             return "mixed"
 
@@ -195,7 +180,7 @@ class TestSchemaGeneration:
         assert {"type": "integer"} in optional_types
         assert {"type": "null"} in optional_types
         assert schema["properties"]["optional_num"]["default"] is None
-        
+
         # Only required parameters should be in the required list
         required_params = set(schema["required"])
         expected_required = {"text", "number", "decimal", "flag", "items"}
@@ -208,4 +193,4 @@ class TestSchemaGeneration:
         def test_func(param: str) -> str:
             return param
 
-        assert test_func.tool_spec.version == "1.0.0" 
+        assert test_func.tool_spec.version == "1.0.0"

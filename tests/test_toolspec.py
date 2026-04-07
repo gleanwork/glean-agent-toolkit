@@ -5,7 +5,7 @@ from glean.agent_toolkit.spec import ToolSpec
 
 class SampleModel(BaseModel):
     """Sample model for ToolSpec testing."""
-    
+
     value: str
 
 
@@ -14,6 +14,7 @@ class TestToolSpec:
 
     def test_toolspec_creation(self) -> None:
         """Test basic ToolSpec creation."""
+
         def test_func(param: str) -> str:
             return param
 
@@ -22,7 +23,7 @@ class TestToolSpec:
             description="Test function",
             function=test_func,
             input_schema={"type": "object", "properties": {"param": {"type": "string"}}},
-            output_schema={"type": "string"}
+            output_schema={"type": "string"},
         )
 
         assert spec.name == "test"
@@ -33,6 +34,7 @@ class TestToolSpec:
 
     def test_toolspec_with_version(self) -> None:
         """Test ToolSpec creation with version."""
+
         def test_func() -> str:
             return "test"
 
@@ -42,13 +44,14 @@ class TestToolSpec:
             function=test_func,
             input_schema={"type": "object"},
             output_schema={"type": "string"},
-            version="1.2.3"
+            version="1.2.3",
         )
 
         assert spec.version == "1.2.3"
 
     def test_toolspec_with_output_model(self) -> None:
         """Test ToolSpec creation with output model."""
+
         def test_func() -> SampleModel:
             return SampleModel(value="test")
 
@@ -58,13 +61,14 @@ class TestToolSpec:
             function=test_func,
             input_schema={"type": "object"},
             output_schema={"type": "object"},
-            output_model=SampleModel
+            output_model=SampleModel,
         )
 
         assert spec.output_model == SampleModel
 
     def test_toolspec_adapter_storage(self) -> None:
         """Test adapter storage and retrieval."""
+
         def test_func() -> str:
             return "test"
 
@@ -73,7 +77,7 @@ class TestToolSpec:
             description="Test function",
             function=test_func,
             input_schema={"type": "object"},
-            output_schema={"type": "string"}
+            output_schema={"type": "string"},
         )
 
         # Initially no adapters
@@ -83,7 +87,7 @@ class TestToolSpec:
         # Set adapters
         mock_adapter1 = "mock_openai_adapter"
         mock_adapter2 = "mock_langchain_adapter"
-        
+
         spec.set_adapter("openai", mock_adapter1)
         spec.set_adapter("langchain", mock_adapter2)
 
@@ -96,6 +100,7 @@ class TestToolSpec:
 
     def test_toolspec_adapter_overwrite(self) -> None:
         """Test adapter overwriting."""
+
         def test_func() -> str:
             return "test"
 
@@ -104,7 +109,7 @@ class TestToolSpec:
             description="Test function",
             function=test_func,
             input_schema={"type": "object"},
-            output_schema={"type": "string"}
+            output_schema={"type": "string"},
         )
 
         # Set initial adapter
@@ -117,6 +122,7 @@ class TestToolSpec:
 
     def test_toolspec_empty_schemas(self) -> None:
         """Test ToolSpec with minimal schemas."""
+
         def test_func() -> None:
             pass
 
@@ -125,7 +131,7 @@ class TestToolSpec:
             description="Test function",
             function=test_func,
             input_schema={},
-            output_schema={}
+            output_schema={},
         )
 
         assert spec.input_schema == {}
@@ -133,6 +139,7 @@ class TestToolSpec:
 
     def test_toolspec_complex_schemas(self) -> None:
         """Test ToolSpec with complex schemas."""
+
         def test_func() -> None:
             pass
 
@@ -141,12 +148,9 @@ class TestToolSpec:
             "properties": {
                 "param1": {"type": "string"},
                 "param2": {"type": "integer", "minimum": 0},
-                "param3": {
-                    "type": "array",
-                    "items": {"type": "string"}
-                }
+                "param3": {"type": "array", "items": {"type": "string"}},
             },
-            "required": ["param1", "param2"]
+            "required": ["param1", "param2"],
         }
 
         complex_output_schema = {
@@ -155,12 +159,9 @@ class TestToolSpec:
                 "result": {"type": "string"},
                 "metadata": {
                     "type": "object",
-                    "properties": {
-                        "timestamp": {"type": "string"},
-                        "success": {"type": "boolean"}
-                    }
-                }
-            }
+                    "properties": {"timestamp": {"type": "string"}, "success": {"type": "boolean"}},
+                },
+            },
         }
 
         spec = ToolSpec(
@@ -168,7 +169,7 @@ class TestToolSpec:
             description="Test function",
             function=test_func,
             input_schema=complex_input_schema,
-            output_schema=complex_output_schema
+            output_schema=complex_output_schema,
         )
 
         assert spec.input_schema == complex_input_schema
@@ -176,6 +177,7 @@ class TestToolSpec:
 
     def test_toolspec_function_preservation(self) -> None:
         """Test that ToolSpec preserves function behavior."""
+
         def test_func(a: int, b: int) -> int:
             return a + b
 
@@ -184,7 +186,7 @@ class TestToolSpec:
             description="Add function",
             function=test_func,
             input_schema={"type": "object"},
-            output_schema={"type": "integer"}
+            output_schema={"type": "integer"},
         )
 
         # Function should still work through ToolSpec
@@ -193,24 +195,26 @@ class TestToolSpec:
 
     def test_toolspec_name_validation(self) -> None:
         """Test ToolSpec name handling."""
+
         def test_func() -> str:
             return "test"
 
         # Test with various valid names
         valid_names = ["test", "test_function", "testFunction", "test123", "Test"]
-        
+
         for name in valid_names:
             spec = ToolSpec(
                 name=name,
                 description="Test function",
                 function=test_func,
                 input_schema={"type": "object"},
-                output_schema={"type": "string"}
+                output_schema={"type": "string"},
             )
             assert spec.name == name
 
     def test_toolspec_description_handling(self) -> None:
         """Test ToolSpec description handling."""
+
         def test_func() -> str:
             return "test"
 
@@ -227,6 +231,6 @@ class TestToolSpec:
                 description=desc,
                 function=test_func,
                 input_schema={"type": "object"},
-                output_schema={"type": "string"}
+                output_schema={"type": "string"},
             )
-            assert spec.description == desc 
+            assert spec.description == desc

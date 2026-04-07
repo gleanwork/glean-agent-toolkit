@@ -12,21 +12,14 @@ from glean.api_client.utils import BackoffStrategy, RetryConfig
 
 
 def api_client() -> Glean:
-    """Get the Glean API client."""
-    api_token = os.getenv("GLEAN_API_TOKEN")
-    server_url = os.getenv("GLEAN_SERVER_URL")
-    # GLEAN_INSTANCE is deprecated/legacy — prefer GLEAN_SERVER_URL
-    instance = os.getenv("GLEAN_INSTANCE")
+    """Get the Glean API client.
 
-    if not api_token:
-        raise ValueError("GLEAN_API_TOKEN environment variable is required")
+    .. deprecated::
+        Use :class:`~glean.agent_toolkit.context.GleanContext` instead.
+    """
+    from glean.agent_toolkit.context import GleanContext
 
-    if server_url:
-        return Glean(api_token=api_token, server_url=server_url, retry_config=_build_retry_config())
-    elif instance:
-        return Glean(api_token=api_token, instance=instance, retry_config=_build_retry_config())
-    else:
-        raise ValueError("GLEAN_SERVER_URL or GLEAN_INSTANCE environment variable is required")
+    return GleanContext().get_client()
 
 
 def clean_query(query: str) -> str:
@@ -56,63 +49,36 @@ def convert_to_tool_params(**kwargs: Any) -> dict[str, models.ToolsCallParameter
     return {key: models.ToolsCallParameter(name=key, value=value) for key, value in kwargs.items()}
 
 
-def _parse_retry_env_float(name: str, default: float) -> float:
-    value = os.getenv(name)
-    if not value:
-        return default
-    try:
-        return float(value)
-    except Exception:
-        return default
-
-
-def _parse_retry_env_int(name: str, default: int) -> int:
-    value = os.getenv(name)
-    if not value:
-        return default
-    try:
-        return int(value)
-    except Exception:
-        return default
-
-
-def _build_retry_config() -> RetryConfig:
-    initial = _parse_retry_env_float("GLEAN_RETRY_INITIAL", 1.0)
-    maximum = _parse_retry_env_float("GLEAN_RETRY_MAX", 50.0)
-    exponent = _parse_retry_env_float("GLEAN_RETRY_MULTIPLIER", 1.1)
-    max_elapsed = _parse_retry_env_float("GLEAN_RETRY_MAX_ELAPSED", 60.0)
-
-    initial_interval = round(initial)
-    max_interval = round(maximum)
-    max_elapsed_time = round(max_elapsed)
-
-    return RetryConfig(
-        strategy="backoff",
-        backoff=BackoffStrategy(
-            initial_interval=initial_interval,
-            max_interval=max_interval,
-            exponent=exponent,
-            max_elapsed_time=max_elapsed_time,
-        ),
-        retry_connection_errors=True,
-    )
-
-
 def run_tool(
     tool_display_name: str,
     parameters: dict[str, models.ToolsCallParameter],
+    *,
+    client: Glean | None = None,
 ) -> dict[str, Any]:
     """Execute a Glean stub tool and wrap the response.
 
     Args:
         tool_display_name: Display name for the tool
         parameters: Tool parameters
+        client: Optional pre-configured Glean client. When ``None``,
+            falls back to creating one from environment variables.
 
     Returns:
         Tool execution result wrapped in success/error format
     """
     try:
-        with api_client() as g_client:
+        if client is not None:
+            g_client = client
+        else:
+            g_client = api_client()
+
+        if hasattr(g_client, "__enter__"):
+            with g_client as gc:
+                result = gc.client.tools.run(
+                    name=tool_display_name,
+                    parameters=parameters,
+                )
+        else:
             result = g_client.client.tools.run(
                 name=tool_display_name,
                 parameters=parameters,
