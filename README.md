@@ -35,28 +35,38 @@ export GLEAN_RETRY_MAX_ELAPSED=30.0
 
 ## Installation
 
-Install the base toolkit:
+Install with the extra for your agent framework:
+
+```bash snippet=readme/snippet-03.bash
+pip install "glean-agent-toolkit[all]"        # every framework
+```
+
+Or pick only the framework you need:
+
+```bash snippet=readme/snippet-02.bash
+pip install "glean-agent-toolkit[openai]"     # OpenAI + OpenAI Agents SDK
+pip install "glean-agent-toolkit[langchain]"  # LangChain
+pip install "glean-agent-toolkit[crewai]"     # CrewAI
+pip install "glean-agent-toolkit[adk]"        # Google ADK
+```
+
+The base package (no extras) provides tool definitions but no framework adapters:
 
 ```bash snippet=readme/snippet-01.bash
 pip install glean-agent-toolkit
 ```
 
-To include support for specific agent frameworks, install the relevant extras:
+### Available extras
 
-```bash snippet=readme/snippet-02.bash
-pip install glean-agent-toolkit[openai]
-pip install glean-agent-toolkit[adk]
-pip install glean-agent-toolkit[langchain]
-pip install glean-agent-toolkit[crewai]
-```
+| Extra        | What it installs                    |
+| ------------ | ----------------------------------- |
+| `openai`     | `openai`, `openai-agents`           |
+| `langchain`  | `langchain`                         |
+| `crewai`     | `crewai`                            |
+| `adk`        | `google-adk`                        |
+| `all`        | All of the above                    |
 
-You can also install all extras:
-
-```bash snippet=readme/snippet-03.bash
-pip install glean-agent-toolkit[all]
-```
-
-Note: The `[openai]` extra installs the standard `openai` Python library, used for direct API interactions like Chat Completions or the Assistants API. The example below for the "OpenAI Agents SDK" uses a separate library, `openai-agents`, which you'll need to install independently: `pip install openai-agents`.
+> **Note:** The `[openai]` extra installs both the standard `openai` library and the `openai-agents` SDK. If you only need the Agents SDK you can install it independently: `pip install openai-agents`.
 
 ## Prerequisites
 
@@ -182,17 +192,33 @@ This type of assistant can dramatically improve employee productivity by making 
 
 ## Available Tools
 
-The toolkit comes with a suite of production-ready tools that connect to various Glean functionalities:
+All tools are imported from `glean.agent_toolkit.tools`:
 
-- `search`: Search your company's knowledge base for relevant documents and information
-- **`read_document`**: Read full content of a specific document by ID or URL (requires
-  config settings `queryapi.getDocuments.enabled` and `queryapi.getDocuments.content.enabled`)
-- **`web_search`**: Search the public web for up-to-date external information
-- `calendar_search`: Find meetings and calendar events
-- `employee_search`: Search for employees by name, team, department, or expertise
-- `code_search`: Search your company's source code repositories
-- `gmail_search`: Search Gmail messages and conversations
-- `outlook_search`: Search Outlook mail and calendar items
+```python
+from glean.agent_toolkit.tools import search, employee_search, calendar_search
+```
+
+| Tool               | Import name         | Description                                               |
+| ------------------ | ------------------- | --------------------------------------------------------- |
+| Search             | `search`            | Search your company's knowledge base                      |
+| Read Document      | `read_document`     | Read full document content by ID or URL *                 |
+| Web Search         | `web_search`        | Search the public web for external information            |
+| Calendar Search    | `calendar_search`   | Find meetings and calendar events                         |
+| Employee Search    | `employee_search`   | Search employees by name, team, department, or expertise  |
+| Code Search        | `code_search`       | Search your company's source code repositories            |
+| Gmail Search       | `gmail_search`      | Search Gmail messages and conversations                   |
+| Outlook Search     | `outlook_search`    | Search Outlook mail and calendar items                    |
+
+\* `read_document` requires config settings `queryapi.getDocuments.enabled` and `queryapi.getDocuments.content.enabled`.
+
+Each tool object exposes adapter methods you call to convert it for your framework:
+
+| Method                | Required extra | Returns                   |
+| --------------------- | -------------- | ------------------------- |
+| `tool.as_openai_tool()`   | `openai`       | OpenAI function schema    |
+| `tool.as_langchain_tool()` | `langchain`    | LangChain `Tool`          |
+| `tool.as_crewai_tool()`   | `crewai`       | CrewAI `Tool`             |
+| `tool.as_adk_tool()`      | `adk`          | Google ADK `Tool`         |
 
 ### Web Research with Context
 
