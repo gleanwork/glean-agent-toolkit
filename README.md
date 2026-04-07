@@ -281,6 +281,8 @@ print(f"Search results: {result.final_output}")
 ```python snippet=readme/snippet-04.py
 import os
 
+# NOTE: AgentExecutor requires the full `langchain` package (not just langchain-core).
+# Install with: pip install langchain
 from langchain.agents import AgentExecutor, create_react_agent
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_openai import ChatOpenAI
