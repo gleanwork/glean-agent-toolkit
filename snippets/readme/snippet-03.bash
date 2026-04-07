@@ -1,1 +1,1 @@
-pip install glean-agent-toolkit[all]
+pip install "glean-agent-toolkit[all]"
