@@ -2,6 +2,7 @@
 
 import functools
 import inspect
+import types
 from collections.abc import Callable
 from typing import Annotated, Any, Protocol, TypedDict, TypeVar, Union, cast, get_args, get_origin
 
@@ -73,11 +74,16 @@ def _is_context_param(param: inspect.Parameter) -> bool:
 
     # Handle string annotations (from __future__ annotations)
     if isinstance(ann, str):
-        return "GleanContext" in ann
+        return (
+            ann == "GleanContext"
+            or ann.endswith(".GleanContext")
+            or "GleanContext |" in ann
+            or "| GleanContext" in ann
+        )
 
     # Handle union types like GleanContext | None
     origin = get_origin(ann)
-    if origin is Union:
+    if origin is Union or isinstance(ann, types.UnionType):
         args = get_args(ann)
         return any(getattr(a, "__name__", "") == "GleanContext" for a in args)
 

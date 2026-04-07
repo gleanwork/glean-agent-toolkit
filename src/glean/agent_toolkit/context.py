@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-from typing import Any
 
 from glean.api_client import Glean
 from glean.api_client.utils import BackoffStrategy, RetryConfig
@@ -87,16 +86,20 @@ class GleanContext:
             raise ValueError("GLEAN_API_TOKEN environment variable is required")
 
         if server_url:
-            return Glean(
+            client = Glean(
                 api_token=api_token,
                 server_url=server_url,
                 retry_config=_build_retry_config(),
             )
+            self._client = client
+            return client
         elif instance:
-            return Glean(
+            client = Glean(
                 api_token=api_token,
                 instance=instance,
                 retry_config=_build_retry_config(),
             )
+            self._client = client
+            return client
         else:
             raise ValueError("GLEAN_SERVER_URL or GLEAN_INSTANCE environment variable is required")
