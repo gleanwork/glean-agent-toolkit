@@ -37,8 +37,14 @@ def configure(
 
 def api_client() -> Glean:
     """Get the Glean API client."""
-    api_token = _config["api_token"] or os.getenv("GLEAN_API_TOKEN")
-    server_url = _config["server_url"] or os.getenv("GLEAN_SERVER_URL")
+    api_token = (
+        _config["api_token"] if _config["api_token"] is not None else os.getenv("GLEAN_API_TOKEN")
+    )
+    server_url = (
+        _config["server_url"]
+        if _config["server_url"] is not None
+        else os.getenv("GLEAN_SERVER_URL")
+    )
     # GLEAN_INSTANCE is deprecated/legacy — prefer GLEAN_SERVER_URL
     instance = os.getenv("GLEAN_INSTANCE")
 

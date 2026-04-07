@@ -67,14 +67,20 @@ def get_tools(
     if include is not None and exclude is not None:
         raise ValueError("Cannot specify both 'include' and 'exclude'")
 
-    adapter_method = {
-        "openai": "as_openai_tool",
-        "langchain": "as_langchain_tool",
-        "crewai": "as_crewai_tool",
-        "adk": "as_adk_tool",
-    }.get(framework)
+    from glean.agent_toolkit.adapters.adk import ADKAdapter
+    from glean.agent_toolkit.adapters.crewai import CrewAIAdapter
+    from glean.agent_toolkit.adapters.langchain import LangChainAdapter
+    from glean.agent_toolkit.adapters.openai import OpenAIAdapter
 
-    if adapter_method is None:
+    adapter_classes: dict[str, type] = {
+        "openai": OpenAIAdapter,
+        "langchain": LangChainAdapter,
+        "crewai": CrewAIAdapter,
+        "adk": ADKAdapter,
+    }
+
+    adapter_cls = adapter_classes.get(framework)
+    if adapter_cls is None:
         raise ValueError(
             f"Unknown framework {framework!r}. Choose from: openai, langchain, crewai, adk"
         )
@@ -93,21 +99,6 @@ def get_tools(
 
     result: list[Any] = []
     for spec in specs:
-        # Each ToolSpec is wrapped by the @tool_spec decorator which attaches
-        # as_<framework>_tool() helpers.  The adapters are also accessible via
-        # the adapter classes directly.
-        from glean.agent_toolkit.adapters.adk import ADKAdapter
-        from glean.agent_toolkit.adapters.crewai import CrewAIAdapter
-        from glean.agent_toolkit.adapters.langchain import LangChainAdapter
-        from glean.agent_toolkit.adapters.openai import OpenAIAdapter
-
-        adapter_cls: type = {
-            "openai": OpenAIAdapter,
-            "langchain": LangChainAdapter,
-            "crewai": CrewAIAdapter,
-            "adk": ADKAdapter,
-        }[framework]
-
         adapter = adapter_cls(spec)
         result.append(adapter.to_tool())
 
