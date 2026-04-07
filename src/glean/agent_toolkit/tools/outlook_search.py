@@ -7,7 +7,7 @@ from typing import Annotated, Any
 from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import convert_to_tool_params, run_tool
+from glean.agent_toolkit.tools._common import ToolResult, convert_to_tool_params, run_tool
 
 
 @tool_spec(
@@ -37,7 +37,7 @@ def outlook_search(
             ],
         ),
     ],
-) -> dict[str, Any]:
+) -> ToolResult:
     """Search Outlook messages based on the query.
 
     Args:
