@@ -1,0 +1,35 @@
+interactions:
+- request:
+    body: '{"name":"Glean Search","parameters":{"query":{"name":"query","value":"support
+      tickets"},"datasource":{"name":"datasource","value":"zendesk"}}}'
+    headers:
+      accept:
+      - application/json
+      accept-encoding:
+      - gzip, deflate, zstd
+      connection:
+      - keep-alive
+      content-length:
+      - '139'
+      content-type:
+      - application/json
+      host:
+      - test-instance-be.glean.com
+    method: POST
+    uri: https://test-instance-be.glean.com/rest/api/v1/tools/call
+  response:
+    body:
+      string: "{\"rawResponse\":{\"result\":\"{\\\"searchResponse\\\":{\\\"documents\\\":[{\\\"id\\\":\\\"zendesk_12345\\\",\\\"trackingToken\\\":\\\"SEARCH_abc123\\\",\\\"documentDebugInfo\\\":{},\\\"title\\\":\\\"Support ticket: Login issues\\\",\\\"datasource\\\":\\\"zendesk\\\",\\\"url\\\":\\\"https://support.example.com/tickets/12345\\\",\\\"snippets\\\":[{\\\"source\\\":\\\"SEARCH_RESULT_SNIPPET\\\",\\\"snippet\\\":\\\"Customer reported login issues after password reset\\\"}],\\\"updateTime\\\":\\\"2025-06-03\\\"}]}}\"}}"
+    headers:
+      Cache-Control:
+      - no-cache, no-store, must-revalidate
+      Content-Type:
+      - application/json
+      Date:
+      - Thu, 05 Jun 2025 01:49:03 GMT
+      Transfer-Encoding:
+      - chunked
+    status:
+      code: 200
+      message: OK
+version: 1

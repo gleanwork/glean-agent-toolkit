@@ -40,11 +40,26 @@ def search(
             ],
         ),
     ],
+    datasource: Annotated[
+        str | None,
+        Field(
+            default=None,
+            description=(
+                "Filter results to a specific datasource (e.g., 'confluence', "
+                "'jira', 'zendesk', 'salesforce', 'slack', 'gmail'). "
+                "Leave empty to search all sources."
+            ),
+        ),
+    ] = None,
 ) -> dict[str, Any]:
     """Search Glean for relevant documents using the query.
 
     Args:
         query: Search query with optional filters - API will validate filter syntax
+        datasource: Optional datasource name to restrict results to a single source
     """
-    parameters = convert_to_tool_params(query=query)
+    params: dict[str, Any] = {"query": query}
+    if datasource is not None:
+        params["datasource"] = datasource
+    parameters = convert_to_tool_params(**params)
     return run_tool("Glean Search", parameters)
