@@ -7,7 +7,12 @@ from typing import TYPE_CHECKING, Annotated, Any
 from pydantic import BaseModel, Field
 
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import ToolResult, make_error, make_ok, serialize_tool_result
+from glean.agent_toolkit.tools._common import (
+    ToolResult,
+    make_error,
+    run_with_error_handling,
+    serialize_tool_result,
+)
 
 if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
@@ -90,18 +95,13 @@ def glean_chat(
     ctx = ctx or GleanContext()
     client = ctx.get_client()
 
-    try:
+    def _do_chat() -> dict[str, Any]:
         with client as g_client:
             response = g_client.client.chat.create(
                 messages=[{"fragments": [{"text": message}]}],
             )
-
         answer = _extract_answer(response)
         sources = _extract_sources(response)
-        chat_result = ChatResult(answer=answer, sources=sources)
-        return make_ok(chat_result.model_dump())
-    except Exception as e:
-        from glean.agent_toolkit.tools._common import _classify_error
+        return ChatResult(answer=answer, sources=sources).model_dump()
 
-        error_type, suggested_action = _classify_error(e)
-        return make_error(str(e), error_type, suggested_action)
+    return run_with_error_handling(_do_chat)

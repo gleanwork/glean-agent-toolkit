@@ -4,12 +4,11 @@ from __future__ import annotations
 
 import functools
 import json
-from datetime import date, datetime
-from typing import TYPE_CHECKING, Any, TypeAlias, Union, cast
+from typing import TYPE_CHECKING, Any, TypeAlias, cast
 
 from pydantic import BaseModel
 
-from glean.agent_toolkit.adapters.base import BaseAdapter
+from glean.agent_toolkit.adapters.base import BaseAdapter, get_field_type
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
@@ -147,7 +146,7 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
         field_defs: dict[str, tuple[type, Any]] = {}
 
         for name, schema in props.items():
-            field_type = self._get_field_type(schema)
+            field_type = get_field_type(schema, use_date_types=True)
             is_required = name in required
 
             description = schema.get("description", "")
@@ -159,37 +158,3 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
 
         model = create_model(f"{self.tool_spec.name}Schema", **field_defs)  # type: ignore
         return cast(type[BaseModel], model)
-
-    def _get_field_type(self, schema: dict[str, Any]) -> type:
-        """Determine the Python type from JSON schema property.
-
-        Args:
-            schema: JSON schema property definition
-
-        Returns:
-            Appropriate Python type
-        """
-        if "enum" in schema:
-            return str
-
-        schema_type = schema.get("type", "string")
-        schema_format = schema.get("format", "")
-
-        if schema_type == "string":
-            if schema_format == "date-time":
-                return datetime
-            elif schema_format == "date":
-                return date
-            return str
-        elif schema_type == "integer":
-            return int
-        elif schema_type == "number":
-            return float
-        elif schema_type == "boolean":
-            return bool
-        elif schema_type == "array":
-            return list
-        elif schema_type == "object":
-            return dict
-        else:
-            return str

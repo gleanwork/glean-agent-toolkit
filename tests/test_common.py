@@ -1,93 +1,11 @@
 import os
-from unittest import mock
 from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 
 from glean.agent_toolkit.context import GleanContext
-from glean.agent_toolkit.tools._common import api_client, run_tool
+from glean.agent_toolkit.tools._common import run_tool
 from glean.api_client import models
-
-
-class TestApiClient:
-    """Test legacy api_client function."""
-
-    def test_api_client_with_server_url(self) -> None:
-        with patch.dict(os.environ, {
-            "GLEAN_API_TOKEN": "test-token",
-            "GLEAN_SERVER_URL": "https://example-be.glean.com",
-        }, clear=True):
-            with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
-                api_client()
-                mock_glean.assert_called_once_with(
-                    api_token="test-token",
-                    server_url="https://example-be.glean.com",
-                    retry_config=ANY,
-                )
-
-    def test_api_client_with_instance(self) -> None:
-        with patch.dict(os.environ, {
-            "GLEAN_API_TOKEN": "test-token",
-            "GLEAN_INSTANCE": "test-instance",
-        }, clear=True):
-            with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
-                api_client()
-                mock_glean.assert_called_once_with(
-                    api_token="test-token",
-                    instance="test-instance",
-                    retry_config=ANY,
-                )
-
-    def test_api_client_server_url_takes_precedence(self) -> None:
-        with patch.dict(os.environ, {
-            "GLEAN_API_TOKEN": "test-token",
-            "GLEAN_SERVER_URL": "https://example-be.glean.com",
-            "GLEAN_INSTANCE": "test-instance",
-        }, clear=True):
-            with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
-                api_client()
-                mock_glean.assert_called_once_with(
-                    api_token="test-token",
-                    server_url="https://example-be.glean.com",
-                    retry_config=ANY,
-                )
-
-    def test_api_client_missing_token(self) -> None:
-        with patch.dict(os.environ, {"GLEAN_INSTANCE": "test-instance"}, clear=True):
-            with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
-                api_client()
-
-    def test_api_client_missing_server_url_and_instance(self) -> None:
-        with patch.dict(os.environ, {"GLEAN_API_TOKEN": "test-token"}, clear=True):
-            with pytest.raises(ValueError, match="GLEAN_SERVER_URL or GLEAN_INSTANCE"):
-                api_client()
-
-    def test_api_client_missing_all(self) -> None:
-        with patch.dict(os.environ, {}, clear=True):
-            with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
-                api_client()
-
-    def test_api_client_empty_token(self) -> None:
-        with patch.dict(os.environ, {
-            "GLEAN_API_TOKEN": "",
-            "GLEAN_INSTANCE": "test-instance"
-        }, clear=True):
-            with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
-                api_client()
-
-    def test_api_client_empty_server_url_falls_back_to_instance(self) -> None:
-        with patch.dict(os.environ, {
-            "GLEAN_API_TOKEN": "test-token",
-            "GLEAN_SERVER_URL": "",
-            "GLEAN_INSTANCE": "test-instance",
-        }, clear=True):
-            with patch("glean.agent_toolkit.tools._common.Glean") as mock_glean:
-                api_client()
-                mock_glean.assert_called_once_with(
-                    api_token="test-token",
-                    instance="test-instance",
-                    retry_config=ANY,
-                )
 
 
 class TestGleanContext:

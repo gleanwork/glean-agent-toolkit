@@ -8,7 +8,7 @@ from pydantic import Field
 
 import glean.agent_toolkit.tools._common as common
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import ToolResult, _classify_error, make_error, make_ok
+from glean.agent_toolkit.tools._common import ToolResult, make_error, run_with_error_handling
 from glean.api_client import models
 from glean.api_client.client_documents import ClientDocuments
 
@@ -70,7 +70,7 @@ def read_document(
     ctx = ctx or GleanContext()
     client = ctx.get_client()
 
-    try:
+    def _do_read() -> Any:
         with client as g_client:
             documents_client: ClientDocuments = g_client.client.documents
 
@@ -92,7 +92,6 @@ def read_document(
             retrieve_fn = resolve_method(documents_client, "retrieve", "get")
             result = retrieve_fn(request=request)
 
-        return make_ok(common.serialize_tool_result(result))
-    except Exception as e:
-        error_type, suggested_action = _classify_error(e)
-        return make_error(str(e), error_type, suggested_action)
+        return common.serialize_tool_result(result)
+
+    return run_with_error_handling(_do_read)
