@@ -24,7 +24,6 @@ def test_employee_search_success() -> None:
 
     result = employee_search(ctx, query="John Smith engineering manager")
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["result"] == mock_result
     assert result["error"] is None
@@ -39,23 +38,24 @@ def test_employee_search_api_error() -> None:
 
     result = employee_search(ctx, query="invalid query that causes error")
 
-    assert result is not None
     assert result["status"] == "error"
     assert result["result"] is None
 
 
-@pytest.mark.parametrize("query", [
-    "Sarah Johnson product manager",
-    "data scientist machine learning",
-    "frontend developer React",
-    "security engineer DevOps",
-    "UX designer mobile apps",
-])
+@pytest.mark.parametrize(
+    "query",
+    [
+        "Sarah Johnson product manager",
+        "data scientist machine learning",
+        "frontend developer React",
+        "security engineer DevOps",
+        "UX designer mobile apps",
+    ],
+)
 def test_employee_search_various_queries(query: str) -> None:
     ctx = _make_ctx()
 
     result = employee_search(ctx, query=query)
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["error"] is None

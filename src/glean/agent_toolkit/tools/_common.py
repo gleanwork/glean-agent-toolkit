@@ -3,11 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
+import functools
 from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel
 
 from glean.api_client import Glean, models
+
+_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=10)
 
 ErrorType = Literal["auth", "validation", "api", "timeout", "not_found", "rate_limit"]
 SuggestedAction = Literal["retry", "check_credentials", "rephrase_query"]
@@ -179,7 +183,10 @@ async def arun_tool(
     Returns:
         Structured ``ToolResult`` with status, result/error, and classification.
     """
-    return await asyncio.to_thread(run_tool, tool_display_name, parameters, client=client)
+    loop = asyncio.get_running_loop()
+    return await loop.run_in_executor(
+        _EXECUTOR, functools.partial(run_tool, tool_display_name, parameters, client=client)
+    )
 
 
 def serialize_tool_result(value: Any) -> Any:

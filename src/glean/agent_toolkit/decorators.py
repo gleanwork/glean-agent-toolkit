@@ -3,9 +3,11 @@
 from __future__ import annotations
 
 import asyncio
+import concurrent.futures
 import functools
 import inspect
 import types
+import typing
 from collections.abc import Callable
 from typing import Annotated, Any, Protocol, TypedDict, TypeVar, Union, cast, get_args, get_origin
 
@@ -15,21 +17,40 @@ from pydantic.fields import FieldInfo
 from glean.agent_toolkit.registry import get_registry
 from glean.agent_toolkit.spec import ToolSpec
 
+_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=10)
 
-def _is_context_param(param: inspect.Parameter) -> bool:
+
+def _is_context_param(param: inspect.Parameter, func: Callable | None = None) -> bool:
     """Return ``True`` if *param* is a ``GleanContext`` annotation.
 
-    Handles:
-    - Direct class reference (``GleanContext``)
-    - ``GleanContext | None`` via ``types.UnionType`` (Python 3.10+)
-    - ``Optional[GleanContext]`` via ``typing.Union``
-    - String annotations from ``from __future__ import annotations``
+    Uses :func:`typing.get_type_hints` to robustly resolve string
+    annotations (e.g. from ``from __future__ import annotations``).
+    Falls back to substring matching only when resolution fails.
     """
-    ann = param.annotation
-    if ann is inspect.Parameter.empty:
+    from glean.agent_toolkit.context import GleanContext
+
+    if param.annotation is inspect.Parameter.empty:
         return False
 
-    # String annotation (from __future__ import annotations)
+    # Prefer resolved type hints when a function reference is available
+    if func is not None:
+        try:
+            hints = typing.get_type_hints(func)
+            ann = hints.get(param.name)
+            if ann is not None:
+                if ann is GleanContext:
+                    return True
+                origin = get_origin(ann)
+                args = get_args(ann)
+                if origin is Union or isinstance(ann, types.UnionType):
+                    return any(a is GleanContext for a in args)
+                return False
+        except Exception:
+            pass  # Fall through to string/runtime matching
+
+    ann = param.annotation
+
+    # String annotation fallback
     if isinstance(ann, str):
         return (
             ann == "GleanContext"
@@ -38,17 +59,12 @@ def _is_context_param(param: inspect.Parameter) -> bool:
             or "| GleanContext" in ann
         )
 
-    # Direct class check
-    from glean.agent_toolkit.context import GleanContext
-
     if ann is GleanContext:
         return True
 
-    # types.UnionType (Python 3.10+ ``X | Y`` syntax)
     if isinstance(ann, types.UnionType):
         return any(a is GleanContext for a in ann.__args__)
 
-    # typing.Union / typing.Optional
     if get_origin(ann) is Union:
         return any(a is GleanContext for a in get_args(ann))
 
@@ -103,11 +119,14 @@ def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
     return param_type, None
 
 
-def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any]:
+def _create_pydantic_input_schema(
+    signature: inspect.Signature, func: Callable | None = None
+) -> dict[str, Any]:
     """Create a JSON schema using Pydantic's TypeAdapter for all parameters.
 
     Args:
         signature: Function signature to analyze
+        func: The original function, used for robust annotation resolution.
 
     Returns:
         JSON schema dictionary
@@ -115,7 +134,7 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
     fields = {}
 
     for param_name, param in signature.parameters.items():
-        if _is_context_param(param):
+        if _is_context_param(param, func):
             continue
         if param.annotation == inspect.Parameter.empty:
             fields[param_name] = (str, ...)
@@ -153,7 +172,7 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
         required = []
 
         for param_name, param in signature.parameters.items():
-            if _is_context_param(param):
+            if _is_context_param(param, func):
                 continue
             if param.default is param.empty:
                 required.append(param_name)
@@ -254,7 +273,7 @@ def tool_spec(
         sig = inspect.signature(func)
 
         # Use Pydantic's schema generation instead of manual creation
-        input_schema_dict = _create_pydantic_input_schema(sig)
+        input_schema_dict = _create_pydantic_input_schema(sig, func)
         input_schema = cast(InputSchema, input_schema_dict)
 
         # Generate output schema using Pydantic when possible
@@ -289,7 +308,8 @@ def tool_spec(
                     output_schema = {"type": "object"}
 
         async def _async_wrapper(*args: Any, **kwargs: Any) -> Any:
-            return await asyncio.to_thread(func, *args, **kwargs)
+            loop = asyncio.get_running_loop()
+            return await loop.run_in_executor(_EXECUTOR, functools.partial(func, *args, **kwargs))
 
         tool_spec_obj = ToolSpec(
             name=name,

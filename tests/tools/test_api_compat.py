@@ -57,7 +57,7 @@ def test_resolve_method_no_fallbacks() -> None:
 def test_get_api_client_version_returns_string() -> None:
     result = get_api_client_version()
     # glean-api-client is installed in test env
-    assert result is not None
+
     assert isinstance(result, str)
 
 

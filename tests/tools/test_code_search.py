@@ -24,7 +24,6 @@ def test_code_search_success() -> None:
 
     result = code_search(ctx, query="function authenticate user")
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["result"] == mock_result
     assert result["error"] is None
@@ -39,24 +38,25 @@ def test_code_search_api_error() -> None:
 
     result = code_search(ctx, query="invalid query that causes error")
 
-    assert result is not None
     assert result["status"] == "error"
     assert result["result"] is None
 
 
-@pytest.mark.parametrize("query", [
-    "class UserManager",
-    "function login validation",
-    "API endpoint security",
-    "database connection pool",
-    "error handling middleware",
-])
+@pytest.mark.parametrize(
+    "query",
+    [
+        "class UserManager",
+        "function login validation",
+        "API endpoint security",
+        "database connection pool",
+        "error handling middleware",
+    ],
+)
 def test_code_search_various_queries(query: str) -> None:
     ctx = _make_ctx()
 
     result = code_search(ctx, query=query)
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["error"] is None
 
@@ -66,5 +66,4 @@ def test_code_search_empty_query() -> None:
 
     result = code_search(ctx, query="")
 
-    assert result is not None
     assert result["status"] == "ok"
