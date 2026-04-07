@@ -14,16 +14,15 @@ if TYPE_CHECKING:
 
 
 @tool_spec(
-    name="code_search",
+    name="glean_code_search",
     description=(
-        "Searches over all code changes made in the company.\n"
+        "Search internal code repositories for functions, classes, files, and commits. "
+        "Use this for questions about the company's codebase. "
+        "Returns matching code snippets and file references.\n"
         "INSTRUCTIONS:\n"
-        "- Use this tool to help users find information in or about code, add new code, etc. "
-        "Prefer including code snippets in your response.\n"
-        "- This is your primary tool to access knowledge present in the company's code "
-        "repositories.\n"
-        "- The results returned are not exhaustive; we only return the top few most relevant "
-        "results to a query."
+        "- Primary tool for internal code knowledge.\n"
+        "- Prefer including code snippets in your response.\n"
+        "- Returns top relevant results, not exhaustive."
     ),
 )
 def code_search(

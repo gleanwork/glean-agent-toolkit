@@ -122,10 +122,10 @@ root_agent = Agent(
     instruction="""You are a helpful company assistant that helps employees find information,
     people, and resources within the organization. You have access to:
 
-    - Company knowledge base and documents (use search)
-    - Employee directory and contact information (use employee_search)
-    - Calendar and meeting information (use calendar_search)
-    - Email search capabilities (use gmail_search)
+    - Company knowledge base and documents (use glean_search)
+    - Employee directory and contact information (use glean_employee_search)
+    - Calendar and meeting information (use glean_calendar_search)
+    - Email search capabilities (use glean_gmail_search)
 
     Always be helpful, professional, and respect privacy. When searching for people,
     only share appropriate business contact information.""",
@@ -184,15 +184,15 @@ This type of assistant can dramatically improve employee productivity by making 
 
 The toolkit comes with a suite of production-ready tools that connect to various Glean functionalities:
 
-- `search`: Search your company's knowledge base for relevant documents and information
-- **`read_document`**: Read full content of a specific document by ID or URL (requires
+- `glean_search`: Search your company's knowledge base for relevant documents and information
+- **`glean_read_document`**: Read full content of a specific document by ID or URL (requires
   config settings `queryapi.getDocuments.enabled` and `queryapi.getDocuments.content.enabled`)
-- **`web_search`**: Search the public web for up-to-date external information
-- `calendar_search`: Find meetings and calendar events
-- `employee_search`: Search for employees by name, team, department, or expertise
-- `code_search`: Search your company's source code repositories
-- `gmail_search`: Search Gmail messages and conversations
-- `outlook_search`: Search Outlook mail and calendar items
+- **`glean_web_search`**: Search the public web for up-to-date external information
+- `glean_calendar_search`: Find meetings and calendar events
+- `glean_employee_search`: Search for employees by name, team, department, or expertise
+- `glean_code_search`: Search your company's source code repositories
+- `glean_gmail_search`: Search Gmail messages and conversations
+- `glean_outlook_search`: Search Outlook mail and calendar items
 
 ### Web Research with Context
 

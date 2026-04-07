@@ -14,15 +14,15 @@ if TYPE_CHECKING:
 
 
 @tool_spec(
-    name="search",
+    name="glean_search",
     description=(
-        "Finds relevant documents in the company.\n"
+        "Search internal company documents, wikis, tickets, and knowledge bases. "
+        "Use this instead of web_search when looking for internal/company information. "
+        "Returns the top matching documents.\n"
         "INSTRUCTIONS:\n"
-        "- This is your primary tool to access all knowledge within the company.\n"
-        "- The results returned are not exhaustive; we only return the top few most relevant "
-        "documents to a query.\n"
-        '- For analytics questions such as "how many documents..." use the "statistics" '
-        "field in the output."
+        "- Primary tool for all internal company knowledge.\n"
+        "- Returns top relevant results, not exhaustive.\n"
+        '- For count queries ("how many..."), use the "statistics" field in the output.'
     ),
 )
 def search(

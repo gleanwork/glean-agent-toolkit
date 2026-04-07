@@ -14,14 +14,15 @@ if TYPE_CHECKING:
 
 
 @tool_spec(
-    name="calendar_search",
+    name="glean_calendar_search",
     description=(
-        "Searches over all the calendar meetings of the company.\n"
+        "Search company calendar meetings and events. "
+        "Returns meeting details and can extract transcripts. "
+        "Use this for scheduling, meeting history, or finding past discussions.\n"
         "INSTRUCTIONS:\n"
-        "- Use this tool to find meetings, calendar events, and schedule information.\n"
-        "- The results returned are not exhaustive; we only return the top few most relevant "
-        "meetings to a query.\n"
-        "- Can extract meeting transcripts if available when searching for meeting content."
+        "- Returns top relevant meetings, not exhaustive.\n"
+        "- Supports filtering by participants, date ranges, and topics.\n"
+        "- Can extract meeting transcripts when available."
     ),
 )
 def calendar_search(

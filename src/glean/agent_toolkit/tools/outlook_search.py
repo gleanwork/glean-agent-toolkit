@@ -14,12 +14,14 @@ if TYPE_CHECKING:
 
 
 @tool_spec(
-    name="outlook_search",
+    name="glean_outlook_search",
     description=(
-        "Finds relevant emails in the user's mailbox.\n"
-        "- Only use this tool if the user asks for email.\n"
-        "- Results returned are not exhaustive; we can only return the top 10 emails sorted by "
-        "recency (most recent first)."
+        "Search Outlook emails by sender, recipient, subject, date, or content. "
+        "Use only when the user asks about email in a Microsoft/Outlook environment. "
+        "For Gmail/Google email, use glean_gmail_search instead.\n"
+        "INSTRUCTIONS:\n"
+        "- Returns up to 10 emails sorted by recency.\n"
+        "- Supports filters: from, to, importance, hasattachment, date ranges."
     ),
 )
 def outlook_search(

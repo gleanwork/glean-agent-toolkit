@@ -14,27 +14,17 @@ if TYPE_CHECKING:
 
 
 @tool_spec(
-    name="web_search",
+    name="glean_web_search",
     description=(
-        "Can search for up-to-date external information from the web. Closely evaluate the "
-        "instructions below for the user query to decide whether to use web search. If you think "
-        "the scenarios are contradictory, do not use web search unless there is clear user intent."
-        "\n"
+        "Search the public internet for external, up-to-date information. "
+        "Use this instead of glean_search when the user needs current information "
+        "outside the company (news, weather, public data, external docs).\n"
         "INSTRUCTIONS:\n"
-        "Examples of when to use this tool:\n"
-        "- User Intent: Use this tool if the user is asking you to search the web, look online, "
-        "provide links/sources, or explicitly looking for current external information (outside "
-        "of the company) like weather, news, latest updates/plans, or financial data.\n"
-        "- Freshness: Use this tool if you need up-to-date information on time-dependent topics "
-        "or any time you would otherwise refuse to answer a question because your knowledge might "
-        "be out of date.\n"
-        "- Niche Information: If the answer would likely change based on detailed information not "
-        "widely known or understood (which might be found on the internet), use web sources "
-        "directly rather than relying on the distilled knowledge from pretraining.\n"
-        "- Do NOT use this tool for programming related queries. You already know enough about "
-        "those.\n"
-        "- Do NOT use this tool for queries seeking general ideas, which may not benefit from "
-        "specific information."
+        "- Use when: user asks to search the web, needs current external info "
+        "(news, weather, financial data), or your training data may be outdated.\n"
+        "- Use for niche topics where web sources are more reliable than pretraining.\n"
+        "- Do NOT use for programming queries or general ideas.\n"
+        "- Do NOT use for internal company information (use glean_search instead)."
     ),
 )
 def web_search(

@@ -35,7 +35,7 @@ class _FallbackAdkFunctionTool:
     func: Callable[..., Any]
     schema: dict[str, Any] | None
 
-    def __init__(self, func: Callable[..., Any]) -> None:  # noqa: D401 – keep signature minimal
+    def __init__(self, func: Callable[..., Any]) -> None:  # noqa: ANN101, D401
         self.func = func
         self.name = func.__name__
         self.description = func.__doc__
@@ -58,6 +58,7 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
     """Adapter for Google ADK tools."""
 
     def __init__(self, tool_spec: ToolSpec, ctx: GleanContext | None = None) -> None:
+    def __init__(self, tool_spec: ToolSpec) -> None:  # noqa: ANN101
         """Initialize the adapter.
 
         Args:
@@ -73,6 +74,7 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
             )
 
     def to_tool(self) -> AdkFunctionTool:
+    def to_tool(self) -> "AdkFunctionTool":  # noqa: ANN101
         """Convert to Google ADK FunctionTool format.
 
         Returns:
@@ -86,6 +88,7 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
 
         tool = _RuntimeAdkFunctionTool(func=func)  # type: ignore[arg-type]
 
+        tool.name = self.tool_spec.name
         setattr(tool, "schema", self.tool_spec.input_schema)
 
         return tool

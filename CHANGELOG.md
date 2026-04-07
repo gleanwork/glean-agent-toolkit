@@ -8,7 +8,7 @@
 
 ### Changed
 
-- Rename `glean_search` tool to `search` across all adapters, tests, docs, and snippets
+- Add `glean_` prefix to all tool spec names for clarity in multi-tool agent environments (`search` → `glean_search`, `employee_search` → `glean_employee_search`, etc.)
 
 ## 0.3.0 (2025-07-21)
 

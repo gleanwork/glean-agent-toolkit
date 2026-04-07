@@ -17,12 +17,13 @@ if TYPE_CHECKING:
 
 
 @tool_spec(
-    name="read_document",
+    name="glean_read_document",
     description=(
-        "Read the full content of a specific document by ID or URL.\n"
+        "Retrieve the full content of a document by its Glean ID or URL. "
+        "Use after glean_search to read a specific result in full.\n"
         "INSTRUCTIONS:\n"
-        "- Provide exactly one of document_id or url.\n"
-        "- The tool requires instance settings: queryapi.getDocuments.enabled and "
+        "- Provide exactly one of document_id or url, not both.\n"
+        "- Requires instance settings: queryapi.getDocuments.enabled and "
         "queryapi.getDocuments.content.enabled."
     ),
 )
