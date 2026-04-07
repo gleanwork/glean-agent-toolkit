@@ -1,30 +1,47 @@
+"""Tests for the Web Search tool."""
+
+from unittest.mock import MagicMock
+
 import pytest
 
+from glean.agent_toolkit.context import GleanContext
 from glean.agent_toolkit.tools.web_search import web_search
 
 
-def test_web_search_success(vcr_cassette):
-    """Test successful Web Search tool execution with VCR recording/replay."""
-    query_text = "Python programming best practices"
-
-    result = web_search(query=query_text)
-
-    assert result is not None
-    assert "result" in result
-    assert result.get("error") is None
-
-    if result["result"] and hasattr(result["result"], "result"):
-        response_data = result["result"].result
-        assert response_data is not None
+def _make_ctx(return_value: object = None) -> GleanContext:
+    mock_client = MagicMock()
+    mock_client.__enter__ = MagicMock(return_value=mock_client)
+    mock_client.__exit__ = MagicMock(return_value=False)
+    mock_client.client.tools.run.return_value = (
+        return_value if return_value is not None else {"data": "mock"}
+    )
+    return GleanContext(client=mock_client)
 
 
-def test_web_search_api_error(vcr_cassette):
-    """Test Web Search tool with API error response."""
-    query_text = "invalid query that causes error"
+def test_web_search_success() -> None:
+    mock_result = {"data": "mock"}
+    ctx = _make_ctx(mock_result)
 
-    result = web_search(query=query_text)
+    result = web_search(ctx, query="Python programming best practices")
 
     assert result is not None
+    assert result["status"] == "ok"
+    assert result["result"] == mock_result
+    assert result["error"] is None
+
+
+def test_web_search_api_error() -> None:
+    mock_client = MagicMock()
+    mock_client.__enter__ = MagicMock(return_value=mock_client)
+    mock_client.__exit__ = MagicMock(return_value=False)
+    mock_client.client.tools.run.side_effect = Exception("API Error")
+    ctx = GleanContext(client=mock_client)
+
+    result = web_search(ctx, query="invalid query that causes error")
+
+    assert result is not None
+    assert result["status"] == "error"
+    assert result["result"] is None
 
 
 @pytest.mark.parametrize("query", [
@@ -34,36 +51,11 @@ def test_web_search_api_error(vcr_cassette):
     "database optimization techniques",
     "mobile app development",
 ])
-def test_web_search_various_queries(vcr_cassette, query: str):
-    """Test Web Search tool with various technical queries."""
-    result = web_search(query=query)
+def test_web_search_various_queries(query: str) -> None:
+    ctx = _make_ctx()
+
+    result = web_search(ctx, query=query)
 
     assert result is not None
-    assert "result" in result
-
-
-def test_web_search_specific_domain(vcr_cassette):
-    """Test Web Search tool with domain-specific search."""
-    query_text = "site:stackoverflow.com Python async programming"
-
-    result = web_search(query=query_text)
-
-    assert result is not None
-
-
-def test_web_search_news_query(vcr_cassette):
-    """Test Web Search tool with news-related query."""
-    query_text = "latest technology news 2025"
-
-    result = web_search(query=query_text)
-
-    assert result is not None
-
-
-def test_web_search_no_results(vcr_cassette):
-    """Test Web Search tool when no relevant results are found."""
-    query_text = "extremely specific nonexistent query xyz123abc"
-
-    result = web_search(query=query_text)
-
-    assert result is not None
+    assert result["status"] == "ok"
+    assert result["error"] is None

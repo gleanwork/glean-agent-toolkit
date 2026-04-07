@@ -1,18 +1,18 @@
 import os
 from unittest import mock
-from unittest.mock import ANY, patch
+from unittest.mock import ANY, MagicMock, patch
 
 import pytest
 
+from glean.agent_toolkit.context import GleanContext
 from glean.agent_toolkit.tools._common import api_client, run_tool
 from glean.api_client import models
 
 
 class TestApiClient:
-    """Test api_client function."""
+    """Test legacy api_client function."""
 
     def test_api_client_with_server_url(self) -> None:
-        """Test API client creation with GLEAN_SERVER_URL."""
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "test-token",
             "GLEAN_SERVER_URL": "https://example-be.glean.com",
@@ -26,7 +26,6 @@ class TestApiClient:
                 )
 
     def test_api_client_with_instance(self) -> None:
-        """Test API client creation with GLEAN_INSTANCE."""
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "test-token",
             "GLEAN_INSTANCE": "test-instance",
@@ -40,7 +39,6 @@ class TestApiClient:
                 )
 
     def test_api_client_server_url_takes_precedence(self) -> None:
-        """Test that GLEAN_SERVER_URL takes precedence over GLEAN_INSTANCE."""
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "test-token",
             "GLEAN_SERVER_URL": "https://example-be.glean.com",
@@ -55,25 +53,21 @@ class TestApiClient:
                 )
 
     def test_api_client_missing_token(self) -> None:
-        """Test API client creation with missing token."""
         with patch.dict(os.environ, {"GLEAN_INSTANCE": "test-instance"}, clear=True):
             with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
                 api_client()
 
     def test_api_client_missing_server_url_and_instance(self) -> None:
-        """Test API client creation with missing server URL and instance."""
         with patch.dict(os.environ, {"GLEAN_API_TOKEN": "test-token"}, clear=True):
             with pytest.raises(ValueError, match="GLEAN_SERVER_URL or GLEAN_INSTANCE"):
                 api_client()
 
     def test_api_client_missing_all(self) -> None:
-        """Test API client creation with missing credentials."""
         with patch.dict(os.environ, {}, clear=True):
             with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
                 api_client()
 
     def test_api_client_empty_token(self) -> None:
-        """Test API client creation with empty token."""
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "",
             "GLEAN_INSTANCE": "test-instance"
@@ -82,7 +76,6 @@ class TestApiClient:
                 api_client()
 
     def test_api_client_empty_server_url_falls_back_to_instance(self) -> None:
-        """Test that empty GLEAN_SERVER_URL falls back to GLEAN_INSTANCE."""
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "test-token",
             "GLEAN_SERVER_URL": "",
@@ -97,153 +90,176 @@ class TestApiClient:
                 )
 
 
+class TestGleanContext:
+    """Test GleanContext constructor and get_client."""
+
+    def test_injected_client_returned_directly(self) -> None:
+        mock_client = MagicMock()
+        ctx = GleanContext(client=mock_client)
+        assert ctx.get_client() is mock_client
+
+    def test_client_cached_after_creation(self) -> None:
+        with patch.dict(os.environ, {
+            "GLEAN_API_TOKEN": "tok",
+            "GLEAN_SERVER_URL": "https://example-be.glean.com",
+        }, clear=True):
+            with patch("glean.agent_toolkit.context.Glean") as mock_glean:
+                ctx = GleanContext()
+                c1 = ctx.get_client()
+                c2 = ctx.get_client()
+                assert c1 is c2
+                mock_glean.assert_called_once()
+
+    def test_explicit_params_override_env(self) -> None:
+        with patch.dict(os.environ, {
+            "GLEAN_API_TOKEN": "env-token",
+            "GLEAN_SERVER_URL": "https://env.glean.com",
+        }, clear=True):
+            with patch("glean.agent_toolkit.context.Glean") as mock_glean:
+                ctx = GleanContext(
+                    api_token="explicit-token",
+                    server_url="https://explicit.glean.com",
+                )
+                ctx.get_client()
+                mock_glean.assert_called_once_with(
+                    api_token="explicit-token",
+                    server_url="https://explicit.glean.com",
+                    retry_config=ANY,
+                )
+
+    def test_missing_token_raises(self) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            ctx = GleanContext()
+            with pytest.raises(ValueError, match="GLEAN_API_TOKEN"):
+                ctx.get_client()
+
+    def test_missing_server_url_and_instance_raises(self) -> None:
+        with patch.dict(os.environ, {"GLEAN_API_TOKEN": "tok"}, clear=True):
+            ctx = GleanContext()
+            with pytest.raises(ValueError, match="GLEAN_SERVER_URL or GLEAN_INSTANCE"):
+                ctx.get_client()
+
+    def test_instance_fallback(self) -> None:
+        with patch.dict(os.environ, {
+            "GLEAN_API_TOKEN": "tok",
+            "GLEAN_INSTANCE": "my-inst",
+        }, clear=True):
+            with patch("glean.agent_toolkit.context.Glean") as mock_glean:
+                ctx = GleanContext()
+                ctx.get_client()
+                mock_glean.assert_called_once_with(
+                    api_token="tok",
+                    instance="my-inst",
+                    retry_config=ANY,
+                )
+
+
 class TestRunTool:
-    """Test run_tool function."""
+    """Test run_tool function with injected client."""
+
+    @staticmethod
+    def _mock_client(return_value=None, side_effect=None) -> MagicMock:
+        client = MagicMock()
+        client.__enter__ = MagicMock(return_value=client)
+        client.__exit__ = MagicMock(return_value=False)
+        if side_effect is not None:
+            client.client.tools.run.side_effect = side_effect
+        else:
+            client.client.tools.run.return_value = return_value
+        return client
 
     def test_run_tool_success(self) -> None:
-        """Test successful tool execution."""
         mock_result = {"documents": [{"title": "Test Document"}]}
         parameters = {
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
+        client = self._mock_client(return_value=mock_result)
 
-        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-            mock_client = mock.MagicMock()
-            mock_client.client.tools.run.return_value = mock_result
-            mock_api_client.return_value.__enter__.return_value = mock_client
+        result = run_tool("Test Tool", parameters, client=client)
 
-            result = run_tool("Test Tool", parameters)
-
-            assert result["status"] == "ok"
-            assert result["result"] == mock_result
-            assert result["error"] is None
-            assert result["error_type"] is None
-            assert result["suggested_action"] is None
-            mock_client.client.tools.run.assert_called_once_with(
-                name="Test Tool",
-                parameters=parameters
-            )
+        assert result["status"] == "ok"
+        assert result["result"] == mock_result
+        assert result["error"] is None
+        assert result["error_type"] is None
+        assert result["suggested_action"] is None
+        client.client.tools.run.assert_called_once_with(
+            name="Test Tool",
+            parameters=parameters
+        )
 
     def test_run_tool_api_error(self) -> None:
-        """Test tool execution with API error."""
         parameters = {
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
+        client = self._mock_client(side_effect=Exception("API Error"))
 
-        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-            mock_client = mock.MagicMock()
-            mock_client.client.tools.run.side_effect = Exception("API Error")
-            mock_api_client.return_value.__enter__.return_value = mock_client
+        result = run_tool("Test Tool", parameters, client=client)
 
-            result = run_tool("Test Tool", parameters)
-
-            assert result["status"] == "error"
-            assert result["error"] == "API Error"
-            assert result["result"] is None
-            assert result["error_type"] == "api"
-            assert result["suggested_action"] == "retry"
-            assert mock_client.client.tools.run.call_count >= 1
+        assert result["status"] == "error"
+        assert result["error"] == "API Error"
+        assert result["result"] is None
+        assert result["error_type"] == "api"
+        assert result["suggested_action"] == "retry"
 
     def test_run_tool_connection_error(self) -> None:
-        """Test tool execution with connection error."""
         parameters = {
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
+        client = self._mock_client(side_effect=ConnectionError("Network error"))
 
-        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-            mock_client = mock.MagicMock()
-            mock_client.client.tools.run.side_effect = ConnectionError("Network error")
-            mock_api_client.return_value.__enter__.return_value = mock_client
+        result = run_tool("Test Tool", parameters, client=client)
 
-            result = run_tool("Test Tool", parameters)
-
-            assert result["status"] == "error"
-            assert result["error"] == "Network error"
-            assert result["error_type"] == "api"
-            assert result["suggested_action"] == "retry"
-            assert mock_client.client.tools.run.call_count >= 1
-
-    def test_run_tool_transient_then_success(self) -> None:
-        parameters = {
-            "query": models.ToolsCallParameter(name="query", value="test query")
-        }
-
-        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-            mock_client = mock.MagicMock()
-            mock_client.client.tools.run.side_effect = [Exception("temporary 500")]
-            mock_api_client.return_value.__enter__.return_value = mock_client
-
-            result = run_tool("Test Tool", parameters)
-
-            assert result["status"] == "error"
-            assert result["error"] == "temporary 500"
-            assert mock_client.client.tools.run.call_count == 1
+        assert result["status"] == "error"
+        assert result["error"] == "Network error"
+        assert result["error_type"] == "api"
+        assert result["suggested_action"] == "retry"
 
     def test_run_tool_empty_parameters(self) -> None:
-        """Test tool execution with empty parameters."""
         mock_result = {"status": "success"}
-        parameters = {}
+        client = self._mock_client(return_value=mock_result)
 
-        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-            mock_client = mock.MagicMock()
-            mock_client.client.tools.run.return_value = mock_result
-            mock_api_client.return_value.__enter__.return_value = mock_client
+        result = run_tool("Test Tool", {}, client=client)
 
-            result = run_tool("Test Tool", parameters)
-
-            assert result["status"] == "ok"
-            assert result["result"] == mock_result
-            mock_client.client.tools.run.assert_called_once_with(
-                name="Test Tool",
-                parameters={}
-            )
-
-    def test_run_tool_client_creation_error(self) -> None:
-        """Test tool execution when API client creation fails."""
-        parameters = {
-            "query": models.ToolsCallParameter(name="query", value="test query")
-        }
-
-        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-            mock_api_client.side_effect = ValueError("Missing credentials")
-
-            result = run_tool("Test Tool", parameters)
-
-            assert result["status"] == "error"
-            assert result["error"] == "Missing credentials"
-            assert result["error_type"] == "validation"
-            assert result["suggested_action"] == "rephrase_query"
+        assert result["status"] == "ok"
+        assert result["result"] == mock_result
+        client.client.tools.run.assert_called_once_with(
+            name="Test Tool",
+            parameters={}
+        )
 
     def test_run_tool_auth_error(self) -> None:
-        """Test tool execution with authentication error."""
         parameters = {
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
+        client = self._mock_client(side_effect=Exception("HTTP 401 Unauthorized"))
 
-        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-            mock_client = mock.MagicMock()
-            mock_client.client.tools.run.side_effect = Exception("HTTP 401 Unauthorized")
-            mock_api_client.return_value.__enter__.return_value = mock_client
+        result = run_tool("Test Tool", parameters, client=client)
 
-            result = run_tool("Test Tool", parameters)
-
-            assert result["status"] == "error"
-            assert result["error_type"] == "auth"
-            assert result["suggested_action"] == "check_credentials"
+        assert result["status"] == "error"
+        assert result["error_type"] == "auth"
+        assert result["suggested_action"] == "check_credentials"
 
     def test_run_tool_timeout_error(self) -> None:
-        """Test tool execution with timeout error."""
+        parameters = {
+            "query": models.ToolsCallParameter(name="query", value="test query")
+        }
+        client = self._mock_client(side_effect=TimeoutError("request timed out"))
+
+        result = run_tool("Test Tool", parameters, client=client)
+
+        assert result["status"] == "error"
+        assert result["error_type"] == "timeout"
+        assert result["suggested_action"] == "retry"
+
+    def test_run_tool_client_creation_error(self) -> None:
+        """Test that run_tool without client falls back to GleanContext."""
         parameters = {
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
 
-        with patch("glean.agent_toolkit.tools._common.api_client") as mock_api_client:
-            mock_client = mock.MagicMock()
-            mock_client.client.tools.run.side_effect = TimeoutError("request timed out")
-            mock_api_client.return_value.__enter__.return_value = mock_client
-
+        with patch.dict(os.environ, {}, clear=True):
             result = run_tool("Test Tool", parameters)
 
-            assert result["status"] == "error"
-            assert result["error_type"] == "timeout"
-            assert result["suggested_action"] == "retry"
+        assert result["status"] == "error"
+        assert "GLEAN_API_TOKEN" in result["error"]
+        assert result["error_type"] == "validation"

@@ -1,11 +1,17 @@
 """OpenAI adapter for converting tool specifications."""
 
+from __future__ import annotations
+
+import functools
 import json
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict, Union
 
 from glean.agent_toolkit.adapters.base import BaseAdapter
 from glean.agent_toolkit.spec import ToolSpec
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 if TYPE_CHECKING:
     from agents.tool import FunctionTool as _RealOpenAIFunctionTool
@@ -62,13 +68,14 @@ class OpenAIToolDef(TypedDict):
 class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
     """Adapter for OpenAI tools."""
 
-    def __init__(self, tool_spec: ToolSpec) -> None:
+    def __init__(self, tool_spec: ToolSpec, ctx: GleanContext | None = None) -> None:
         """Initialize the adapter.
 
         Args:
             tool_spec: The tool specification
+            ctx: Optional GleanContext to bind into tool invocations.
         """
-        super().__init__(tool_spec)
+        super().__init__(tool_spec, ctx)
         if not HAS_OPENAI:
             raise ImportError(
                 "OpenAI package is required for OpenAI adapter. "
@@ -117,6 +124,8 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
             An OpenAI Agents SDK FunctionTool
         """
         original_func = self.tool_spec.function
+        if self.ctx is not None:
+            original_func = functools.partial(original_func, self.ctx)
 
         async def on_invoke_tool(ctx: Any, input_str: str) -> str:
             """Function that invokes the tool with parameters.

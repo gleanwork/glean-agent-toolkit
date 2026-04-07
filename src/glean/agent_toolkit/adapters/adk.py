@@ -1,10 +1,16 @@
 """Google ADK adapter for converting tool specifications."""
 
+from __future__ import annotations
+
+import functools
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias
 
 from glean.agent_toolkit.adapters.base import BaseAdapter
 from glean.agent_toolkit.spec import ToolSpec
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 if TYPE_CHECKING:
     from google.adk.tools.function_tool import FunctionTool as _RealAdkFunctionTool
@@ -51,13 +57,14 @@ AdkFunctionTool: TypeAlias = _RealAdkFunctionTool | _FallbackAdkFunctionTool
 class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
     """Adapter for Google ADK tools."""
 
-    def __init__(self, tool_spec: ToolSpec) -> None:
+    def __init__(self, tool_spec: ToolSpec, ctx: GleanContext | None = None) -> None:
         """Initialize the adapter.
 
         Args:
             tool_spec: The tool specification
+            ctx: Optional GleanContext to bind into tool invocations.
         """
-        super().__init__(tool_spec)
+        super().__init__(tool_spec, ctx)
         if not HAS_ADK:
             raise ImportError(
                 "Google Agent Development Kit (ADK) is required for ADK adapter. "
@@ -65,13 +72,15 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
                 "`pip install google-adk`."
             )
 
-    def to_tool(self) -> "AdkFunctionTool":
+    def to_tool(self) -> AdkFunctionTool:
         """Convert to Google ADK FunctionTool format.
 
         Returns:
             An ADK FunctionTool instance
         """
         func = self.tool_spec.function
+        if self.ctx is not None:
+            func = functools.partial(func, self.ctx)
         if not func.__doc__:
             func.__doc__ = self.tool_spec.description
 

@@ -1,5 +1,8 @@
 """LangChain adapter for converting tool specifications."""
 
+from __future__ import annotations
+
+import functools
 import json
 from datetime import date, datetime
 from typing import TYPE_CHECKING, Any, TypeAlias, Union, cast
@@ -8,6 +11,9 @@ from pydantic import BaseModel
 
 from glean.agent_toolkit.adapters.base import BaseAdapter
 from glean.agent_toolkit.spec import ToolSpec
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 if TYPE_CHECKING:
     from langchain_core.tools import Tool as LangchainTool  # pragma: no cover
@@ -69,13 +75,14 @@ else:
 class LangChainAdapter(BaseAdapter[LangChainToolType]):
     """Adapter for LangChain tools."""
 
-    def __init__(self, tool_spec: ToolSpec) -> None:
+    def __init__(self, tool_spec: ToolSpec, ctx: GleanContext | None = None) -> None:
         """Initialize the adapter.
 
         Args:
             tool_spec: The tool specification
+            ctx: Optional GleanContext to bind into tool invocations.
         """
-        super().__init__(tool_spec)
+        super().__init__(tool_spec, ctx)
         if not HAS_LANGCHAIN:
             raise ImportError(
                 "langchain-core package is required for LangChain adapter. "
@@ -92,6 +99,8 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
             LangChain Tool instance
         """
         original_func = self.tool_spec.function
+        if self.ctx is not None:
+            original_func = functools.partial(original_func, self.ctx)
 
         def _string_wrapper(**kwargs: Any) -> str:
             result = original_func(**kwargs)

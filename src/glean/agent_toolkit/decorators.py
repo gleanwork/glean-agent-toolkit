@@ -1,15 +1,57 @@
 """Decorators for creating tool specifications."""
 
+from __future__ import annotations
+
 import functools
 import inspect
+import types
 from collections.abc import Callable
-from typing import Annotated, Any, Protocol, TypedDict, TypeVar, cast, get_args, get_origin
+from typing import Annotated, Any, Protocol, TypedDict, TypeVar, Union, cast, get_args, get_origin
 
 from pydantic import BaseModel, Field, TypeAdapter, create_model
 from pydantic.fields import FieldInfo
 
 from glean.agent_toolkit.registry import get_registry
 from glean.agent_toolkit.spec import ToolSpec
+
+
+def _is_context_param(param: inspect.Parameter) -> bool:
+    """Return ``True`` if *param* is a ``GleanContext`` annotation.
+
+    Handles:
+    - Direct class reference (``GleanContext``)
+    - ``GleanContext | None`` via ``types.UnionType`` (Python 3.10+)
+    - ``Optional[GleanContext]`` via ``typing.Union``
+    - String annotations from ``from __future__ import annotations``
+    """
+    ann = param.annotation
+    if ann is inspect.Parameter.empty:
+        return False
+
+    # String annotation (from __future__ import annotations)
+    if isinstance(ann, str):
+        return (
+            ann == "GleanContext"
+            or ann.endswith(".GleanContext")
+            or "GleanContext |" in ann
+            or "| GleanContext" in ann
+        )
+
+    # Direct class check
+    from glean.agent_toolkit.context import GleanContext
+
+    if ann is GleanContext:
+        return True
+
+    # types.UnionType (Python 3.10+ ``X | Y`` syntax)
+    if isinstance(ann, types.UnionType):
+        return any(a is GleanContext for a in ann.__args__)
+
+    # typing.Union / typing.Optional
+    if get_origin(ann) is Union:
+        return any(a is GleanContext for a in get_args(ann))
+
+    return False
 
 
 class InputSchema(TypedDict):
@@ -72,6 +114,8 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
     fields = {}
 
     for param_name, param in signature.parameters.items():
+        if _is_context_param(param):
+            continue
         if param.annotation == inspect.Parameter.empty:
             fields[param_name] = (str, ...)
         else:
@@ -108,6 +152,8 @@ def _create_pydantic_input_schema(signature: inspect.Signature) -> dict[str, Any
         required = []
 
         for param_name, param in signature.parameters.items():
+            if _is_context_param(param):
+                continue
             if param.default is param.empty:
                 required.append(param_name)
 

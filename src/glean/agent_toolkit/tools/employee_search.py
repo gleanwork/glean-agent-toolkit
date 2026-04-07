@@ -2,12 +2,15 @@
 
 from __future__ import annotations
 
-from typing import Annotated, Any
+from typing import TYPE_CHECKING, Annotated, Any
 
 from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import ToolResult, convert_to_tool_params, run_tool
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 
 @tool_spec(
@@ -30,6 +33,8 @@ from glean.agent_toolkit.tools._common import ToolResult, convert_to_tool_params
     ),
 )
 def employee_search(
+    ctx: GleanContext | None = None,
+    *,
     query: Annotated[
         str,
         Field(
@@ -51,8 +56,13 @@ def employee_search(
     """Search for employees based on the query.
 
     Args:
+        ctx: Optional Glean context for client injection.
         query: Employee search query with optional filters
         like 'roletype:manager startafter:2023-01-01'
     """
+    from glean.agent_toolkit.context import GleanContext
+
+    ctx = ctx or GleanContext()
+    client = ctx.get_client()
     parameters = convert_to_tool_params(query=query)
-    return run_tool("Employee Search", parameters)
+    return run_tool("Employee Search", parameters, client=client)

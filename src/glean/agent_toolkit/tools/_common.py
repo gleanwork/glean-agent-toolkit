@@ -171,18 +171,27 @@ def _build_retry_config() -> RetryConfig:
 def run_tool(
     tool_display_name: str,
     parameters: dict[str, models.ToolsCallParameter],
+    *,
+    client: Glean | None = None,
 ) -> ToolResult:
     """Execute a Glean stub tool and wrap the response.
 
     Args:
         tool_display_name: Display name for the tool
         parameters: Tool parameters
+        client: Optional pre-configured Glean client. When ``None``,
+            a default client is created via :class:`GleanContext`.
 
     Returns:
         Structured ``ToolResult`` with status, result/error, and classification.
     """
     try:
-        with api_client() as g_client:
+        if client is None:
+            from glean.agent_toolkit.context import GleanContext
+
+            client = GleanContext().get_client()
+
+        with client as g_client:
             result = g_client.client.tools.run(
                 name=tool_display_name,
                 parameters=parameters,
