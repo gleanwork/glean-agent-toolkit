@@ -8,8 +8,8 @@ from pydantic import Field
 
 import glean.agent_toolkit.tools._common as common
 from glean.agent_toolkit.decorators import tool_spec
+from glean.agent_toolkit.tools._compat import resolve_method
 from glean.api_client import models
-from glean.api_client.client_documents import ClientDocuments
 
 
 @tool_spec(
@@ -54,7 +54,7 @@ def read_document(
 
     try:
         with common.api_client() as g_client:
-            documents_client: ClientDocuments = g_client.client.documents
+            documents_client = g_client.client.documents
 
             include_fields = [models.GetDocumentsRequestIncludeField.DOCUMENT_CONTENT]
 
@@ -69,8 +69,11 @@ def read_document(
                     include_fields=include_fields,
                 )
 
-            result = documents_client.retrieve(request=request)
+            retrieve_fn = resolve_method(documents_client, "retrieve", "get", "fetch")
+            result = retrieve_fn(request=request)
 
         return {"result": common.serialize_tool_result(result)}
+    except AttributeError as e:
+        return {"error": f"API client compatibility error: {str(e)}", "result": None}
     except Exception as e:
         return {"error": str(e), "result": None}

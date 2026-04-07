@@ -7,8 +7,11 @@ from typing import Any
 
 from pydantic import BaseModel
 
+from glean.agent_toolkit.tools._compat import check_api_client_compatibility, resolve_method
 from glean.api_client import Glean, models
 from glean.api_client.utils import BackoffStrategy, RetryConfig
+
+check_api_client_compatibility()
 
 
 def api_client() -> Glean:
@@ -113,11 +116,14 @@ def run_tool(
     """
     try:
         with api_client() as g_client:
-            result = g_client.client.tools.run(
+            tools_run = resolve_method(g_client.client.tools, "run", "execute", "call")
+            result = tools_run(
                 name=tool_display_name,
                 parameters=parameters,
             )
         return {"result": serialize_tool_result(result)}
+    except AttributeError as e:
+        return {"error": f"API client compatibility error: {str(e)}", "result": None}
     except ValueError as e:
         return {"error": f"Parameter validation error: {str(e)}", "result": None}
     except Exception as e:
