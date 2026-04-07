@@ -58,7 +58,6 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
     """Adapter for Google ADK tools."""
 
     def __init__(self, tool_spec: ToolSpec, ctx: GleanContext | None = None) -> None:
-    def __init__(self, tool_spec: ToolSpec) -> None:  # noqa: ANN101
         """Initialize the adapter.
 
         Args:
@@ -74,7 +73,6 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
             )
 
     def to_tool(self) -> AdkFunctionTool:
-    def to_tool(self) -> "AdkFunctionTool":  # noqa: ANN101
         """Convert to Google ADK FunctionTool format.
 
         Returns:
