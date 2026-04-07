@@ -9,7 +9,7 @@ from glean.agent_toolkit.adapters.base import BaseAdapter
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
-    from langchain.tools import Tool as LangchainTool  # pragma: no cover
+    from langchain_core.tools import Tool as LangchainTool  # pragma: no cover
 else:
     LangchainTool = Any  # type: ignore  # noqa: N816
 
@@ -44,7 +44,7 @@ def _fallback_pydantic_create_model(*args: Any, **kwargs: Any) -> Any:
 
 
 try:
-    from langchain.tools import Tool as _ActualLangchainToolImport  # type: ignore
+    from langchain_core.tools import Tool as _ActualLangchainToolImport  # type: ignore
     from pydantic import Field as _ActualPydanticFieldImport  # type: ignore
     from pydantic import create_model as _actual_pydantic_create_model_import
 
@@ -77,7 +77,7 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
         super().__init__(tool_spec)
         if not HAS_LANGCHAIN:
             raise ImportError(
-                "LangChain package is required for LangChain adapter. "
+                "langchain-core package is required for LangChain adapter. "
                 "Install it with `pip install glean-agent-toolkit[langchain]`."
             )
 
