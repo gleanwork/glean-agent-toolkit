@@ -56,9 +56,11 @@ class TestGetApiClientVersion:
         assert "." in ver
 
     def test_returns_none_when_missing(self) -> None:
+        from importlib.metadata import PackageNotFoundError
+
         with patch(
             "glean.agent_toolkit.tools._compat.version",
-            side_effect=__import__("importlib.metadata", fromlist=["PackageNotFoundError"]).PackageNotFoundError,
+            side_effect=PackageNotFoundError,
         ):
             assert get_api_client_version() is None
 
