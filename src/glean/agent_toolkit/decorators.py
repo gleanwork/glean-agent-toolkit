@@ -1,5 +1,6 @@
 """Decorators for creating tool specifications."""
 
+import asyncio
 import functools
 import inspect
 from collections.abc import Callable
@@ -162,6 +163,18 @@ class ToolSpecFunction(Protocol):
         """
         ...
 
+    async def acall(self, *args: Any, **kwargs: Any) -> Any:
+        """Call the async version of the function.
+
+        Args:
+            *args: Positional arguments
+            **kwargs: Keyword arguments
+
+        Returns:
+            Function result
+        """
+        ...
+
     def __call__(self, *args: Any, **kwargs: Any) -> Any:
         """Call the function.
 
@@ -241,12 +254,17 @@ def tool_spec(
                 else:
                     output_schema = {"type": "object"}
 
+        @functools.wraps(func)
+        async def _async_wrapper(*args: Any, **kwargs: Any) -> Any:
+            return await asyncio.to_thread(func, *args, **kwargs)
+
         tool_spec_obj = ToolSpec(
             name=name,
             description=description,
             function=func,
             input_schema=cast(dict[str, Any], input_schema),
             output_schema=output_schema,
+            async_function=_async_wrapper,
             version=version,
             output_model=(
                 output_model
@@ -269,6 +287,18 @@ def tool_spec(
                 The result of the function call
             """
             return func(*args, **kwargs)
+
+        async def acall(*args: Any, **kwargs: Any) -> Any:
+            """Async version of calling the tool function.
+
+            Args:
+                *args: Positional arguments
+                **kwargs: Keyword arguments
+
+            Returns:
+                The result of the async function call
+            """
+            return await tool_spec_obj.async_function(*args, **kwargs)
 
         def as_openai_tool() -> dict[str, Any] | Any:
             """Convert to OpenAI tool format.
@@ -331,6 +361,7 @@ def tool_spec(
             return adapter.to_tool()
 
         wrapper.tool_spec = tool_spec_obj  # type: ignore
+        wrapper.acall = acall  # type: ignore
         wrapper.as_openai_tool = as_openai_tool  # type: ignore
         wrapper.as_adk_tool = as_adk_tool  # type: ignore
         wrapper.as_langchain_tool = as_langchain_tool  # type: ignore

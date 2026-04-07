@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import os
 from typing import Any
 
@@ -122,6 +123,25 @@ def run_tool(
         return {"error": f"Parameter validation error: {str(e)}", "result": None}
     except Exception as e:
         return {"error": str(e), "result": None}
+
+
+async def arun_tool(
+    tool_display_name: str,
+    parameters: dict[str, models.ToolsCallParameter],
+) -> dict[str, Any]:
+    """Async version of run_tool.
+
+    Wraps the synchronous Glean API call in ``asyncio.to_thread`` so it can
+    be awaited without blocking the event loop.
+
+    Args:
+        tool_display_name: Display name for the tool
+        parameters: Tool parameters
+
+    Returns:
+        Tool execution result wrapped in success/error format
+    """
+    return await asyncio.to_thread(run_tool, tool_display_name, parameters)
 
 
 def serialize_tool_result(value: Any) -> Any:

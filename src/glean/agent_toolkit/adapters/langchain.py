@@ -87,12 +87,15 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
         Returns:
             LangChain Tool instance
         """
-        return ToolClass(
-            name=self.tool_spec.name,
-            description=self.tool_spec.description,
-            func=self.tool_spec.function,
-            args_schema=self._create_args_schema(),
-        )
+        kwargs: dict[str, Any] = {
+            "name": self.tool_spec.name,
+            "description": self.tool_spec.description,
+            "func": self.tool_spec.function,
+            "args_schema": self._create_args_schema(),
+        }
+        if self.tool_spec.async_function is not None:
+            kwargs["coroutine"] = self.tool_spec.async_function
+        return ToolClass(**kwargs)
 
     def _create_args_schema(self) -> type[BaseModel] | None:
         """Create a Pydantic model for the arguments schema.

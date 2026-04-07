@@ -116,13 +116,17 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
         Returns:
             An OpenAI Agents SDK FunctionTool
         """
-        original_func = self.tool_spec.function
+        async_func = self.tool_spec.async_function
+        sync_func = self.tool_spec.function
 
         async def on_invoke_tool(ctx: Any, input_str: str) -> Any:
             """Function that invokes the tool with parameters."""
             try:
                 params = json.loads(input_str) if input_str else {}
-                result = original_func(**params)
+                if async_func is not None:
+                    result = await async_func(**params)
+                else:
+                    result = sync_func(**params)
                 return result
             except Exception as e:
                 return f"Error executing tool: {str(e)}"

@@ -1,6 +1,6 @@
 """Tool specification dataclass."""
 
-from collections.abc import Callable
+from collections.abc import Callable, Coroutine
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -15,6 +15,7 @@ class ToolSpec:
         name: The name of the tool
         description: A description of what the tool does
         function: The function that implements the tool
+        async_function: Async version of function (auto-generated if not provided)
         input_schema: JSON schema for the input parameters
         output_schema: JSON schema for the output value
         version: Optional version string
@@ -23,9 +24,10 @@ class ToolSpec:
 
     name: str
     description: str
-    function: Callable
+    function: Callable[..., Any]
     input_schema: dict[str, Any]
     output_schema: dict[str, Any]
+    async_function: Callable[..., Coroutine[Any, Any, Any]] | None = None
     version: str | None = None
     output_model: type[BaseModel] | None = None
     _adapters: dict[str, Any] = field(default_factory=dict)
