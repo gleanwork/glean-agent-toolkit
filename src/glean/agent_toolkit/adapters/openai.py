@@ -123,18 +123,24 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
         Returns:
             An OpenAI Agents SDK FunctionTool
         """
-        original_func = self.tool_spec.function
+        async_func = self.tool_spec.async_function
+        sync_func = self.tool_spec.function
         if self.ctx is not None:
-            original_func = functools.partial(original_func, self.ctx)
+            async_func = functools.partial(async_func, self.ctx) if async_func else None
+            sync_func = functools.partial(sync_func, self.ctx)
 
         async def on_invoke_tool(ctx: Any, input_str: str) -> str:
             """Function that invokes the tool with parameters.
 
             The OpenAI Agents SDK expects string returns from tool invocations.
+            Uses the async wrapper when available, falling back to sync.
             """
             try:
                 params = json.loads(input_str) if input_str else {}
-                result = original_func(**params)
+                if async_func is not None:
+                    result = await async_func(**params)
+                else:
+                    result = sync_func(**params)
                 if isinstance(result, str):
                     return result
                 return json.dumps(result, default=str)

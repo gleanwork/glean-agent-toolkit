@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import functools
 import inspect
 import types
@@ -287,6 +288,9 @@ def tool_spec(
                 else:
                     output_schema = {"type": "object"}
 
+        async def _async_wrapper(*args: Any, **kwargs: Any) -> Any:
+            return await asyncio.to_thread(func, *args, **kwargs)
+
         tool_spec_obj = ToolSpec(
             name=name,
             description=description,
@@ -299,6 +303,7 @@ def tool_spec(
                 if isinstance(output_model, type) and issubclass(output_model, BaseModel)
                 else None
             ),
+            async_function=_async_wrapper,
         )
 
         get_registry().register(tool_spec_obj)

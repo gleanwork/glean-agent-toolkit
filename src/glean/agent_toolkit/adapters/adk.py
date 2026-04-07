@@ -75,12 +75,24 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
     def to_tool(self) -> AdkFunctionTool:
         """Convert to Google ADK FunctionTool format.
 
+        Uses the async function when available since ADK natively
+        supports async tool functions.
+
         Returns:
             An ADK FunctionTool instance
         """
-        func = self.tool_spec.function
-        if self.ctx is not None:
-            func = functools.partial(func, self.ctx)
+        async_func = self.tool_spec.async_function
+        sync_func = self.tool_spec.function
+
+        if async_func is not None:
+            func = async_func
+            if self.ctx is not None:
+                func = functools.partial(func, self.ctx)
+        else:
+            func = sync_func
+            if self.ctx is not None:
+                func = functools.partial(func, self.ctx)
+
         if not func.__doc__:
             func.__doc__ = self.tool_spec.description
 
