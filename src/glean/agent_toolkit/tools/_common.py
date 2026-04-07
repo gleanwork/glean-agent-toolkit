@@ -10,11 +10,35 @@ from pydantic import BaseModel
 from glean.api_client import Glean, models
 from glean.api_client.utils import BackoffStrategy, RetryConfig
 
+_config: dict[str, str | None] = {
+    "api_token": None,
+    "server_url": None,
+}
+
+
+def configure(
+    *,
+    api_token: str | None = None,
+    server_url: str | None = None,
+) -> None:
+    """Set module-level Glean credentials used by all tools.
+
+    Values set here take priority over environment variables.
+    Pass ``None`` to clear a previously set value and fall back to the
+    environment variable.
+
+    Args:
+        api_token: Glean API token.
+        server_url: Glean server URL.
+    """
+    _config["api_token"] = api_token
+    _config["server_url"] = server_url
+
 
 def api_client() -> Glean:
     """Get the Glean API client."""
-    api_token = os.getenv("GLEAN_API_TOKEN")
-    server_url = os.getenv("GLEAN_SERVER_URL")
+    api_token = _config["api_token"] or os.getenv("GLEAN_API_TOKEN")
+    server_url = _config["server_url"] or os.getenv("GLEAN_SERVER_URL")
     # GLEAN_INSTANCE is deprecated/legacy — prefer GLEAN_SERVER_URL
     instance = os.getenv("GLEAN_INSTANCE")
 
