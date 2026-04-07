@@ -808,7 +808,7 @@ dependencies = [
     { name = "instructor", marker = "platform_python_implementation == 'PyPy'" },
     { name = "json-repair", version = "0.25.3", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
     { name = "jsonref", marker = "platform_python_implementation == 'PyPy'" },
-    { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "langchain", marker = "platform_python_implementation == 'PyPy'" },
     { name = "openai", marker = "platform_python_implementation == 'PyPy'" },
     { name = "opentelemetry-api", marker = "platform_python_implementation == 'PyPy'" },
     { name = "opentelemetry-exporter-otlp-proto-http", marker = "platform_python_implementation == 'PyPy'" },
@@ -1020,7 +1020,7 @@ dependencies = [
     { name = "cohere", marker = "platform_python_implementation == 'PyPy'" },
     { name = "google-cloud-aiplatform", marker = "platform_python_implementation == 'PyPy'" },
     { name = "gptcache", marker = "platform_python_implementation == 'PyPy'" },
-    { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "langchain", marker = "platform_python_implementation == 'PyPy'" },
     { name = "langchain-cohere", marker = "platform_python_implementation == 'PyPy'" },
     { name = "langchain-community", marker = "platform_python_implementation == 'PyPy'" },
     { name = "langchain-openai", marker = "platform_python_implementation == 'PyPy'" },
@@ -1256,8 +1256,8 @@ all = [
     { name = "crewai", version = "0.51.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
     { name = "crewai", version = "0.95.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
     { name = "google-adk" },
-    { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
-    { name = "langchain", version = "0.3.23", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
+    { name = "langchain-core", version = "0.2.43", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "langchain-core", version = "0.3.54", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
     { name = "openai" },
     { name = "openai-agents" },
 ]
@@ -1275,8 +1275,8 @@ dev = [
     { name = "vcrpy" },
 ]
 langchain = [
-    { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
-    { name = "langchain", version = "0.3.23", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
+    { name = "langchain-core", version = "0.2.43", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "langchain-core", version = "0.3.54", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
 ]
 lint = [
     { name = "ruff" },
@@ -1289,8 +1289,8 @@ test = [
     { name = "crewai", version = "0.51.1", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
     { name = "crewai", version = "0.95.0", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
     { name = "google-adk" },
-    { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
-    { name = "langchain", version = "0.3.23", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
+    { name = "langchain-core", version = "0.2.43", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "langchain-core", version = "0.3.54", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
     { name = "openai" },
     { name = "openai-agents" },
     { name = "pytest" },
@@ -1320,9 +1320,9 @@ requires-dist = [
     { name = "google-adk", marker = "extra == 'adk'", specifier = ">=1.7.0,<2.0" },
     { name = "google-adk", marker = "extra == 'all'", specifier = ">=1.7.0,<2.0" },
     { name = "google-adk", marker = "extra == 'test'", specifier = ">=1.7.0,<2.0" },
-    { name = "langchain", marker = "extra == 'all'", specifier = ">=0.1.0,<1.0" },
-    { name = "langchain", marker = "extra == 'langchain'", specifier = ">=0.1.0,<1.0" },
-    { name = "langchain", marker = "extra == 'test'", specifier = ">=0.1.0,<1.0" },
+    { name = "langchain-core", marker = "extra == 'all'", specifier = ">=0.1.0" },
+    { name = "langchain-core", marker = "extra == 'langchain'", specifier = ">=0.1.0" },
+    { name = "langchain-core", marker = "extra == 'test'", specifier = ">=0.1.0" },
     { name = "openai", marker = "extra == 'all'", specifier = ">=1.0.0,<2.0" },
     { name = "openai", marker = "extra == 'openai'", specifier = ">=1.0.0,<2.0" },
     { name = "openai", marker = "extra == 'test'", specifier = ">=1.0.0,<2.0" },
@@ -2443,18 +2443,11 @@ wheels = [
 name = "langchain"
 version = "0.2.17"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.12.4' and python_full_version < '3.13' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.12' and python_full_version < '3.12.4' and platform_python_implementation == 'PyPy'",
-    "python_full_version == '3.11.*' and platform_python_implementation == 'PyPy'",
-    "python_full_version < '3.11' and platform_python_implementation == 'PyPy'",
-]
 dependencies = [
     { name = "aiohttp", marker = "platform_python_implementation == 'PyPy'" },
     { name = "async-timeout", marker = "python_full_version < '3.11' and platform_python_implementation == 'PyPy'" },
     { name = "langchain-core", version = "0.2.43", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
-    { name = "langchain-text-splitters", version = "0.2.4", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "langchain-text-splitters", marker = "platform_python_implementation == 'PyPy'" },
     { name = "langsmith", version = "0.1.147", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
     { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
     { name = "pydantic", marker = "platform_python_implementation == 'PyPy'" },
@@ -2466,31 +2459,6 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/fd/ed/f3954eb9c534c0bbaba02f71962b35dfbf24a224b7a658f04f64f0435dd9/langchain-0.2.17.tar.gz", hash = "sha256:5a99ce94aae05925851777dba45cbf2c475565d1e91cbe7d82c5e329d514627e", size = 414625, upload-time = "2024-11-04T19:14:44.487Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/5c/d5/f72c36008cc086b18c724a51c3a853b150aca6b6f9f72f1795059ec0faf5/langchain-0.2.17-py3-none-any.whl", hash = "sha256:a97a33e775f8de074370aecab95db148b879c794695d9e443c95457dce5eb525", size = 1001153, upload-time = "2024-11-04T19:14:42.679Z" },
-]
-
-[[package]]
-name = "langchain"
-version = "0.3.23"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.13' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.12.4' and python_full_version < '3.13' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.11' and python_full_version < '3.12.4' and platform_python_implementation != 'PyPy'",
-    "python_full_version < '3.11' and platform_python_implementation != 'PyPy'",
-]
-dependencies = [
-    { name = "async-timeout", marker = "python_full_version < '3.11' and platform_python_implementation != 'PyPy'" },
-    { name = "langchain-core", version = "0.3.54", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
-    { name = "langchain-text-splitters", version = "0.3.8", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
-    { name = "langsmith", version = "0.3.32", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
-    { name = "pydantic", marker = "platform_python_implementation != 'PyPy'" },
-    { name = "pyyaml", marker = "platform_python_implementation != 'PyPy'" },
-    { name = "requests", marker = "platform_python_implementation != 'PyPy'" },
-    { name = "sqlalchemy", marker = "platform_python_implementation != 'PyPy'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/47/ea/b0de568ca17614d5c00275c4ca506af4139cc7c51d0418802b2447055c00/langchain-0.3.23.tar.gz", hash = "sha256:d95004afe8abebb52d51d6026270248da3f4b53d93e9bf699f76005e0c83ad34", size = 10225576, upload-time = "2025-04-04T14:12:09.713Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/d4/49/6e933837da1931c9db745967282ff8bfff51bc3faec0eade846b12203b75/langchain-0.3.23-py3-none-any.whl", hash = "sha256:084f05ee7e80b7c3f378ebadd7309f2a37868ce2906fa0ae64365a67843ade3d", size = 1011778, upload-time = "2025-04-04T14:12:07.704Z" },
 ]
 
 [[package]]
@@ -2516,7 +2484,7 @@ source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "aiohttp", marker = "platform_python_implementation == 'PyPy'" },
     { name = "dataclasses-json", marker = "platform_python_implementation == 'PyPy'" },
-    { name = "langchain", version = "0.2.17", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
+    { name = "langchain", marker = "platform_python_implementation == 'PyPy'" },
     { name = "langchain-core", version = "0.2.43", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
     { name = "langsmith", version = "0.1.147", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
     { name = "numpy", version = "1.26.4", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
@@ -2610,37 +2578,12 @@ wheels = [
 name = "langchain-text-splitters"
 version = "0.2.4"
 source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.13' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.12.4' and python_full_version < '3.13' and platform_python_implementation == 'PyPy'",
-    "python_full_version >= '3.12' and python_full_version < '3.12.4' and platform_python_implementation == 'PyPy'",
-    "python_full_version == '3.11.*' and platform_python_implementation == 'PyPy'",
-    "python_full_version < '3.11' and platform_python_implementation == 'PyPy'",
-]
 dependencies = [
     { name = "langchain-core", version = "0.2.43", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation == 'PyPy'" },
 ]
 sdist = { url = "https://files.pythonhosted.org/packages/83/b3/b1ccde47c86c5fe2585dc012555cff7949c556bd6993dd9c09e49a356190/langchain_text_splitters-0.2.4.tar.gz", hash = "sha256:f7daa7a3b0aa8309ce248e2e2b6fc8115be01118d336c7f7f7dfacda0e89bf29", size = 20236, upload-time = "2024-09-03T18:19:03.973Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8f/f3/d01591229e9d0eec1e8106ed6f9b670f299beb1c94fed4aa335afa78acb0/langchain_text_splitters-0.2.4-py3-none-any.whl", hash = "sha256:2702dee5b7cbdd595ccbe43b8d38d01a34aa8583f4d6a5a68ad2305ae3e7b645", size = 25552, upload-time = "2024-09-03T18:19:02.463Z" },
-]
-
-[[package]]
-name = "langchain-text-splitters"
-version = "0.3.8"
-source = { registry = "https://pypi.org/simple" }
-resolution-markers = [
-    "python_full_version >= '3.13' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.12.4' and python_full_version < '3.13' and platform_python_implementation != 'PyPy'",
-    "python_full_version >= '3.11' and python_full_version < '3.12.4' and platform_python_implementation != 'PyPy'",
-    "python_full_version < '3.11' and platform_python_implementation != 'PyPy'",
-]
-dependencies = [
-    { name = "langchain-core", version = "0.3.54", source = { registry = "https://pypi.org/simple" }, marker = "platform_python_implementation != 'PyPy'" },
-]
-sdist = { url = "https://files.pythonhosted.org/packages/e7/ac/b4a25c5716bb0103b1515f1f52cc69ffb1035a5a225ee5afe3aed28bf57b/langchain_text_splitters-0.3.8.tar.gz", hash = "sha256:116d4b9f2a22dda357d0b79e30acf005c5518177971c66a9f1ab0edfdb0f912e", size = 42128, upload-time = "2025-04-04T14:03:51.521Z" }
-wheels = [
-    { url = "https://files.pythonhosted.org/packages/8b/a3/3696ff2444658053c01b6b7443e761f28bb71217d82bb89137a978c5f66f/langchain_text_splitters-0.3.8-py3-none-any.whl", hash = "sha256:e75cc0f4ae58dcf07d9f18776400cf8ade27fadd4ff6d264df6278bb302f6f02", size = 32440, upload-time = "2025-04-04T14:03:50.6Z" },
 ]
 
 [[package]]
