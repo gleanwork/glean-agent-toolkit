@@ -457,6 +457,32 @@ langchain_weather = get_weather.as_langchain_tool()
 crewai_weather = get_weather.as_crewai_tool()
 ```
 
+## Agent Skills
+
+The `skills/` directory contains [Agent Skills](https://agentskills.io) — structured instructions that teach AI coding agents how to use the Glean Agent Toolkit effectively. Skills are supported by Claude Code, Cursor, GitHub Copilot, VS Code, Gemini CLI, OpenAI Codex, Goose, Amp, Roo Code, Junie, and [many others](https://agentskills.io).
+
+### Install
+
+Use [`npx skills`](https://github.com/agentskills/agentskills) to install into your agent:
+
+```bash
+# Install all skills at once
+npx skills add https://github.com/gleanwork/glean-agent-toolkit
+```
+
+```bash
+# Or install individual skills
+npx skills add https://github.com/gleanwork/glean-agent-toolkit/tree/main/skills/glean-agent-toolkit-guide
+npx skills add https://github.com/gleanwork/glean-agent-toolkit/tree/main/skills/glean-agent-toolkit-builder
+```
+
+### Available Skills
+
+| Skill | Description |
+| --- | --- |
+| `glean-agent-toolkit-guide` | How to use the SDK: `get_tools()`, `GleanContext`, adapters, error handling, async |
+| `glean-agent-toolkit-builder` | How to create custom tools with `@tool_spec` |
+
 ## Contributing
 
 Interested in contributing? Check out our [Contributing Guide](CONTRIBUTING.md) for instructions on setting up the development environment and submitting changes.
