@@ -55,4 +55,4 @@ def web_search(
     ctx = ctx or GleanContext()
     client = ctx.get_client()
     parameters = convert_to_tool_params(query=query)
-    return run_tool("Web Browser", parameters, client=client)
+    return run_tool("Gemini Web Search", parameters, client=client)
