@@ -1,6 +1,6 @@
 ---
 name: glean-agent-toolkit-guide
-description: "How to use the Glean Agent Toolkit SDK. Use when building agents that need enterprise search, chat, or document retrieval via Glean. Triggers on: 'glean search', 'glean toolkit', 'glean agent', 'enterprise search tool', 'GleanContext', 'get_tools', 'as_openai_tool', 'as_langchain_tool'."
+description: "How to use the Glean Agent Toolkit SDK. Use when building agents that integrate Glean enterprise search via the glean-agent-toolkit Python package. Triggers on: 'glean-agent-toolkit', 'glean agent toolkit', 'GleanContext', 'get_tools', 'as_openai_tool', 'as_langchain_tool', 'as_crewai_tool', 'as_adk_tool', '@tool_spec'."
 ---
 
 # Glean Agent Toolkit — Usage Guide
