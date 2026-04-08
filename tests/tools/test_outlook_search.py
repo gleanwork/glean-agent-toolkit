@@ -24,7 +24,6 @@ def test_outlook_search_success() -> None:
 
     result = outlook_search(ctx, query="quarterly planning meeting")
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["result"] == mock_result
     assert result["error"] is None
@@ -39,23 +38,24 @@ def test_outlook_search_api_error() -> None:
 
     result = outlook_search(ctx, query="invalid query that causes error")
 
-    assert result is not None
     assert result["status"] == "error"
     assert result["result"] is None
 
 
-@pytest.mark.parametrize("query", [
-    "budget review meeting",
-    "team standup calendar",
-    "client presentation tomorrow",
-    "all-hands meeting",
-    "project deadline reminder",
-])
+@pytest.mark.parametrize(
+    "query",
+    [
+        "budget review meeting",
+        "team standup calendar",
+        "client presentation tomorrow",
+        "all-hands meeting",
+        "project deadline reminder",
+    ],
+)
 def test_outlook_search_various_queries(query: str) -> None:
     ctx = _make_ctx()
 
     result = outlook_search(ctx, query=query)
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["error"] is None

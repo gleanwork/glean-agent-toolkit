@@ -24,7 +24,6 @@ def test_gmail_search_success() -> None:
 
     result = gmail_search(ctx, query="project updates from last week")
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["result"] == mock_result
     assert result["error"] is None
@@ -39,39 +38,42 @@ def test_gmail_search_api_error() -> None:
 
     result = gmail_search(ctx, query="invalid query that causes error")
 
-    assert result is not None
     assert result["status"] == "error"
     assert result["result"] is None
 
 
-@pytest.mark.parametrize("query", [
-    "urgent emails from manager",
-    "meeting invitations",
-    "invoice from vendor",
-    "password reset emails",
-    "security alerts",
-])
+@pytest.mark.parametrize(
+    "query",
+    [
+        "urgent emails from manager",
+        "meeting invitations",
+        "invoice from vendor",
+        "password reset emails",
+        "security alerts",
+    ],
+)
 def test_gmail_search_various_queries(query: str) -> None:
     ctx = _make_ctx()
 
     result = gmail_search(ctx, query=query)
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["error"] is None
 
 
-@pytest.mark.parametrize("search_filter", [
-    "from:boss@company.com",
-    "subject:urgent",
-    "has:attachment",
-    "before:2025/01/01",
-    "label:important",
-])
+@pytest.mark.parametrize(
+    "search_filter",
+    [
+        "from:boss@company.com",
+        "subject:urgent",
+        "has:attachment",
+        "before:2025/01/01",
+        "label:important",
+    ],
+)
 def test_gmail_search_with_filters(search_filter: str) -> None:
     ctx = _make_ctx()
 
     result = gmail_search(ctx, query=search_filter)
 
-    assert result is not None
     assert result["status"] == "ok"

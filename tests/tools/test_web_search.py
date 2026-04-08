@@ -24,7 +24,6 @@ def test_web_search_success() -> None:
 
     result = web_search(ctx, query="Python programming best practices")
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["result"] == mock_result
     assert result["error"] is None
@@ -39,23 +38,24 @@ def test_web_search_api_error() -> None:
 
     result = web_search(ctx, query="invalid query that causes error")
 
-    assert result is not None
     assert result["status"] == "error"
     assert result["result"] is None
 
 
-@pytest.mark.parametrize("query", [
-    "JavaScript frameworks comparison",
-    "Docker container deployment",
-    "API design patterns",
-    "database optimization techniques",
-    "mobile app development",
-])
+@pytest.mark.parametrize(
+    "query",
+    [
+        "JavaScript frameworks comparison",
+        "Docker container deployment",
+        "API design patterns",
+        "database optimization techniques",
+        "mobile app development",
+    ],
+)
 def test_web_search_various_queries(query: str) -> None:
     ctx = _make_ctx()
 
     result = web_search(ctx, query=query)
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["error"] is None

@@ -23,7 +23,6 @@ def test_search_success() -> None:
 
     result = search(ctx, query="company holidays 2025")
 
-    assert result is not None
     assert result["status"] == "ok"
     assert result["result"] == mock_result
     assert result["error"] is None
@@ -38,7 +37,6 @@ def test_search_api_error() -> None:
 
     result = search(ctx, query="invalid query that causes error")
 
-    assert result is not None
     assert result["status"] == "error"
     assert result["error"] == "API Error"
     assert result["result"] is None
