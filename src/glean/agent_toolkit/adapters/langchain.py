@@ -15,11 +15,10 @@ if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
 
 if TYPE_CHECKING:
-    from langchain_core.tools import Tool as LangchainTool  # pragma: no cover
+    from langchain_core.tools import StructuredTool as LangchainTool  # pragma: no cover
 else:
     LangchainTool = Any  # type: ignore  # noqa: N816
 
-from pydantic import Field as PydanticField  # type: ignore
 from pydantic import create_model as pydantic_create_model
 
 ToolClass: Any = object
@@ -27,12 +26,13 @@ Field: Any = object
 create_model = pydantic_create_model
 
 
-class _FallbackLangchainTool:
-    """Fallback for langchain.tools.Tool."""
+class _FallbackStructuredTool:
+    """Fallback for langchain_core.tools.StructuredTool."""
 
     name: str
     description: str
     func: Any
+    coroutine: Any
     args_schema: Any
 
     def __init__(self, *args: Any, **kwargs: Any) -> None:  # noqa: D107
@@ -50,16 +50,16 @@ def _fallback_pydantic_create_model(*args: Any, **kwargs: Any) -> Any:
 
 
 try:
-    from langchain_core.tools import Tool as _ActualLangchainToolImport  # type: ignore
+    from langchain_core.tools import StructuredTool as _ActualStructuredToolImport  # type: ignore
     from pydantic import Field as _ActualPydanticFieldImport  # type: ignore
     from pydantic import create_model as _actual_pydantic_create_model_import
 
-    ToolClass = _ActualLangchainToolImport
+    ToolClass = _ActualStructuredToolImport
     Field = _ActualPydanticFieldImport
     create_model = _actual_pydantic_create_model_import
     HAS_LANGCHAIN = True
 except ImportError:  # pragma: no cover
-    ToolClass = _FallbackLangchainTool  # type: ignore[assignment]
+    ToolClass = _FallbackStructuredTool  # type: ignore[assignment]
     Field = _fallback_pydantic_field
     create_model = _fallback_pydantic_create_model
     HAS_LANGCHAIN = False
@@ -91,13 +91,17 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
     def to_tool(self) -> Any:
         """Convert to LangChain tool format.
 
+        Builds a ``StructuredTool`` so multi-argument tools are invocable
+        (the legacy single-input ``Tool`` rejects dict inputs with more
+        than one key and calls its func positionally).
+
         LangChain's tool contract expects string returns.  The wrapper
         JSON-serializes whatever the underlying function produces.
         When an async_function is available, passes it as ``coroutine``
         so LangChain can ``await`` it natively.
 
         Returns:
-            LangChain Tool instance
+            LangChain StructuredTool instance
         """
         original_func = self.tool_spec.function
         async_func = self.tool_spec.async_function
@@ -118,11 +122,17 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
                 return result
             return json.dumps(result, default=str)
 
+        args_schema = self._create_args_schema()
+        if args_schema is None:
+            # StructuredTool requires an args_schema; use an empty model
+            # for tools that take no arguments.
+            args_schema = cast("type[BaseModel]", create_model(f"{self.tool_spec.name}Schema"))
+
         tool_kwargs: dict[str, Any] = {
             "name": self.tool_spec.name,
             "description": self.tool_spec.description,
             "func": _string_wrapper,
-            "args_schema": self._create_args_schema(),
+            "args_schema": args_schema,
         }
         if async_func is not None:
             tool_kwargs["coroutine"] = _async_string_wrapper
