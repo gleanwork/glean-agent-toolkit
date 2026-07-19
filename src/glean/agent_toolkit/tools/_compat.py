@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import inspect
 import warnings
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
@@ -39,6 +40,54 @@ def resolve_method(obj: Any, preferred: str, *fallbacks: str) -> Any:
 
     tried = ", ".join([preferred, *fallbacks])
     raise AttributeError(f"{type(obj).__name__} has none of the expected methods: {tried}")
+
+
+def resolve_kwarg(fn: Any, preferred: str, *fallbacks: str) -> str:
+    """Return the first keyword argument name accepted by *fn*.
+
+    Inspects the callable's signature to pick the keyword argument to use,
+    warning when a fallback (legacy) name is selected. If the signature
+    cannot be introspected, or the callable accepts arbitrary ``**kwargs``,
+    *preferred* is returned.
+
+    Args:
+        fn: The callable whose signature to inspect.
+        preferred: The preferred keyword argument name.
+        *fallbacks: Alternative keyword argument names to try in order.
+
+    Returns:
+        The keyword argument name to use when calling *fn*.
+
+    Raises:
+        TypeError: If *fn* accepts neither *preferred*, any fallback, nor
+            arbitrary ``**kwargs``.
+    """
+    try:
+        params = inspect.signature(fn).parameters
+    except (TypeError, ValueError):
+        return preferred
+
+    if preferred in params:
+        return preferred
+
+    fn_name = getattr(fn, "__qualname__", None) or getattr(fn, "__name__", None) or repr(fn)
+
+    for name in fallbacks:
+        if name in params:
+            warnings.warn(
+                f"{fn_name}() does not accept keyword argument '{preferred}'; "
+                f"falling back to '{name}'. "
+                f"This fallback will be removed in a future release.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
+            return name
+
+    if any(param.kind is inspect.Parameter.VAR_KEYWORD for param in params.values()):
+        return preferred
+
+    tried = ", ".join([preferred, *fallbacks])
+    raise TypeError(f"{fn_name} accepts none of the expected keyword arguments: {tried}")
 
 
 def get_api_client_version() -> str | None:
