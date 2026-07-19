@@ -1,3 +1,9 @@
+## 0.6.1 (2026-07-19)
+
+### Fix
+
+- **read_document**: support renamed retrieve kwarg across glean-api-client versions (#81)
+
 ## 0.6.0 (2026-07-19)
 
 ### Fix
