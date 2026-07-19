@@ -27,23 +27,24 @@ test = [
   "pytest-asyncio>=0.23.2,<1.0",
   "pytest-cov>=4.1.0,<6.0",
   "pytest-httpx>=0.35.0,<1.0",
+  "vcrpy>=6.0.2,<7.0",
   # Optional dependencies for testing adapters
   "openai>=1.0.0,<2.0",
-  "openai-agents>=0.0.11,<1.0",
-  "langchain-core",
-  "crewai>=0.28.0,<1.0",
-  "google-adk>=1.7.0,<2.0",
+  "openai-agents>=0.3,<1.0",
+  "langchain-core>=0.3,<2.0",
+  "crewai>=0.100,<1.0",
+  "google-adk>=1.28.1,<2.0",
 ]
-openai = ["openai>=1.0.0,<2.0", "openai-agents>=0.0.11,<1.0"]
-adk = ["google-adk>=1.7.0,<2.0"]
-langchain = ["langchain-core"]
-crewai = ["crewai>=0.28.0,<1.0"]
+openai = ["openai>=1.0.0,<2.0", "openai-agents>=0.3,<1.0"]
+adk = ["google-adk>=1.28.1,<2.0"]
+langchain = ["langchain-core>=0.3,<2.0"]
+crewai = ["crewai>=0.100,<1.0"]
 all = [
   "openai>=1.0.0,<2.0",
-  "openai-agents>=0.0.11,<1.0",
-  "langchain-core",
-  "crewai>=0.28.0,<1.0",
-  "google-adk>=1.7.0,<2.0",
+  "openai-agents>=0.3,<1.0",
+  "langchain-core>=0.3,<2.0",
+  "crewai>=0.100,<1.0",
+  "google-adk>=1.28.1,<2.0",
 ]
 codespell = ["codespell>=2.2.6,<3.0"]
 lint = ["ruff>=0.5,<1.0"]
