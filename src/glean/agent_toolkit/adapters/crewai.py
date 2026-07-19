@@ -92,14 +92,17 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
             function: The function to call when the tool is invoked
             args_schema: Optional schema for the arguments
         """
-        super().__init__(name=name, description=description)
+        # ``args_schema`` must be passed to ``super().__init__`` (not assigned
+        # afterwards) because CrewAI generates the LLM-facing tool description
+        # during ``__init__``. Assigning it after the fact leaves the
+        # description built from ``_run(self, **kwargs)``, so agents would see
+        # a bogus ``kwargs`` parameter instead of the real arguments.
+        init_kwargs: dict[str, Any] = {"name": name, "description": description}
+        if args_schema is not None:
+            init_kwargs["args_schema"] = args_schema
+        super().__init__(**init_kwargs)
 
         self._function = function
-
-        # Only override ``args_schema`` when we actually created one; otherwise
-        # leave the placeholder so CrewAI can lazily generate a schema.
-        if args_schema is not None:
-            self.args_schema = args_schema
 
         object.__setattr__(self, "_tool_spec_ref", None)
 
