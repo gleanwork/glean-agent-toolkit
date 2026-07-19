@@ -1,14 +1,54 @@
+## 0.6.0 (2026-07-19)
+
+### Fix
+
+- **crewai**: pass args_schema to BaseTool so the LLM sees real parameters (#73)
+- **adk**: expose real typed signatures so declarations and invocation work (#77)
+- **openai**: sanitize strict schemas and isolate per-tool conversion failures (#76)
+- **adapters**: map anyOf/union and array item types correctly in get_field_type (#75)
+- **langchain**: use StructuredTool so converted tools are invocable (#74)
+- **tools**: stop closing shared Glean client on every tool call (#72)
+
+## 0.5.0 (2026-04-07)
+
+### Feat
+
+- add installable skills for SDK usage and tool building (#70)
+- search API alignment, chat tool, deprecation path, get_tools, async support, import docs (#66)
+- injectable GleanContext replaces hidden api_client() global (#62) (#65)
+- **deps**: add [all] extra combining all framework adapters (CHK-001) (#27)
+
+### Fix
+
+- correct web search tool name from 'Web Browser' to 'Gemini Web Search' (#71)
+- resolve remaining P2 eval items (CHK-111, CHK-115, CHK-118, CHK-119) (#68)
+- resolve eval checklist items — dedup, dead code, error handling, imports (#67)
+- namespace tool names and optimize descriptions for LLM consumption (#58)
+- structured error results and consistent adapter return types (#55)
+- depend on langchain-core instead of langchain to support LangGraph 1.x (#54)
+- Regenerate lockfile
+- align publish workflow tag trigger with commitizen tag format (#39)
+- use is not None checks in read_document validation (#37)
+- export Registry from top-level package (#36)
+- remove pydantic BaseModel from adapters public API (#35)
+- preserve float values in retry backoff config (CHK-002)
+- **release**: correct broken version_files path in .cz.toml (CHK-006) (#31)
+
 ## 0.4.0 (2026-03-05)
 
 ### Feat
 
-- Add `read_document` tool for fetching full document content by URL or document ID
-- Add `GLEAN_SERVER_URL` environment variable support; `GLEAN_INSTANCE` is retained as a deprecated fallback
-- Add retry backoff configuration via environment variables (`GLEAN_RETRY_INITIAL`, `GLEAN_RETRY_MAX`, `GLEAN_RETRY_MULTIPLIER`, `GLEAN_RETRY_MAX_ELAPSED`)
+- support GLEAN_SERVER_URL with GLEAN_INSTANCE fallback (#26)
+- **api**: Add retry configuration to API client with environment variable controls (#15)
+- **dev**: adopt mise with full task parity and Node 22; move dev docs to CONTRIBUTING; README links to CONTRIBUTING (#12)
 
-### Changed
+### Fix
 
-- Add `glean_` prefix to all tool spec names for clarity in multi-tool agent environments (`search` → `glean_search`, `employee_search` → `glean_employee_search`, etc.)
+- **adapters**: correct install hints to use glean-agent-toolkit extras
+
+### Refactor
+
+- rename glean_search to search across code, tests, docs, and snippets (#19)
 
 ## 0.3.0 (2025-07-21)
 
