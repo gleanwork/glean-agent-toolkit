@@ -7,6 +7,7 @@ import pytest
 from glean.agent_toolkit.tools._compat import (
     check_api_client_compatibility,
     get_api_client_version,
+    resolve_kwarg,
     resolve_method,
 )
 
@@ -52,6 +53,54 @@ def test_resolve_method_no_fallbacks() -> None:
     obj = _EmptyClient()
     with pytest.raises(AttributeError):
         resolve_method(obj, "run")
+
+
+def _new_style(*, get_documents_request: object) -> str:
+    return "new"
+
+
+def _old_style(*, request: object) -> str:
+    return "old"
+
+
+def _kwargs_only(**kwargs: object) -> str:
+    return "kwargs"
+
+
+def _no_match(*, other: object) -> str:
+    return "other"
+
+
+def test_resolve_kwarg_preferred() -> None:
+    assert resolve_kwarg(_new_style, "get_documents_request", "request") == (
+        "get_documents_request"
+    )
+
+
+def test_resolve_kwarg_fallback_with_warning() -> None:
+    with warnings.catch_warnings(record=True) as w:
+        warnings.simplefilter("always")
+        name = resolve_kwarg(_old_style, "get_documents_request", "request")
+        assert name == "request"
+        assert len(w) == 1
+        assert issubclass(w[0].category, DeprecationWarning)
+        assert "falling back to 'request'" in str(w[0].message)
+
+
+def test_resolve_kwarg_var_keyword_uses_preferred() -> None:
+    assert resolve_kwarg(_kwargs_only, "get_documents_request", "request") == (
+        "get_documents_request"
+    )
+
+
+def test_resolve_kwarg_none_found() -> None:
+    with pytest.raises(TypeError, match="accepts none of the expected keyword arguments"):
+        resolve_kwarg(_no_match, "get_documents_request", "request")
+
+
+def test_resolve_kwarg_uninspectable_uses_preferred() -> None:
+    # Some C-implemented callables cannot be introspected via inspect.signature.
+    assert resolve_kwarg(min, "get_documents_request", "request") == "get_documents_request"
 
 
 def test_get_api_client_version_returns_string() -> None:
