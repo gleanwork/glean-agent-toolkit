@@ -86,10 +86,13 @@ def read_document(
                 include_fields=include_fields,
             )
 
-        from glean.agent_toolkit.tools._compat import resolve_method
+        from glean.agent_toolkit.tools._compat import resolve_kwarg, resolve_method
 
         retrieve_fn = resolve_method(documents_client, "retrieve", "get")
-        result = retrieve_fn(request=request)
+        # glean-api-client renamed the kwarg from `request` (<=0.6.x) to
+        # `get_documents_request` (>=0.15.x).
+        request_kwarg = resolve_kwarg(retrieve_fn, "get_documents_request", "request")
+        result = retrieve_fn(**{request_kwarg: request})
 
         return common.serialize_tool_result(result)
 
