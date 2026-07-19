@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import copy
 import functools
 import json
 from collections.abc import Callable
@@ -46,6 +47,23 @@ except ImportError:  # pragma: no cover
 
 
 OpenAIFunctionTool: TypeAlias = _RealOpenAIFunctionTool | _FallbackOpenAIFunctionTool
+
+
+def _sanitize_schema_for_strict_mode(schema: dict[str, Any]) -> dict[str, Any]:
+    """Return a strict-mode-compatible copy of *schema*.
+
+    Uses the OpenAI Agents SDK's own ``ensure_strict_json_schema`` helper when
+    available. Raises if the schema cannot be made strict-compatible (e.g.
+    free-form ``object`` schemas with ``additionalProperties: true``), in which
+    case callers should fall back to non-strict mode.
+    """
+    schema_copy = copy.deepcopy(schema)
+    try:
+        from agents.strict_schema import ensure_strict_json_schema  # type: ignore
+    except ImportError:  # pragma: no cover - older/newer SDK layouts
+        return schema_copy
+    # NOTE: ensure_strict_json_schema mutates its input, hence the deepcopy.
+    return ensure_strict_json_schema(schema_copy)
 
 
 OpenAIToolType = dict[str, Any] | OpenAIFunctionTool
@@ -155,13 +173,23 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
             else {"type": "object", "properties": {}}
         )
 
-        return _RuntimeOpenAIFunctionTool(
-            name=self.tool_spec.name,
-            description=self.tool_spec.description,
-            params_json_schema=params_json_schema_dict,
-            on_invoke_tool=on_invoke_tool,
-            strict_json_schema=True,
-        )
+        def _build_tool(schema: dict[str, Any], strict: bool) -> OpenAIFunctionTool:
+            return _RuntimeOpenAIFunctionTool(
+                name=self.tool_spec.name,
+                description=self.tool_spec.description,
+                params_json_schema=schema,
+                on_invoke_tool=on_invoke_tool,
+                strict_json_schema=strict,
+            )
+
+        try:
+            strict_schema = _sanitize_schema_for_strict_mode(params_json_schema_dict)
+            return _build_tool(strict_schema, strict=True)
+        except Exception:
+            # Schemas that cannot be expressed under OpenAI strict-mode rules
+            # (e.g. free-form dict parameters) fall back to non-strict mode so
+            # the tool still works instead of raising at construction time.
+            return _build_tool(copy.deepcopy(params_json_schema_dict), strict=False)
 
     def to_callable(self) -> Callable:
         """Get the callable for OpenAI function calling.
