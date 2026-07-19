@@ -83,8 +83,10 @@ def test_openai_adapter() -> None:
 
 
 @pytest.mark.skipif(not HAS_OPENAI, reason="OpenAI not installed")
-def test_openai_adapter_integration() -> None:
+async def test_openai_adapter_integration() -> None:
     """Test OpenAI adapter with actual dependency."""
+    import json
+
     from glean.agent_toolkit.adapters.openai import OpenAIAdapter
 
     tool_spec = create_mock_tool_spec()
@@ -100,10 +102,12 @@ def test_openai_adapter_integration() -> None:
         assert tool["function"]["name"] == "add"
     else:
         # Agents SDK format
-        assert getattr(tool, "name", "add") == "add"
-        assert "Add two integers" in getattr(tool, "description", "")
-        assert hasattr(tool, "params_json_schema")
-        assert hasattr(tool, "on_invoke_tool")
+        assert tool.name == "add"
+        assert "Add two integers" in tool.description
+        assert tool.params_json_schema["properties"].keys() == {"a", "b"}
+        # Drive the tool through the Agents SDK invocation path.
+        result = await tool.on_invoke_tool(None, json.dumps({"a": 3, "b": 5}))
+        assert result == "8"
 
     # Test to_callable method
     callable_fn = adapter.to_callable()
@@ -135,25 +139,36 @@ def test_adk_adapter_integration() -> None:
 
     # Test to_tool method
     tool = adapter.to_tool()
-    assert getattr(tool, "name", "") == "add"
-    assert "Add two integers" in getattr(tool, "description", "")
+    assert tool.name == "add"
+    assert "Add two integers" in (tool.description or "")
 
-    # Test the tool can be used and exposes a real, typed signature
-    assert callable(getattr(tool, "func", lambda: None))
+    # The wrapper must expose a real, typed signature and actually execute.
     import inspect
 
     assert list(inspect.signature(tool.func).parameters) == ["a", "b"]
+    assert tool.func(3, 5) == 8
+    assert tool.func(a=4, b=6) == 10
 
 
 @pytest.mark.skipif(not HAS_ADK, reason="Google ADK not installed")
-def test_read_document_as_adk_tool() -> None:
+async def test_read_document_as_adk_tool() -> None:
     """Ensure read_document can be adapted for ADK function calling."""
+    import inspect
+
     from glean.agent_toolkit.tools.read_document import read_document
 
     tool = read_document.as_adk_tool()
 
-    assert getattr(tool, "name", "") == "glean_read_document"
-    assert callable(getattr(tool, "func", lambda: None))
+    assert tool.name == "glean_read_document"
+    # The wrapper signature must mirror the input schema (ctx excluded).
+    assert list(inspect.signature(tool.func).parameters) == ["document_id", "url"]
+
+    # Calling with neither document_id nor url short-circuits before any
+    # network access, exercising the real wrapper end-to-end.
+    result = await tool.func()
+    assert result["status"] == "error"
+    assert result["error_type"] == "validation"
+    assert result["error"] == "Provide exactly one of document_id or url"
 
 
 def test_langchain_adapter_import_error() -> None:
@@ -177,12 +192,15 @@ def test_langchain_adapter_integration() -> None:
 
     # Test to_tool method
     tool = adapter.to_tool()
-    assert getattr(tool, "name", "") == "add"
-    assert "Add two integers" in getattr(tool, "description", "")
-    assert callable(getattr(tool, "func", lambda: None))
+    assert tool.name == "add"
+    assert "Add two integers" in tool.description
 
     # Test args_schema was created properly
     assert tool.args_schema is not None
+    assert set(tool.args_schema.model_fields) == {"a", "b"}
+
+    # Drive the tool through LangChain's own invocation path.
+    assert tool.invoke({"a": 3, "b": 5}) == "8"
 
 
 def test_crewai_adapter_import_error() -> None:
@@ -199,19 +217,21 @@ def test_crewai_adapter_import_error() -> None:
 @pytest.mark.skipif(not HAS_CREWAI, reason="CrewAI not installed")
 def test_crewai_adapter_integration() -> None:
     """Test CrewAI adapter with actual dependency."""
+    from typing import Any
+
     from glean.agent_toolkit.adapters.crewai import CrewAIAdapter
 
     tool_spec = create_mock_tool_spec()
     adapter = CrewAIAdapter(tool_spec)
 
     # Test to_tool method
-    tool = adapter.to_tool()
-    assert getattr(tool, "name", "") == "add"
-    assert hasattr(tool, "description")
+    tool: Any = adapter.to_tool()
+    assert tool.name == "add"
+    assert "Add two integers" in tool.description
     # Reference the spec via the special attribute
-    assert hasattr(tool, "_tool_spec_ref")
+    assert tool._tool_spec_ref is tool_spec
+    assert tool.args_schema is not None
+    assert set(tool.args_schema.model_fields) == {"a", "b"}
 
-    # Test the tool can be run if arguments match — _run now returns str
-    if hasattr(tool, "_run"):
-        result = tool._run(a=3, b=5)
-        assert result == "8"
+    # Drive the tool through CrewAI's public run path — _run returns str
+    assert tool.run(a=3, b=5) == "8"
