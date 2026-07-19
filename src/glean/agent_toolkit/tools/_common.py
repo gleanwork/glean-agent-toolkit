@@ -150,14 +150,13 @@ def run_tool(
 
             client = GleanContext().get_client()
 
-        with client as g_client:
-            from glean.agent_toolkit.tools._compat import resolve_method
+        from glean.agent_toolkit.tools._compat import resolve_method
 
-            run_fn = resolve_method(g_client.client.tools, "run", "execute")
-            result = run_fn(
-                name=tool_display_name,
-                parameters=parameters,
-            )
+        run_fn = resolve_method(client.client.tools, "run", "execute")
+        result = run_fn(
+            name=tool_display_name,
+            parameters=parameters,
+        )
         return make_ok(serialize_tool_result(result))
     except Exception as e:
         error_type, suggested_action = _classify_error(e)
