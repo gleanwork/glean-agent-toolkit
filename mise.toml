@@ -34,6 +34,26 @@ run = "uv run ptw --now . -- -vv --tb=auto -rA --durations=10 -p no:logging test
 description = "Run tests with coverage"
 run = "uv run pytest --cov=glean --cov-report=term --cov-report=html -v tests/"
 
+[tasks."test:latest-frameworks"]
+description = "Upgrade all agent frameworks to their latest releases and run the full suite (mirrors nightly CI; note CI upgrades one framework per matrix leg)"
+run = [
+  "uv pip install --upgrade langchain-core openai-agents google-adk crewai",
+  "uv run pytest -v --tb=auto -rA -p no:logging tests/",
+]
+
+[tasks."test:install-only"]
+description = "Verify the package tests pass with only the [test] extra installed (mirrors the CI test-only-install job) — uses a throwaway venv"
+shell = "bash -c"
+run = """
+set -euo pipefail
+VENV_ROOT=$(mktemp -d)
+trap 'rm -rf "$VENV_ROOT"' EXIT
+uv venv "$VENV_ROOT/venv" --python "$(command -v python)"
+VIRTUAL_ENV="$VENV_ROOT/venv" uv pip install -e ".[test]"
+"$VENV_ROOT/venv/bin/python" -m pytest tests/ --collect-only -q
+"$VENV_ROOT/venv/bin/python" -m pytest -v --tb=auto -rA tests/
+"""
+
 [tasks."test:vcr:regenerate"]
 description = "Regenerate all VCR cassettes by re-recording HTTP interactions"
 run = [
