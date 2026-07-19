@@ -1,0 +1,48 @@
+name: Nightly Latest Frameworks
+
+# Runs the full test suite against the LATEST released version of each agent
+# framework we adapt to. The PR-gating CI job pins framework versions via the
+# locked dev environment, so a breaking framework release (this happened with
+# LangChain) would otherwise go undetected until a user hit it. One matrix leg
+# per framework so a breaking release is directly attributable. A failed run
+# is the alert; there are no external notifications.
+
+on:
+  schedule:
+    - cron: "23 6 * * *"
+  workflow_dispatch:
+
+jobs:
+  latest-frameworks:
+    name: Latest ${{ matrix.framework }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        framework:
+          - langchain-core
+          - openai-agents
+          - google-adk
+          - crewai
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up mise
+        uses: jdx/mise-action@v2
+        with:
+          cache: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup development environment (locked deps)
+        run: mise run setup
+
+      - name: Upgrade ${{ matrix.framework }} to latest release
+        run: uv pip install --upgrade ${{ matrix.framework }}
+
+      - name: Show resolved framework version
+        run: uv pip show ${{ matrix.framework }}
+
+      - name: Run full test suite
+        run: uv run pytest -v --tb=auto -rA tests/
