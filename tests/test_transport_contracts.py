@@ -79,11 +79,11 @@ def test_search_deserializes_realistic_tools_call_response(httpx_mock: HTTPXMock
     assert result["status"] == "ok"
     assert result["error"] is None
     # serialize_tool_result dumps the SDK model with by_alias=True, so the
-    # camelCase keys of the raw payload must survive verbatim.
-    assert result["result"] == {
-        "rawResponse": REALISTIC_SEARCH_RAW_RESPONSE,
-        "error": None,
-    }
+    # camelCase keys of the raw payload must survive verbatim. Field-wise
+    # check: older glean-api-client versions dump unset optional fields as
+    # explicit None ("error": None); newer versions omit them entirely.
+    assert result["result"]["rawResponse"] == REALISTIC_SEARCH_RAW_RESPONSE
+    assert result["result"].get("error") is None
 
     body = _request_body(httpx_mock)
     assert body["name"] == "Glean Search"
@@ -122,11 +122,11 @@ def test_search_tool_level_error_field_is_preserved(httpx_mock: HTTPXMock) -> No
 
     # The HTTP call itself succeeded, so the ToolResult is "ok" and the
     # tool-level error is surfaced inside the deserialized payload.
+    # (Field-wise: newer glean-api-client versions omit the unset
+    # rawResponse key instead of dumping "rawResponse": None.)
     assert result["status"] == "ok"
-    assert result["result"] == {
-        "rawResponse": None,
-        "error": "Tool execution failed upstream",
-    }
+    assert result["result"].get("rawResponse") is None
+    assert result["result"]["error"] == "Tool execution failed upstream"
 
 
 def test_search_http_401_maps_to_auth_error(httpx_mock: HTTPXMock) -> None:

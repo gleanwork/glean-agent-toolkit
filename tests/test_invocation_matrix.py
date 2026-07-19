@@ -108,7 +108,11 @@ def _tools_call_case(
 
     def check_result(result: Any) -> None:
         # serialize_tool_result preserves camelCase aliases from the SDK model.
-        assert result == {"rawResponse": raw_response, "error": None}
+        assert result["rawResponse"] == raw_response
+        # Older glean-api-client versions (e.g. 0.6.x) dump unset optional
+        # fields as explicit None ("error": None); newer versions omit them.
+        # Accept both: the contract is "no tool-level error".
+        assert result.get("error") is None
 
     return ToolCase(
         tool_name=tool_name,
