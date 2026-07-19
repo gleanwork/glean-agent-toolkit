@@ -1,16 +1,26 @@
 """Global fixtures for tests."""
 
+from __future__ import annotations
+
 import os
 import pathlib
 import re
 from collections.abc import Generator
-from typing import Any
+from typing import TYPE_CHECKING, Any
 from unittest.mock import patch
 
 import pytest
-import vcr
-from vcr.cassette import Cassette
-from vcr.record_mode import RecordMode
+
+try:
+    import vcr
+    from vcr.record_mode import RecordMode
+except ImportError:  # pragma: no cover - vcrpy is an optional test dependency
+    vcr = None  # type: ignore[assignment]
+    RecordMode = None  # type: ignore[assignment]
+
+if TYPE_CHECKING:
+    from vcr import VCR
+    from vcr.cassette import Cassette
 
 CASSETTES_DIR = pathlib.Path(__file__).parent / "cassettes"
 
@@ -149,8 +159,11 @@ def should_regenerate_cassettes() -> bool:
     return os.getenv("VCR_REGENERATE", "").lower() in ("1", "true", "yes")
 
 
-def get_vcr_config() -> vcr.VCR:
+def get_vcr_config() -> VCR:
     """Get configured VCR instance for recording/replaying HTTP interactions."""
+    if vcr is None or RecordMode is None:
+        pytest.skip("vcrpy is not installed; install the 'dev' extra to run VCR-based tests")
+
     if should_regenerate_cassettes():
         record_mode = RecordMode.NEW_EPISODES
     else:
@@ -181,6 +194,9 @@ def vcr_cassette(request) -> Generator[Cassette, None, None]:
     """
     test_name = request.node.name
     cassette_name = f"{test_name}.yaml"
+
+    if vcr is None:
+        pytest.skip("vcrpy is not installed; install the 'dev' extra to run VCR-based tests")
 
     if should_regenerate_cassettes():
         cassette_path = CASSETTES_DIR / cassette_name
