@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import operator
 from abc import ABC, abstractmethod
+from functools import reduce
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
 from glean.agent_toolkit.spec import ToolSpec
@@ -13,20 +15,56 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 
-def get_field_type(schema: dict[str, Any], *, use_date_types: bool = False) -> type:
+def get_field_type(schema: dict[str, Any], *, use_date_types: bool = False) -> Any:
     """Determine the Python type from a JSON schema property.
+
+    Handles scalar types, ``anyOf``/``oneOf`` unions (including the
+    ``Optional`` pattern emitted by Pydantic for parameters with a ``None``
+    default), typed arrays, objects, and enums. ``$ref`` schemas fall back
+    to :data:`~typing.Any`.
 
     Args:
         schema: JSON schema property definition.
         use_date_types: When ``True``, map ``date-time`` and ``date``
             string formats to :class:`~datetime.datetime` and
             :class:`~datetime.date` respectively.
+
+    Returns:
+        The Python type (or typing construct, e.g. ``list[str] | None``)
+        corresponding to the schema.
     """
-    if "enum" in schema:
-        return str
+    if not isinstance(schema, dict):
+        return Any
+
+    if "$ref" in schema:
+        return Any
+
+    union_members = schema.get("anyOf") or schema.get("oneOf")
+    if union_members:
+        has_null = False
+        member_types: list[Any] = []
+        for member in union_members:
+            if isinstance(member, dict) and member.get("type") == "null":
+                has_null = True
+                continue
+            member_type = get_field_type(member, use_date_types=use_date_types)
+            if member_type not in member_types:
+                member_types.append(member_type)
+
+        if not member_types:
+            result: Any = Any
+        else:
+            result = reduce(operator.or_, member_types)
+
+        if has_null:
+            return result | None
+        return result
 
     schema_type = schema.get("type", "string")
     schema_format = schema.get("format", "")
+
+    if "enum" in schema and schema_type == "string":
+        return str
 
     if schema_type == "string":
         if use_date_types:
@@ -46,9 +84,15 @@ def get_field_type(schema: dict[str, Any], *, use_date_types: bool = False) -> t
     elif schema_type == "boolean":
         return bool
     elif schema_type == "array":
-        return list
+        items = schema.get("items")
+        if isinstance(items, dict):
+            item_type = get_field_type(items, use_date_types=use_date_types)
+            return list[item_type]  # type: ignore[valid-type]
+        return list[Any]
     elif schema_type == "object":
-        return dict
+        return dict[str, Any]
+    elif schema_type == "null":
+        return type(None)
     else:
         return str
 

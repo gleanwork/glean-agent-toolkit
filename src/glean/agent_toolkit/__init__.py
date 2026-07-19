@@ -7,6 +7,7 @@ Universal Tool/Action Toolkit for Glean agent frameworks.
 from __future__ import annotations
 
 import logging
+import warnings
 from importlib.metadata import PackageNotFoundError, version
 from typing import Any
 
@@ -100,6 +101,14 @@ def get_tools(
             continue
 
         adapter = adapter_cls(spec, ctx)
-        results.append(adapter.to_tool())
+        try:
+            results.append(adapter.to_tool())
+        except Exception as exc:  # noqa: BLE001 - one bad tool must not sink the list
+            warnings.warn(
+                f"Skipping tool {spec.name!r}: failed to convert for framework "
+                f"{framework!r}: {exc}",
+                RuntimeWarning,
+                stacklevel=2,
+            )
 
     return results

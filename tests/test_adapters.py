@@ -138,9 +138,11 @@ def test_adk_adapter_integration() -> None:
     assert getattr(tool, "name", "") == "add"
     assert "Add two integers" in getattr(tool, "description", "")
 
-    # Test the tool can be used
+    # Test the tool can be used and exposes a real, typed signature
     assert callable(getattr(tool, "func", lambda: None))
-    assert hasattr(tool, "schema")
+    import inspect
+
+    assert list(inspect.signature(tool.func).parameters) == ["a", "b"]
 
 
 @pytest.mark.skipif(not HAS_ADK, reason="Google ADK not installed")

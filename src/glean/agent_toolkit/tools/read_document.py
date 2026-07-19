@@ -71,26 +71,25 @@ def read_document(
     client = ctx.get_client()
 
     def _do_read() -> Any:
-        with client as g_client:
-            documents_client: ClientDocuments = g_client.client.documents
+        documents_client: ClientDocuments = client.client.documents
 
-            include_fields = [models.GetDocumentsRequestIncludeField.DOCUMENT_CONTENT]
+        include_fields = [models.GetDocumentsRequestIncludeField.DOCUMENT_CONTENT]
 
-            if document_id is not None:
-                request = models.GetDocumentsRequest(
-                    document_specs=[models.DocumentSpec2(id=document_id)],
-                    include_fields=include_fields,
-                )
-            else:
-                request = models.GetDocumentsRequest(
-                    document_specs=[models.DocumentSpec1(url=common.clean_query(url or ""))],
-                    include_fields=include_fields,
-                )
+        if document_id is not None:
+            request = models.GetDocumentsRequest(
+                document_specs=[models.DocumentSpec2(id=document_id)],
+                include_fields=include_fields,
+            )
+        else:
+            request = models.GetDocumentsRequest(
+                document_specs=[models.DocumentSpec1(url=common.clean_query(url or ""))],
+                include_fields=include_fields,
+            )
 
-            from glean.agent_toolkit.tools._compat import resolve_method
+        from glean.agent_toolkit.tools._compat import resolve_method
 
-            retrieve_fn = resolve_method(documents_client, "retrieve", "get")
-            result = retrieve_fn(request=request)
+        retrieve_fn = resolve_method(documents_client, "retrieve", "get")
+        result = retrieve_fn(request=request)
 
         return common.serialize_tool_result(result)
 
