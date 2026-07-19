@@ -96,10 +96,9 @@ def glean_chat(
     client = ctx.get_client()
 
     def _do_chat() -> dict[str, Any]:
-        with client as g_client:
-            response = g_client.client.chat.create(
-                messages=[{"fragments": [{"text": message}]}],
-            )
+        response = client.client.chat.create(
+            messages=[{"fragments": [{"text": message}]}],
+        )
         answer = _extract_answer(response)
         sources = _extract_sources(response)
         return ChatResult(answer=answer, sources=sources).model_dump()
