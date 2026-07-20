@@ -11,7 +11,12 @@ from glean.agent_toolkit.tools._common import (
     ToolResult,
     serialize_tool_result,
 )
-from glean.agent_toolkit.tools._transport import TypedBackend, execute_tool, register_backend
+from glean.agent_toolkit.tools._transport import (
+    TypedBackend,
+    execute_tool,
+    make_async_tool,
+    register_backend,
+)
 from glean.api_client import Glean
 
 if TYPE_CHECKING:
@@ -83,6 +88,13 @@ def _create_chat(client: Glean, *, message: str) -> Any:
     )
 
 
+async def _create_chat_async(client: Glean, *, message: str) -> Any:
+    """Native async twin of :func:`_create_chat` (``chat.create_async``)."""
+    return await client.client.chat.create_async(
+        messages=[{"fragments": [{"text": message}]}],
+    )
+
+
 def _shape_chat_response(response: Any) -> dict[str, Any]:
     """Shape a ``ChatResponse`` into the ``ChatResult`` payload."""
     answer = _extract_answer(response)
@@ -90,7 +102,10 @@ def _shape_chat_response(response: Any) -> dict[str, Any]:
     return ChatResult(answer=answer, sources=sources).model_dump()
 
 
-register_backend("glean_chat", TypedBackend(_create_chat, _shape_chat_response))
+register_backend(
+    "glean_chat",
+    TypedBackend(_create_chat, _shape_chat_response, async_fn=_create_chat_async),
+)
 
 
 @tool_spec(
@@ -130,3 +145,6 @@ def glean_chat(
     ctx = ctx or GleanContext()
     client = ctx.get_client()
     return execute_tool("glean_chat", {"message": message}, client=client)
+
+
+glean_chat.native_async(make_async_tool("glean_chat"))

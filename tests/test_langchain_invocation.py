@@ -28,8 +28,10 @@ def patched_run_tool(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
     """Replace the Glean network call with a canned ToolResult.
 
     ``search`` binds ``execute_tool`` into its module namespace at import
-    time, so patch it there. Env vars are set so the (unused) client
-    construction inside the tool does not fail.
+    time, so patch it there. The native async path flows through the
+    transport seam's ``execute_tool_async``, so patch that too. Env vars
+    are set so the (unused) client construction inside the tool does not
+    fail.
     """
     monkeypatch.setenv("GLEAN_API_TOKEN", "test-token")
     monkeypatch.setenv("GLEAN_INSTANCE", "test-instance")
@@ -46,10 +48,21 @@ def patched_run_tool(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         captured["arguments"] = dict(arguments)
         return make_ok({"marker": CANNED_PAYLOAD})
 
+    async def fake_execute_tool_async(
+        tool_name: str,
+        arguments: dict[str, Any],
+        *,
+        client: Any = None,
+    ) -> ToolResult:
+        return fake_execute_tool(tool_name, arguments, client=client)
+
     # The tools package re-exports the `search` function under the same
     # name as its module, so resolve the module object explicitly.
     search_module = importlib.import_module("glean.agent_toolkit.tools.search")
     monkeypatch.setattr(search_module, "execute_tool", fake_execute_tool)
+
+    transport_module = importlib.import_module("glean.agent_toolkit.tools._transport")
+    monkeypatch.setattr(transport_module, "execute_tool_async", fake_execute_tool_async)
     return captured
 
 

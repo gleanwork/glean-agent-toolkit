@@ -8,7 +8,12 @@ from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import ToolResult
-from glean.agent_toolkit.tools._transport import TypedBackend, execute_tool, register_backend
+from glean.agent_toolkit.tools._transport import (
+    TypedBackend,
+    execute_tool,
+    make_async_tool,
+    register_backend,
+)
 from glean.api_client import Glean, models
 
 if TYPE_CHECKING:
@@ -51,6 +56,21 @@ def _to_facet_filters(filters: list[dict[str, Any]] | None) -> list[models.Facet
     return facet_filters
 
 
+def _search_request_options(
+    datasources: list[str] | None,
+    filters: list[dict[str, Any]] | None,
+) -> models.SearchRequestOptions | None:
+    """Build ``requestOptions`` from datasources and structured filters."""
+    facet_filters = _to_facet_filters(filters)
+    if not datasources and not facet_filters:
+        return None
+    return models.SearchRequestOptions(
+        facet_bucket_size=0,
+        datasources_filter=list(datasources) if datasources else None,
+        facet_filters=facet_filters or None,
+    )
+
+
 def _query_search(
     client: Glean,
     *,
@@ -64,20 +84,26 @@ def _query_search(
     ``datasources`` maps to ``requestOptions.datasourcesFilter`` and
     structured ``filters`` map to ``requestOptions.facetFilters``.
     """
-    facet_filters = _to_facet_filters(filters)
-
-    request_options: models.SearchRequestOptions | None = None
-    if datasources or facet_filters:
-        request_options = models.SearchRequestOptions(
-            facet_bucket_size=0,
-            datasources_filter=list(datasources) if datasources else None,
-            facet_filters=facet_filters or None,
-        )
-
     return client.client.search.query(
         query=query,
         page_size=page_size,
-        request_options=request_options,
+        request_options=_search_request_options(datasources, filters),
+    )
+
+
+async def _query_search_async(
+    client: Glean,
+    *,
+    query: str,
+    datasources: list[str] | None = None,
+    filters: list[dict[str, Any]] | None = None,
+    page_size: int = 10,
+) -> models.SearchResponse:
+    """Native async twin of :func:`_query_search` (``search.query_async``)."""
+    return await client.client.search.query_async(
+        query=query,
+        page_size=page_size,
+        request_options=_search_request_options(datasources, filters),
     )
 
 
@@ -113,7 +139,10 @@ def _shape_search_response(response: Any) -> dict[str, Any]:
     }
 
 
-register_backend("glean_search", TypedBackend(_query_search, _shape_search_response))
+register_backend(
+    "glean_search",
+    TypedBackend(_query_search, _shape_search_response, async_fn=_query_search_async),
+)
 
 
 @tool_spec(
@@ -205,3 +234,6 @@ def search(
         },
         client=client,
     )
+
+
+search.native_async(make_async_tool("glean_search"))

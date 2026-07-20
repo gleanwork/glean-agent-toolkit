@@ -11,6 +11,7 @@ from glean.agent_toolkit.tools._common import ToolResult
 from glean.agent_toolkit.tools._transport import (
     ToolsCallBackend,
     execute_tool,
+    make_async_tool,
     register_backend,
 )
 
@@ -65,3 +66,6 @@ def employee_search(
     ctx = ctx or GleanContext()
     client = ctx.get_client()
     return execute_tool("glean_employee_search", {"query": query}, client=client)
+
+
+employee_search.native_async(make_async_tool("glean_employee_search"))
