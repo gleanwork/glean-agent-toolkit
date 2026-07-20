@@ -76,18 +76,18 @@ def test_crewai_glean_search_run_with_mocked_glean_layer(
     }
     calls: list[dict[str, Any]] = []
 
-    def fake_run_tool(tool_display_name: str, parameters: Any, **kwargs: Any) -> dict[str, Any]:
-        calls.append({"name": tool_display_name, "parameters": parameters})
+    def fake_execute_tool(tool_name: str, arguments: Any, **kwargs: Any) -> dict[str, Any]:
+        calls.append({"name": tool_name, "arguments": dict(arguments)})
         return canned
 
-    monkeypatch.setattr(search_mod, "run_tool", fake_run_tool)
+    monkeypatch.setattr(search_mod, "execute_tool", fake_execute_tool)
 
     tool = search_mod.search.as_crewai_tool()
     output = tool.run(query="test")
 
     assert len(calls) == 1
-    assert calls[0]["name"] == "Glean Search"
-    assert calls[0]["parameters"]["query"].value == "test"
+    assert calls[0]["name"] == "glean_search"
+    assert calls[0]["arguments"]["query"] == "test"
 
     assert json.loads(output) == canned
 

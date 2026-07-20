@@ -9,9 +9,10 @@ from pydantic import BaseModel, Field
 from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import (
     ToolResult,
-    run_with_error_handling,
     serialize_tool_result,
 )
+from glean.agent_toolkit.tools._transport import TypedBackend, execute_tool, register_backend
+from glean.api_client import Glean
 
 if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
@@ -75,6 +76,23 @@ def _extract_sources(response: Any) -> list[dict[str, Any]]:
     return sources
 
 
+def _create_chat(client: Glean, *, message: str) -> Any:
+    """Perform the typed ``POST /rest/api/v1/chat`` call."""
+    return client.client.chat.create(
+        messages=[{"fragments": [{"text": message}]}],
+    )
+
+
+def _shape_chat_response(response: Any) -> dict[str, Any]:
+    """Shape a ``ChatResponse`` into the ``ChatResult`` payload."""
+    answer = _extract_answer(response)
+    sources = _extract_sources(response)
+    return ChatResult(answer=answer, sources=sources).model_dump()
+
+
+register_backend("glean_chat", TypedBackend(_create_chat, _shape_chat_response))
+
+
 @tool_spec(
     name="glean_chat",
     description=(
@@ -111,13 +129,4 @@ def glean_chat(
 
     ctx = ctx or GleanContext()
     client = ctx.get_client()
-
-    def _do_chat() -> dict[str, Any]:
-        response = client.client.chat.create(
-            messages=[{"fragments": [{"text": message}]}],
-        )
-        answer = _extract_answer(response)
-        sources = _extract_sources(response)
-        return ChatResult(answer=answer, sources=sources).model_dump()
-
-    return run_with_error_handling(_do_chat)
+    return execute_tool("glean_chat", {"message": message}, client=client)

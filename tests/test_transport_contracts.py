@@ -7,9 +7,8 @@ with response JSON shaped like the real backend payloads and verify:
 
 1. The outbound request body matches the wire contract of the endpoint.
 2. Deserialization runs through the real SDK models
-   (``ToolsCallResponse``, ``ChatResponse``, ``GetDocumentsResponse``).
-3. The tool returns a correct, fully structured ``ToolResult``, with
-   camelCase field aliases preserved by ``serialize_tool_result``.
+   (``SearchResponse``, ``ChatResponse``, ``GetDocumentsResponse``).
+3. The tool returns a correct, fully structured ``ToolResult``.
 """
 
 from __future__ import annotations
@@ -24,7 +23,7 @@ from glean.agent_toolkit.tools.read_document import read_document
 from glean.agent_toolkit.tools.search import search
 
 BASE_URL = "https://test-instance-be.glean.com"
-TOOLS_CALL_URL = f"{BASE_URL}/rest/api/v1/tools/call"
+SEARCH_URL = f"{BASE_URL}/rest/api/v1/search"
 CHAT_URL = f"{BASE_URL}/rest/api/v1/chat"
 GET_DOCUMENTS_URL = f"{BASE_URL}/rest/api/v1/getdocuments"
 
@@ -36,97 +35,98 @@ def _request_body(httpx_mock: HTTPXMock) -> dict[str, Any]:
 
 
 # ---------------------------------------------------------------------------
-# search -> POST /rest/api/v1/tools/call (ToolsCallResponse)
+# search -> POST /rest/api/v1/search (SearchResponse)
 # ---------------------------------------------------------------------------
 
 
-REALISTIC_SEARCH_RAW_RESPONSE: dict[str, Any] = {
+REALISTIC_SEARCH_RESPONSE: dict[str, Any] = {
     "results": [
         {
             "title": "Q3 Financial Results",
             "url": "https://drive.google.com/file/d/abc123",
-            "datasource": "gdrive",
-            "snippets": [
-                {"snippet": "Revenue grew 18% quarter over quarter.", "mimeType": "text/plain"}
-            ],
-            "metadata": {
-                "author": {"name": "Test User"},
-                "updateTime": "2025-10-01T12:00:00Z",
+            "document": {
+                "id": "doc-1",
+                "datasource": "gdrive",
+                "title": "Q3 Financial Results",
+                "url": "https://drive.google.com/file/d/abc123",
             },
+            "snippets": [
+                {"text": "Revenue grew 18% quarter over quarter.", "mimeType": "text/plain"}
+            ],
         },
         {
             "title": "Q3 Board Deck",
             "url": "https://docs.google.com/presentation/d/def456",
-            "datasource": "gdrive",
-            "snippets": [{"snippet": "Q3 highlights and FY outlook."}],
+            "document": {"id": "doc-2", "datasource": "gdrive"},
+            "snippets": [{"text": "Q3 highlights and FY outlook."}],
         },
     ],
     "trackingToken": "tracking-token-1",
     "hasMoreResults": False,
+    "backendTimeMillis": 42,
 }
 
 
-def test_search_deserializes_realistic_tools_call_response(httpx_mock: HTTPXMock) -> None:
-    """A realistic ToolsCallResponse round-trips into ToolResult.result."""
+def test_search_deserializes_realistic_search_response(httpx_mock: HTTPXMock) -> None:
+    """A realistic SearchResponse round-trips into the shaped ToolResult."""
     httpx_mock.add_response(
         method="POST",
-        url=TOOLS_CALL_URL,
-        json={"rawResponse": REALISTIC_SEARCH_RAW_RESPONSE, "error": None},
+        url=SEARCH_URL,
+        json=REALISTIC_SEARCH_RESPONSE,
     )
 
     result = search(query="quarterly financial results", page_size=2)
 
     assert result["status"] == "ok"
     assert result["error"] is None
-    # serialize_tool_result dumps the SDK model with by_alias=True, so the
-    # camelCase keys of the raw payload must survive verbatim. Field-wise
-    # check: older glean-api-client versions dump unset optional fields as
-    # explicit None ("error": None); newer versions omit them entirely.
-    assert result["result"]["rawResponse"] == REALISTIC_SEARCH_RAW_RESPONSE
-    assert result["result"].get("error") is None
+
+    payload = result["result"]
+    assert payload["result_count"] == 2
+    assert payload["has_more_results"] is False
+    assert payload["results"][0] == {
+        "title": "Q3 Financial Results",
+        "url": "https://drive.google.com/file/d/abc123",
+        "snippets": ["Revenue grew 18% quarter over quarter."],
+        "datasource": "gdrive",
+        "document_id": "doc-1",
+    }
 
     body = _request_body(httpx_mock)
-    assert body["name"] == "Glean Search"
-    assert body["parameters"]["query"]["value"] == "quarterly financial results"
-    assert body["parameters"]["pageSize"]["value"] == "2"
+    assert body["query"] == "quarterly financial results"
+    assert body["pageSize"] == 2
+    assert "requestOptions" not in body
 
 
 def test_search_sends_datasources_and_filters_on_the_wire(httpx_mock: HTTPXMock) -> None:
-    """Structured args are JSON-encoded into ToolsCallParameter values."""
+    """Structured args map to requestOptions on the typed endpoint."""
     httpx_mock.add_response(
         method="POST",
-        url=TOOLS_CALL_URL,
-        json={"rawResponse": {"results": []}},
+        url=SEARCH_URL,
+        json={"results": []},
     )
 
-    filters = [{"field": "app", "values": ["jira"], "exclude": False}]
+    filters = [
+        {"field": "type", "values": ["Presentation"]},
+        {"field": "from", "values": ["bot"], "exclude": True},
+    ]
     result = search(query="sprint tasks", datasources=["jira", "confluence"], filters=filters)
 
     assert result["status"] == "ok"
+    assert result["result"] == {"results": [], "result_count": 0, "has_more_results": False}
 
     body = _request_body(httpx_mock)
-    params = body["parameters"]
-    assert json.loads(params["datasources"]["value"]) == ["jira", "confluence"]
-    assert json.loads(params["filters"]["value"]) == filters
-
-
-def test_search_tool_level_error_field_is_preserved(httpx_mock: HTTPXMock) -> None:
-    """A tools/call payload carrying an error field still deserializes."""
-    httpx_mock.add_response(
-        method="POST",
-        url=TOOLS_CALL_URL,
-        json={"rawResponse": None, "error": "Tool execution failed upstream"},
-    )
-
-    result = search(query="anything")
-
-    # The HTTP call itself succeeded, so the ToolResult is "ok" and the
-    # tool-level error is surfaced inside the deserialized payload.
-    # (Field-wise: newer glean-api-client versions omit the unset
-    # rawResponse key instead of dumping "rawResponse": None.)
-    assert result["status"] == "ok"
-    assert result["result"].get("rawResponse") is None
-    assert result["result"]["error"] == "Tool execution failed upstream"
+    options = body["requestOptions"]
+    assert options["datasourcesFilter"] == ["jira", "confluence"]
+    assert options["facetFilters"] == [
+        {
+            "fieldName": "type",
+            "values": [{"value": "Presentation", "relationType": "EQUALS"}],
+        },
+        {
+            "fieldName": "from",
+            "values": [{"value": "bot", "relationType": "NOT_EQUALS"}],
+        },
+    ]
 
 
 def test_search_http_401_maps_to_auth_error(httpx_mock: HTTPXMock) -> None:
@@ -137,7 +137,7 @@ def test_search_http_401_maps_to_auth_error(httpx_mock: HTTPXMock) -> None:
     """
     httpx_mock.add_response(
         method="POST",
-        url=TOOLS_CALL_URL,
+        url=SEARCH_URL,
         status_code=401,
         json={"error": "Invalid token"},
     )

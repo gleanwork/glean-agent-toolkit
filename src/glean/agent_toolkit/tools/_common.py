@@ -35,11 +35,61 @@ class ToolResult(TypedDict):
     suggested_action: SuggestedAction | None
 
 
+def _sdk_error_status_code(exc: Exception) -> int | None:
+    """Return the HTTP status code carried by a Glean SDK error, if any."""
+    try:
+        from glean.api_client.errors import GleanBaseError
+    except ImportError:  # pragma: no cover - SDK is a hard dependency
+        return None
+
+    if isinstance(exc, GleanBaseError):
+        status_code = getattr(exc, "status_code", None)
+        if isinstance(status_code, int):
+            return status_code
+    return None
+
+
+def _classify_status_code(status_code: int) -> tuple[ErrorType, SuggestedAction]:
+    """Map an HTTP status code to an error type and suggested action."""
+    if status_code in (401, 403):
+        return "auth", "check_credentials"
+    if status_code == 404:
+        return "not_found", "rephrase_query"
+    if status_code == 408:
+        return "timeout", "retry"
+    if status_code == 429:
+        return "rate_limit", "retry"
+    if status_code in (400, 422):
+        return "validation", "rephrase_query"
+    if status_code >= 500:
+        return "api", "retry"
+    return "api", "retry"
+
+
+def _is_timeout_exception(exc: Exception) -> bool:
+    """Whether *exc* is a known timeout exception class."""
+    if isinstance(exc, TimeoutError):
+        return True
+    try:
+        import httpx
+    except ImportError:  # pragma: no cover - httpx ships with the SDK
+        return False
+    return isinstance(exc, httpx.TimeoutException)
+
+
 def _classify_error(exc: Exception) -> tuple[ErrorType, SuggestedAction]:
-    """Classify an exception into an error type and suggested action."""
+    """Classify an exception into an error type and suggested action.
+
+    Glean SDK errors are classified by their HTTP status code first; the
+    string heuristics below remain as a fallback for non-SDK exceptions.
+    """
+    status_code = _sdk_error_status_code(exc)
+    if status_code is not None:
+        return _classify_status_code(status_code)
+
     msg = str(exc).lower()
 
-    if isinstance(exc, TimeoutError) or "timeout" in msg or "timed out" in msg:
+    if _is_timeout_exception(exc) or "timeout" in msg or "timed out" in msg:
         return "timeout", "retry"
 
     if isinstance(exc, ValueError):
@@ -135,6 +185,10 @@ def run_tool(
 ) -> ToolResult:
     """Execute a Glean stub tool and wrap the response.
 
+    Legacy entry point retained for backward compatibility; execution is
+    delegated to the transport seam's ``ToolsCallBackend`` so the
+    ``tools/call`` plumbing lives in one place.
+
     Args:
         tool_display_name: Display name for the tool
         parameters: Tool parameters
@@ -150,14 +204,10 @@ def run_tool(
 
             client = GleanContext().get_client()
 
-        from glean.agent_toolkit.tools._compat import resolve_method
+        from glean.agent_toolkit.tools._transport import ToolsCallBackend
 
-        run_fn = resolve_method(client.client.tools, "run", "execute")
-        result = run_fn(
-            name=tool_display_name,
-            parameters=parameters,
-        )
-        return make_ok(serialize_tool_result(result))
+        backend = ToolsCallBackend(tool_display_name)
+        return make_ok(backend.call_raw(client, parameters))
     except Exception as e:
         error_type, suggested_action = _classify_error(e)
         return make_error(str(e), error_type, suggested_action)

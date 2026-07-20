@@ -95,15 +95,15 @@ async def test_on_invoke_tool_framework_path(monkeypatch: pytest.MonkeyPatch) ->
     canned = make_ok({"documents": [{"title": "canned-doc"}]})
     captured: dict[str, Any] = {}
 
-    def fake_run_tool(tool_display_name: str, parameters: Any, *, client: Any = None) -> Any:
-        captured["tool_display_name"] = tool_display_name
-        captured["parameters"] = parameters
+    def fake_execute_tool(tool_name: str, arguments: Any, *, client: Any = None) -> Any:
+        captured["tool_name"] = tool_name
+        captured["arguments"] = dict(arguments)
         return canned
 
     import importlib
 
     search_module = importlib.import_module("glean.agent_toolkit.tools.search")
-    monkeypatch.setattr(search_module, "run_tool", fake_run_tool)
+    monkeypatch.setattr(search_module, "execute_tool", fake_execute_tool)
 
     tools = get_tools("openai", include=["glean_search"], client=_mock_client())
     assert len(tools) == 1
@@ -115,7 +115,7 @@ async def test_on_invoke_tool_framework_path(monkeypatch: pytest.MonkeyPatch) ->
     result = json.loads(result_str)
     assert result["status"] == "ok"
     assert result["result"] == {"documents": [{"title": "canned-doc"}]}
-    assert captured["tool_display_name"] == "Glean Search"
+    assert captured["tool_name"] == "glean_search"
 
 
 def test_read_document_optional_params_schema_valid() -> None:

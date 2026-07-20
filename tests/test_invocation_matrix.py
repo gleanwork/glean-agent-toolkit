@@ -57,6 +57,7 @@ except ImportError:  # pragma: no cover
 
 BASE_URL = "https://test-instance-be.glean.com"
 TOOLS_CALL_URL = f"{BASE_URL}/rest/api/v1/tools/call"
+SEARCH_URL = f"{BASE_URL}/rest/api/v1/search"
 CHAT_URL = f"{BASE_URL}/rest/api/v1/chat"
 GET_DOCUMENTS_URL = f"{BASE_URL}/rest/api/v1/getdocuments"
 
@@ -119,6 +120,47 @@ def _tools_call_case(
         args=args,
         url=TOOLS_CALL_URL,
         response_json={"rawResponse": raw_response},
+        check_request=check_request,
+        check_result=check_result,
+    )
+
+
+def _search_case() -> ToolCase:
+    """Build the case for glean_search (typed POST /rest/api/v1/search)."""
+    query = "quarterly financial results"
+
+    def check_request(body: dict[str, Any]) -> None:
+        assert body["query"] == query
+        assert body["pageSize"] == 5
+
+    def check_result(result: Any) -> None:
+        assert result["result_count"] == 1
+        assert result["has_more_results"] is False
+        assert result["results"] == [
+            {
+                "title": "Q3 Financial Results",
+                "url": "https://drive.example.com/doc/abc123",
+                "snippets": ["Revenue grew 18% quarter over quarter."],
+                "datasource": "gdrive",
+                "document_id": "doc-1",
+            }
+        ]
+
+    return ToolCase(
+        tool_name="glean_search",
+        args={"query": query, "page_size": 5},
+        url=SEARCH_URL,
+        response_json={
+            "results": [
+                {
+                    "title": "Q3 Financial Results",
+                    "url": "https://drive.example.com/doc/abc123",
+                    "document": {"id": "doc-1", "datasource": "gdrive"},
+                    "snippets": [{"text": "Revenue grew 18% quarter over quarter."}],
+                }
+            ],
+            "hasMoreResults": False,
+        },
         check_request=check_request,
         check_result=check_result,
     )
@@ -197,13 +239,8 @@ def _read_document_case() -> ToolCase:
 
 
 TOOL_CASES: list[ToolCase] = [
-    # Multi-arg case: query + page_size must both reach the wire.
-    _tools_call_case(
-        "glean_search",
-        "Glean Search",
-        args={"query": "quarterly financial results", "page_size": 5},
-        expected_params={"query": "quarterly financial results", "pageSize": "5"},
-    ),
+    # Multi-arg case: query + page_size must both reach the wire (typed endpoint).
+    _search_case(),
     _tools_call_case(
         "glean_web_search",
         "Gemini Web Search",

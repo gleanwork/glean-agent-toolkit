@@ -17,7 +17,7 @@ from glean.agent_toolkit.context import GleanContext
 from glean.agent_toolkit.tools.search import search
 
 SERVER_URL = "https://example.glean.com"
-TOOLS_CALL_URL = f"{SERVER_URL}/rest/api/v1/tools/call"
+SEARCH_URL = f"{SERVER_URL}/rest/api/v1/search"
 
 
 @pytest.fixture
@@ -30,8 +30,8 @@ def _mock_tools_call(httpx_mock: HTTPXMock, count: int = 1) -> None:
     for _ in range(count):
         httpx_mock.add_response(
             method="POST",
-            url=TOOLS_CALL_URL,
-            json={"rawResponse": {"results": []}},
+            url=SEARCH_URL,
+            json={"results": []},
         )
 
 
