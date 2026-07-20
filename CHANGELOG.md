@@ -1,3 +1,14 @@
+## 0.7.0 (2026-07-19)
+
+### Feat
+
+- **tools**: add transport seam, typed search backend, result truncation, status-code errors (#87)
+
+### Fix
+
+- **chat**: read citations from fragments with legacy fallback (#83)
+- **core**: ctx-aware as_*_tool, registry collision warnings, retry unit fix (#84)
+
 ## 0.6.1 (2026-07-19)
 
 ### Fix
