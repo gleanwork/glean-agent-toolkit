@@ -97,7 +97,10 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.coverage.run]
-omit = ["tests/*"]
+# The SDK installs into the same `glean` namespace package (glean.api_client),
+# so `--cov=glean` would otherwise measure the vendored SDK and the coverage
+# gate would swing with SDK size across releases. Only measure the toolkit.
+omit = ["tests/*", "*/glean/api_client/*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
