@@ -2,6 +2,19 @@ from glean.agent_toolkit.registry import Registry, get_registry
 from glean.agent_toolkit.spec import ToolSpec
 
 
+def _make_spec(name: str, description: str = "A tool") -> ToolSpec:
+    def fn() -> None:
+        return None
+
+    return ToolSpec(
+        name=name,
+        description=description,
+        function=fn,
+        input_schema={"type": "object", "properties": {}, "required": []},
+        output_schema={"type": "object"},
+    )
+
+
 def test_registry_init() -> None:
     """Test registry initialization."""
     registry = Registry()
@@ -115,3 +128,35 @@ def test_get_registry() -> None:
     registry1 = get_registry()
     registry2 = get_registry()
     assert registry1 is registry2
+
+
+def test_register_duplicate_name_warns_and_overwrites() -> None:
+    """Re-registering a name warns (RuntimeWarning) but still overwrites."""
+    import pytest
+
+    registry = Registry()
+    first = _make_spec("dup", "first")
+    second = _make_spec("dup", "second")
+
+    registry.register(first)
+
+    with pytest.warns(RuntimeWarning, match="'dup' is already registered"):
+        registry.register(second)
+
+    assert registry.get("dup") is second
+    assert len(registry.list()) == 1
+
+
+def test_register_unique_names_do_not_warn() -> None:
+    """Registering distinct names must not emit warnings."""
+    import warnings
+
+    registry = Registry()
+
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        registry.register(_make_spec("one"))
+        registry.register(_make_spec("two"))
+
+    assert registry.get("one") is not None
+    assert registry.get("two") is not None

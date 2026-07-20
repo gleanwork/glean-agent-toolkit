@@ -19,6 +19,7 @@ from glean.agent_toolkit.spec import ToolSpec
 from . import adapters
 
 __all__ = [
+    "BUILTIN_TOOL_NAMES",
     "GleanContext",
     "get_tools",
     "tool_spec",
@@ -44,12 +45,28 @@ _ADAPTER_CLASSES: dict[str, str] = {
     "adk": "glean.agent_toolkit.adapters.adk.ADKAdapter",
 }
 
+#: Names of the built-in Glean tools shipped with this package.
+BUILTIN_TOOL_NAMES: frozenset[str] = frozenset(
+    {
+        "glean_calendar_search",
+        "glean_chat",
+        "glean_code_search",
+        "glean_employee_search",
+        "glean_gmail_search",
+        "glean_outlook_search",
+        "glean_read_document",
+        "glean_search",
+        "glean_web_search",
+    }
+)
+
 
 def get_tools(
     framework: str,
     *,
     include: list[str] | None = None,
     exclude: list[str] | None = None,
+    builtin: bool | None = None,
     client: Any | None = None,
     api_token: str | None = None,
     server_url: str | None = None,
@@ -57,10 +74,20 @@ def get_tools(
 ) -> list[Any]:
     """Return framework-adapted tools filtered by include/exclude.
 
+    The tool registry is **global**: by default this returns every tool
+    registered in the current process, which includes both the built-in
+    ``glean_*`` tools and any user-defined tools registered via
+    :func:`tool_spec`. Use *builtin* (or *include*/*exclude*) to scope
+    the result.
+
     Args:
         framework: One of ``"openai"``, ``"langchain"``, ``"crewai"``, ``"adk"``.
         include: If given, only return tools whose names are in this list.
         exclude: If given, skip tools whose names are in this list.
+        builtin: If ``True``, only return the built-in Glean tools (see
+            :data:`BUILTIN_TOOL_NAMES`). If ``False``, only return
+            user-registered tools. If ``None`` (default), return all
+            registered tools. Applied in addition to *include*/*exclude*.
         client: Pre-configured :class:`~glean.api_client.Glean` instance.
         api_token: Glean API token (falls back to ``GLEAN_API_TOKEN``).
         server_url: Glean server URL (falls back to ``GLEAN_SERVER_URL``).
@@ -98,6 +125,10 @@ def get_tools(
         if include_set is not None and spec.name not in include_set:
             continue
         if spec.name in exclude_set:
+            continue
+        if builtin is True and spec.name not in BUILTIN_TOOL_NAMES:
+            continue
+        if builtin is False and spec.name in BUILTIN_TOOL_NAMES:
             continue
 
         adapter = adapter_cls(spec, ctx)

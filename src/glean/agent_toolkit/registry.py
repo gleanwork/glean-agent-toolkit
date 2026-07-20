@@ -1,5 +1,7 @@
 """Tool registry for managing and retrieving tool specifications."""
 
+import warnings
+
 from glean.agent_toolkit.spec import ToolSpec
 
 
@@ -13,9 +15,23 @@ class Registry:
     def register(self, tool_spec: ToolSpec) -> None:
         """Register a tool specification.
 
+        Re-registering an existing name emits a :class:`RuntimeWarning`
+        and overwrites the previous entry (last write wins). Overwriting
+        is intentionally allowed so module reloads in tests/dev do not
+        raise at import time, but the warning surfaces accidental name
+        collisions between unrelated tools.
+
         Args:
             tool_spec: The tool specification to register
         """
+        if tool_spec.name in self._tools:
+            warnings.warn(
+                f"Tool {tool_spec.name!r} is already registered; overwriting the "
+                "previous registration. Use a unique tool name if this is not a "
+                "deliberate re-registration (e.g. a module reload).",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         self._tools[tool_spec.name] = tool_spec
 
     def get(self, name: str) -> ToolSpec | None:

@@ -9,13 +9,27 @@ import inspect
 import types
 import typing
 from collections.abc import Callable
-from typing import Annotated, Any, Protocol, TypedDict, TypeVar, Union, cast, get_args, get_origin
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Any,
+    Protocol,
+    TypedDict,
+    TypeVar,
+    Union,
+    cast,
+    get_args,
+    get_origin,
+)
 
 from pydantic import BaseModel, Field, TypeAdapter, create_model
 from pydantic.fields import FieldInfo
 
 from glean.agent_toolkit.registry import get_registry
 from glean.agent_toolkit.spec import ToolSpec
+
+if TYPE_CHECKING:
+    from glean.agent_toolkit.context import GleanContext
 
 _EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=10)
 
@@ -101,21 +115,6 @@ def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
 
         return base_type, field_info
 
-    # Handle case where annotation got converted to string but contains Annotated info
-    param_str = str(param_type)
-    if "Annotated[" in param_str and "Field(" in param_str:
-        try:
-            # Try to evaluate the string as a type annotation
-            # This is a fallback for cases where type annotations got stringified
-            import ast
-            import typing
-
-            # Simple string parsing fallback - use original type if parsing fails
-            return param_type, None
-        except Exception:
-            # If parsing fails, return the original annotation
-            return param_type, None
-
     return param_type, None
 
 
@@ -196,32 +195,48 @@ class ToolSpecFunction(Protocol):
 
     tool_spec: ToolSpec
 
-    def as_openai_tool(self) -> dict[str, Any] | Any:
+    def as_openai_tool(self, ctx: GleanContext | None = None) -> dict[str, Any] | Any:
         """Convert to OpenAI tool format.
+
+        Args:
+            ctx: Optional context bound into tool invocations. When omitted,
+                configuration falls back to environment variables.
 
         Returns:
             OpenAI tool specification
         """
         ...
 
-    def as_adk_tool(self) -> Any:
+    def as_adk_tool(self, ctx: GleanContext | None = None) -> Any:
         """Convert to Google ADK tool format.
+
+        Args:
+            ctx: Optional context bound into tool invocations. When omitted,
+                configuration falls back to environment variables.
 
         Returns:
             Google ADK tool
         """
         ...
 
-    def as_langchain_tool(self) -> Any:
+    def as_langchain_tool(self, ctx: GleanContext | None = None) -> Any:
         """Convert to LangChain tool format.
+
+        Args:
+            ctx: Optional context bound into tool invocations. When omitted,
+                configuration falls back to environment variables.
 
         Returns:
             LangChain tool
         """
         ...
 
-    def as_crewai_tool(self) -> Any:
+    def as_crewai_tool(self, ctx: GleanContext | None = None) -> Any:
         """Convert to CrewAI tool format.
+
+        Args:
+            ctx: Optional context bound into tool invocations. When omitted,
+                configuration falls back to environment variables.
 
         Returns:
             CrewAI tool
@@ -341,13 +356,22 @@ def tool_spec(
             """
             return func(*args, **kwargs)
 
-        def as_openai_tool() -> dict[str, Any] | Any:
+        def as_openai_tool(ctx: GleanContext | None = None) -> dict[str, Any] | Any:
             """Convert to OpenAI tool format.
+
+            Args:
+                ctx: Optional context bound into tool invocations. When omitted,
+                    configuration falls back to environment variables.
 
             Returns:
                 OpenAI tool specification
             """
             from glean.agent_toolkit.adapters.openai import OpenAIAdapter
+
+            if ctx is not None:
+                # Never reuse a cached (ctx-less) adapter for an explicit
+                # context; build a fresh adapter bound to this ctx.
+                return OpenAIAdapter(tool_spec_obj, ctx).to_tool()
 
             adapter = tool_spec_obj.get_adapter("openai")
             if adapter is None:
@@ -356,13 +380,20 @@ def tool_spec(
 
             return adapter.to_tool()
 
-        def as_adk_tool() -> Any:
+        def as_adk_tool(ctx: GleanContext | None = None) -> Any:
             """Convert to Google ADK tool format.
+
+            Args:
+                ctx: Optional context bound into tool invocations. When omitted,
+                    configuration falls back to environment variables.
 
             Returns:
                 Google ADK tool
             """
             from glean.agent_toolkit.adapters.adk import ADKAdapter
+
+            if ctx is not None:
+                return ADKAdapter(tool_spec_obj, ctx).to_tool()
 
             adapter = tool_spec_obj.get_adapter("adk")
             if adapter is None:
@@ -371,13 +402,20 @@ def tool_spec(
 
             return adapter.to_tool()
 
-        def as_langchain_tool() -> Any:
+        def as_langchain_tool(ctx: GleanContext | None = None) -> Any:
             """Convert to LangChain tool format.
+
+            Args:
+                ctx: Optional context bound into tool invocations. When omitted,
+                    configuration falls back to environment variables.
 
             Returns:
                 LangChain tool
             """
             from glean.agent_toolkit.adapters.langchain import LangChainAdapter
+
+            if ctx is not None:
+                return LangChainAdapter(tool_spec_obj, ctx).to_tool()
 
             adapter = tool_spec_obj.get_adapter("langchain")
             if adapter is None:
@@ -386,13 +424,20 @@ def tool_spec(
 
             return adapter.to_tool()
 
-        def as_crewai_tool() -> Any:
+        def as_crewai_tool(ctx: GleanContext | None = None) -> Any:
             """Convert to CrewAI tool format.
+
+            Args:
+                ctx: Optional context bound into tool invocations. When omitted,
+                    configuration falls back to environment variables.
 
             Returns:
                 CrewAI tool
             """
             from glean.agent_toolkit.adapters.crewai import CrewAIAdapter
+
+            if ctx is not None:
+                return CrewAIAdapter(tool_spec_obj, ctx).to_tool()
 
             adapter = tool_spec_obj.get_adapter("crewai")
             if adapter is None:

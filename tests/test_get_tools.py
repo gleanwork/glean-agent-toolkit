@@ -80,6 +80,46 @@ def test_get_tools_unknown_framework() -> None:
         get_tools("pytorch", client=_mock_client())
 
 
+def test_get_tools_builtin_true_returns_only_builtins() -> None:
+    from glean.agent_toolkit import BUILTIN_TOOL_NAMES, tool_spec
+
+    @tool_spec(name="user_defined_probe_tool", description="A user tool")
+    def user_tool(ctx: GleanContext, text: str) -> str:
+        return text
+
+    tools = get_tools("langchain", builtin=True, client=_mock_client())
+    names = {t.name for t in tools}
+    assert names == set(BUILTIN_TOOL_NAMES)
+    assert "user_defined_probe_tool" not in names
+
+
+def test_get_tools_builtin_false_returns_only_user_tools() -> None:
+    from glean.agent_toolkit import BUILTIN_TOOL_NAMES, tool_spec
+
+    @tool_spec(name="user_defined_probe_tool_2", description="Another user tool")
+    def user_tool(ctx: GleanContext, text: str) -> str:
+        return text
+
+    tools = get_tools("langchain", builtin=False, client=_mock_client())
+    names = {t.name for t in tools}
+    assert "user_defined_probe_tool_2" in names
+    assert not names & set(BUILTIN_TOOL_NAMES)
+
+
+def test_get_tools_builtin_default_returns_all() -> None:
+    """Default (builtin=None) keeps the registry-global behavior."""
+    from glean.agent_toolkit import BUILTIN_TOOL_NAMES, tool_spec
+
+    @tool_spec(name="user_defined_probe_tool_3", description="Yet another user tool")
+    def user_tool(ctx: GleanContext, text: str) -> str:
+        return text
+
+    tools = get_tools("langchain", client=_mock_client())
+    names = {t.name for t in tools}
+    assert set(BUILTIN_TOOL_NAMES) <= names
+    assert "user_defined_probe_tool_3" in names
+
+
 def test_get_tools_uses_ctx_params() -> None:
     mock = _mock_client()
     tools = get_tools("langchain", client=mock, include=["glean_search"])
