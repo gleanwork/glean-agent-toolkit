@@ -8,8 +8,8 @@ from pydantic import BaseModel
 
 from glean.api_client import Glean, models
 
-ErrorType = Literal["auth", "validation", "api", "timeout", "not_found", "rate_limit"]
-SuggestedAction = Literal["retry", "check_credentials", "rephrase_query"]
+ErrorType = Literal["auth", "validation", "api", "timeout", "not_found", "rate_limit", "config"]
+SuggestedAction = Literal["retry", "check_credentials", "rephrase_query", "check_configuration"]
 
 
 class ToolResult(TypedDict):
@@ -72,6 +72,47 @@ def _is_timeout_exception(exc: Exception) -> bool:
     return isinstance(exc, httpx.TimeoutException)
 
 
+_CONNECTION_ERROR_MARKERS = (
+    "getaddrinfo",
+    "name or service not known",
+    "nodename nor servname",
+    "failed to resolve",
+    "temporary failure in name resolution",
+    "connection refused",
+    "all connection attempts failed",
+)
+
+CONNECTION_ERROR_HINT = (
+    " (could not connect to the Glean API: check that GLEAN_SERVER_URL/GLEAN_INSTANCE "
+    "or the configured server_url/instance points at your Glean backend, e.g. "
+    "https://your-company-be.glean.com; connection errors are retried for up to "
+    "GLEAN_RETRY_MAX_ELAPSED seconds, default 60, before giving up)"
+)
+"""Hint appended to connection-level errors so misconfiguration is actionable."""
+
+
+def _is_connection_exception(exc: Exception) -> bool:
+    """Whether *exc* is a connection/DNS-level failure (host unreachable).
+
+    These almost always mean the configured server URL/instance is wrong
+    (typo, missing scheme resolved elsewhere, unreachable host), so they are
+    classified as ``config`` rather than a retryable ``api`` error.
+    """
+    import socket
+
+    if isinstance(exc, ConnectionError | socket.gaierror):
+        return True
+    try:
+        import httpx
+    except ImportError:  # pragma: no cover - httpx ships with the SDK
+        pass
+    else:
+        if isinstance(exc, httpx.ConnectError):
+            return True
+    msg = str(exc).lower()
+    return any(marker in msg for marker in _CONNECTION_ERROR_MARKERS)
+
+
 def _classify_error(exc: Exception) -> tuple[ErrorType, SuggestedAction]:
     """Classify an exception into an error type and suggested action.
 
@@ -86,6 +127,17 @@ def _classify_error(exc: Exception) -> tuple[ErrorType, SuggestedAction]:
 
     if _is_timeout_exception(exc) or "timeout" in msg or "timed out" in msg:
         return "timeout", "retry"
+
+    from glean.agent_toolkit.context import GleanConfigurationError, GleanCredentialsError
+
+    if isinstance(exc, GleanCredentialsError):
+        return "auth", "check_credentials"
+
+    if isinstance(exc, GleanConfigurationError):
+        return "config", "check_configuration"
+
+    if _is_connection_exception(exc):
+        return "config", "check_configuration"
 
     if isinstance(exc, ValueError):
         return "validation", "rephrase_query"
@@ -131,6 +183,21 @@ def make_error(
     )
 
 
+def error_result_from_exception(exc: Exception) -> ToolResult:
+    """Classify *exc* and build the error ``ToolResult`` for it.
+
+    Connection-level failures get an actionable hint appended: they are
+    almost always a misconfigured server URL/instance, and the SDK retries
+    them for the full ``GLEAN_RETRY_MAX_ELAPSED`` budget (60s by default)
+    before surfacing the error, which is otherwise baffling to callers.
+    """
+    error_type, suggested_action = _classify_error(exc)
+    message = str(exc)
+    if error_type == "config" and _is_connection_exception(exc):
+        message += CONNECTION_ERROR_HINT
+    return make_error(message, error_type, suggested_action)
+
+
 def run_with_error_handling(fn: Any, *args: Any, **kwargs: Any) -> ToolResult:
     """Call *fn* and wrap the outcome in a ``ToolResult``.
 
@@ -141,8 +208,7 @@ def run_with_error_handling(fn: Any, *args: Any, **kwargs: Any) -> ToolResult:
         result = fn(*args, **kwargs)
         return make_ok(result)
     except Exception as e:
-        error_type, suggested_action = _classify_error(e)
-        return make_error(str(e), error_type, suggested_action)
+        return error_result_from_exception(e)
 
 
 def clean_query(query: str) -> str:
@@ -195,17 +261,16 @@ def run_tool(
     """
     try:
         if client is None:
-            from glean.agent_toolkit.context import GleanContext
+            from glean.agent_toolkit.context import get_default_context
 
-            client = GleanContext().get_client()
+            client = get_default_context().get_client()
 
         from glean.agent_toolkit.tools._transport import ToolsCallBackend
 
         backend = ToolsCallBackend(tool_display_name)
         return make_ok(backend.call_raw(client, parameters))
     except Exception as e:
-        error_type, suggested_action = _classify_error(e)
-        return make_error(str(e), error_type, suggested_action)
+        return error_result_from_exception(e)
 
 
 async def arun_tool(
@@ -230,17 +295,16 @@ async def arun_tool(
     """
     try:
         if client is None:
-            from glean.agent_toolkit.context import GleanContext
+            from glean.agent_toolkit.context import get_default_context
 
-            client = GleanContext().get_client()
+            client = get_default_context().get_client()
 
         from glean.agent_toolkit.tools._transport import ToolsCallBackend
 
         backend = ToolsCallBackend(tool_display_name)
         return make_ok(await backend.call_raw_async(client, parameters))
     except Exception as e:
-        error_type, suggested_action = _classify_error(e)
-        return make_error(str(e), error_type, suggested_action)
+        return error_result_from_exception(e)
 
 
 def serialize_tool_result(value: Any) -> Any:

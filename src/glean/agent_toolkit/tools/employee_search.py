@@ -61,11 +61,7 @@ def employee_search(
         query: Employee search query with optional filters
         like 'roletype:manager startafter:2023-01-01'
     """
-    from glean.agent_toolkit.context import GleanContext
-
-    ctx = ctx or GleanContext()
-    client = ctx.get_client()
-    return execute_tool("glean_employee_search", {"query": query}, client=client)
+    return execute_tool("glean_employee_search", {"query": query}, ctx=ctx)
 
 
 employee_search.native_async(make_async_tool("glean_employee_search"))

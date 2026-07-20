@@ -139,14 +139,10 @@ def read_document(
     if error is not None:
         return error
 
-    from glean.agent_toolkit.context import GleanContext
-
-    ctx = ctx or GleanContext()
-    client = ctx.get_client()
     return execute_tool(
         "glean_read_document",
         {"document_id": document_id, "url": url},
-        client=client,
+        ctx=ctx,
     )
 
 
@@ -162,11 +158,8 @@ async def _read_document_async(
     if error is not None:
         return error
 
-    from glean.agent_toolkit.context import GleanContext
-
-    ctx = ctx or GleanContext()
     return await execute_tool_async(
         "glean_read_document",
         {"document_id": document_id, "url": url},
-        client=ctx.get_client(),
+        ctx=ctx,
     )

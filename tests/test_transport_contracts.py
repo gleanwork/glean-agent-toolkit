@@ -18,7 +18,7 @@ from typing import Any
 
 from pytest_httpx import HTTPXMock
 
-from glean.agent_toolkit.tools.chat import glean_chat
+from glean.agent_toolkit.tools import chat
 from glean.agent_toolkit.tools.read_document import read_document
 from glean.agent_toolkit.tools.search import search
 
@@ -207,7 +207,7 @@ def test_chat_deserializes_realistic_chat_response(httpx_mock: HTTPXMock) -> Non
     """Fragments and citations from a realistic /chat payload are extracted."""
     httpx_mock.add_response(method="POST", url=CHAT_URL, json=REALISTIC_CHAT_RESPONSE)
 
-    result = glean_chat(message="What is our parental leave policy?")
+    result = chat(message="What is our parental leave policy?")
 
     assert result["status"] == "ok"
     assert result["error"] is None
@@ -246,7 +246,7 @@ def test_chat_response_without_citations_yields_empty_sources(httpx_mock: HTTPXM
         },
     )
 
-    result = glean_chat(message="Something obscure")
+    result = chat(message="Something obscure")
 
     assert result["status"] == "ok"
     assert result["result"]["answer"] == "I could not find anything relevant."

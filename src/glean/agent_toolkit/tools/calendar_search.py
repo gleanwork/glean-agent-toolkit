@@ -60,11 +60,7 @@ def calendar_search(
         ctx: Optional Glean context for client injection.
         query: Calendar search query with optional filters - API will validate filter syntax
     """
-    from glean.agent_toolkit.context import GleanContext
-
-    ctx = ctx or GleanContext()
-    client = ctx.get_client()
-    return execute_tool("glean_calendar_search", {"query": query}, client=client)
+    return execute_tool("glean_calendar_search", {"query": query}, ctx=ctx)
 
 
 calendar_search.native_async(make_async_tool("glean_calendar_search"))

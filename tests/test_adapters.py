@@ -164,11 +164,14 @@ async def test_read_document_as_adk_tool() -> None:
     assert list(inspect.signature(tool.func).parameters) == ["document_id", "url"]
 
     # Calling with neither document_id nor url short-circuits before any
-    # network access, exercising the real wrapper end-to-end.
+    # network access, exercising the real wrapper end-to-end. The adapter
+    # unwraps the ToolResult envelope into the compact error contract.
     result = await tool.func()
-    assert result["status"] == "error"
-    assert result["error_type"] == "validation"
-    assert result["error"] == "Provide exactly one of document_id or url"
+    assert result == {
+        "error": "Provide exactly one of document_id or url",
+        "error_type": "validation",
+        "suggested_action": "rephrase_query",
+    }
 
 
 def test_langchain_adapter_import_error() -> None:

@@ -307,9 +307,9 @@ async def test_langchain_ainvoke_builtin_never_touches_to_thread(
     tool = web_search.as_langchain_tool()
     output = await tool.ainvoke({"query": "async native"})
 
+    # The adapter unwraps the ToolResult envelope: raw payload only.
     result = json.loads(output)
-    assert result["status"] == "ok"
-    assert result["result"]["rawResponse"] == {"results": [{"title": "hit"}]}
+    assert result["rawResponse"] == {"results": [{"title": "hit"}]}
 
 
 async def test_read_document_async_validates_arguments() -> None:

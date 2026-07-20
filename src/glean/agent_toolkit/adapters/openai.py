@@ -8,9 +8,9 @@ import json
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict
 
-from glean.agent_toolkit.adapters.base import BaseAdapter
+from glean.agent_toolkit.adapters.base import BaseAdapter, unwrap_tool_result
 from glean.agent_toolkit.spec import ToolSpec
-from glean.agent_toolkit.tools._common import _classify_error, make_error
+from glean.agent_toolkit.tools._common import _classify_error
 
 if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
@@ -152,8 +152,11 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
         async def on_invoke_tool(ctx: Any, input_str: str) -> str:
             """Function that invokes the tool with parameters.
 
-            The OpenAI Agents SDK expects string returns from tool invocations.
-            Uses the async wrapper when available, falling back to sync.
+            The OpenAI Agents SDK expects string returns from tool
+            invocations. ``ToolResult`` envelopes are unwrapped to the raw
+            ``result`` payload on success or a compact error dict on
+            failure; other return values pass through as-is. Uses the async
+            wrapper when available, falling back to sync.
             """
             try:
                 params = json.loads(input_str) if input_str else {}
@@ -161,12 +164,19 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
                     result = await async_func(**params)
                 else:
                     result = sync_func(**params)
+                result = unwrap_tool_result(result)
                 if isinstance(result, str):
                     return result
                 return json.dumps(result, default=str)
             except Exception as e:
                 error_type, suggested_action = _classify_error(e)
-                return json.dumps(make_error(str(e), error_type, suggested_action))
+                return json.dumps(
+                    {
+                        "error": str(e),
+                        "error_type": error_type,
+                        "suggested_action": suggested_action,
+                    }
+                )
 
         params_json_schema_dict = (
             self.tool_spec.input_schema

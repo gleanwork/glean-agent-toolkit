@@ -1,37 +1,13 @@
 # Glean Agent Toolkit
 
-The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and knowledge discovery capabilities into your AI agents. Use our pre-built tools with popular agent frameworks like OpenAI Assistants, LangChain, CrewAI, and Google's Agent Development Kit (ADK), or adapt your own custom tools for cross-framework use.
+The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and knowledge discovery capabilities into your AI agents. Use our pre-built tools with popular agent frameworks like OpenAI Agents SDK, LangChain, CrewAI, and Google's Agent Development Kit (ADK), or adapt your own custom tools for cross-framework use.
 
 ## Key Features
 
 - **Production-Ready Glean Tools:** Instantly add capabilities like enterprise search, employee lookup, calendar search, Gmail search, and more to your agents.
 - **Framework Adapters:** Seamlessly convert Glean tools into formats compatible with major agent SDKs.
+- **Native Async:** Every built-in tool has a native async path — no hidden thread pools.
 - **Custom Tool Creation:** Define your own tools once using the `@tool_spec` decorator and use them across any supported framework.
-
-## Compatibility & Reliability
-
-- Requires Python 3.10+
-- Built-in retries are enabled via the Python client’s `RetryConfig`.
-- See `docs/prerequisites.md` for server-level configuration and connector requirements.
-
-### Retry configuration (env vars)
-
-| Variable                  | Default | Description                                              | Example |
-| ------------------------- | ------- | -------------------------------------------------------- | ------- |
-| `GLEAN_RETRY_INITIAL`     | `1.0`   | Initial backoff interval in seconds                      | `0.5`   |
-| `GLEAN_RETRY_MAX`         | `50.0`  | Maximum backoff interval in seconds                      | `8`     |
-| `GLEAN_RETRY_MULTIPLIER`  | `1.1`   | Backoff multiplier/exponent                              | `2.0`   |
-| `GLEAN_RETRY_MAX_ELAPSED` | `60.0`  | Total time limit in seconds before giving up on retries  | `30`    |
-
-Intervals are expressed in seconds and may be fractional (e.g. `0.5`); the multiplier is a unitless exponent. Retries cover transient failures such as HTTP 429/5xx and connection timeouts. Set these before constructing any Glean client usage.
-
-```bash
-# Example: low-latency, bounded retries
-export GLEAN_RETRY_INITIAL=0.5
-export GLEAN_RETRY_MAX=8
-export GLEAN_RETRY_MULTIPLIER=2.0
-export GLEAN_RETRY_MAX_ELAPSED=30
-```
 
 ## Installation
 
@@ -64,23 +40,413 @@ pip install glean-agent-toolkit[langchain]
 pip install glean-agent-toolkit[crewai]
 ```
 
-Note: The `[openai]` extra installs both the standard `openai` Python library (for direct API interactions like Chat Completions) and the `openai-agents` library used by the "OpenAI Agents SDK" example below — no separate install is needed.
+Note: The `[openai]` extra installs both the standard `openai` Python library (for direct API interactions like Chat Completions) and the `openai-agents` library used by the "OpenAI Agents SDK" examples below — no separate install is needed.
 
-## Prerequisites
+## Quickstart
 
-Before using any Glean tools, you'll need:
+Set your Glean credentials (get them from your Glean administrator):
 
-1. **Glean API credentials**: Obtain these from your Glean administrator
-2. **Environment variables**:
+```bash
+export GLEAN_API_TOKEN="your-api-token"
+export GLEAN_SERVER_URL="https://your-company-be.glean.com"
+```
 
-   ```bash
-   export GLEAN_API_TOKEN="your-api-token"
-   export GLEAN_SERVER_URL="https://your-company-be.glean.com"
-   ```
+`GLEAN_SERVER_URL` must be a full URL including the `https://` scheme (a bare hostname is rejected immediately with a clear error). You can use `GLEAN_INSTANCE="your-company"` instead of `GLEAN_SERVER_URL`.
 
-See `docs/prerequisites.md` for instance-level connector and Admin settings required per tool.
+Then one call gives you the full bundle of built-in Glean tools, converted for your framework.
 
-## Quickstart Example: Company Assistant with Google ADK
+### LangChain
+
+```python snippet=readme/snippet-11.py
+from glean.agent_toolkit import get_tools
+
+# The nine built-in Glean tools, converted to LangChain StructuredTools.
+# Credentials are read from GLEAN_API_TOKEN and GLEAN_SERVER_URL.
+tools = get_tools("langchain")
+
+# Bind them to any LangChain / LangGraph agent, e.g.:
+#   from langgraph.prebuilt import create_react_agent
+#   agent = create_react_agent(llm, tools)
+print([tool.name for tool in tools])
+```
+
+### OpenAI Agents SDK
+
+```python snippet=readme/snippet-12.py
+from agents import Agent, Runner
+
+from glean.agent_toolkit import get_tools
+
+agent = Agent(
+    name="KnowledgeAssistant",
+    instructions="Answer questions using Glean enterprise search.",
+    tools=get_tools("openai"),
+)
+
+result = Runner.run_sync(agent, "Find our Q4 planning documents")
+print(result.final_output)
+```
+
+`get_tools()` accepts `"openai"`, `"langchain"`, `"crewai"`, and `"adk"`, and can be scoped with `include=`/`exclude=`:
+
+```python
+from glean.agent_toolkit import get_tools
+
+langchain_tools = get_tools("langchain")
+openai_tools = get_tools("openai", include=["glean_search", "glean_chat"])
+```
+
+By default `get_tools()` returns exactly the nine built-in Glean tools. Custom tools you register with `@tool_spec` require explicit opt-in: `builtin=False` for custom tools only, `builtin=None` for everything in the registry, or list them via `include=` (explicitly included tools always win).
+
+## Configuration
+
+### `configure()` — process-wide defaults
+
+Instead of environment variables, you can set credentials once with `configure()`. Every tool call, adapter, and `get_tools()` call made without explicit credentials uses these defaults (and shares one underlying HTTP client):
+
+```python snippet=readme/snippet-13.py
+import glean.agent_toolkit
+
+glean.agent_toolkit.configure(
+    api_token="your-api-token",
+    server_url="https://your-company-be.glean.com",  # or instance="your-company"
+)
+
+tools = glean.agent_toolkit.get_tools("langchain")
+```
+
+`configure()` is idempotent (calling it again replaces the defaults) and always overridable per call: explicit `api_token=`/`server_url=`/`client=` arguments to `get_tools()` or an explicit `GleanContext` passed to a tool win over the configured defaults. Passing `client=` lets you supply a pre-built `glean.api_client.Glean` client.
+
+### Retry configuration (env vars)
+
+Built-in retries are enabled via the Python client's `RetryConfig`. Retries cover transient failures such as HTTP 429/5xx and connection timeouts.
+
+| Variable                  | Default | Description                                              | Example |
+| ------------------------- | ------- | -------------------------------------------------------- | ------- |
+| `GLEAN_RETRY_INITIAL`     | `1.0`   | Initial backoff interval in seconds                      | `0.5`   |
+| `GLEAN_RETRY_MAX`         | `50.0`  | Maximum backoff interval in seconds                      | `8`     |
+| `GLEAN_RETRY_MULTIPLIER`  | `1.1`   | Backoff multiplier/exponent                              | `2.0`   |
+| `GLEAN_RETRY_MAX_ELAPSED` | `60.0`  | Total time limit in seconds before giving up on retries  | `30`    |
+
+Intervals are expressed in seconds and may be fractional (e.g. `0.5`); the multiplier is a unitless exponent. Set these before constructing any Glean client usage.
+
+```bash
+# Example: low-latency, bounded retries
+export GLEAN_RETRY_INITIAL=0.5
+export GLEAN_RETRY_MAX=8
+export GLEAN_RETRY_MULTIPLIER=2.0
+export GLEAN_RETRY_MAX_ELAPSED=30
+```
+
+Note: connection errors (unreachable or unresolvable hosts) are also retried for up to `GLEAN_RETRY_MAX_ELAPSED` seconds before failing — if a misconfigured `server_url` seems to "hang", that is the retry budget. The resulting error is classified as `config` (see the error table below) and carries this hint.
+
+See `docs/prerequisites.md` for server-level configuration and connector requirements. Requires Python 3.10+.
+
+## Available Tools
+
+| Tool name                | Import name         | Description                                    |
+| ------------------------ | ------------------- | ---------------------------------------------- |
+| `glean_search`           | `search`            | Search internal documents and knowledge bases  |
+| `glean_chat`             | `chat`              | Conversational Q&A with Glean Assistant        |
+| `glean_read_document`    | `read_document`     | Read full document content by ID or URL        |
+| `glean_web_search`       | `web_search`        | Search the public web for external information |
+| `glean_calendar_search`  | `calendar_search`   | Find meetings and calendar events              |
+| `glean_employee_search`  | `employee_search`   | Search employees by name, team, or department  |
+| `glean_code_search`      | `code_search`       | Search source code repositories                |
+| `glean_gmail_search`     | `gmail_search`      | Search Gmail messages and conversations        |
+| `glean_outlook_search`   | `outlook_search`    | Search Outlook mail and calendar items         |
+
+### Explicit imports
+
+```python
+from glean.agent_toolkit.tools import search, chat, read_document
+from glean.agent_toolkit.tools import web_search, calendar_search
+from glean.agent_toolkit.tools import employee_search, code_search
+from glean.agent_toolkit.tools import gmail_search, outlook_search
+```
+
+Note: the chat tool's import name is `chat` (the tool ID exposed to LLMs remains `glean_chat`). The old `glean_chat` import name still works but is deprecated and emits a `DeprecationWarning`.
+
+### Adapter methods
+
+Each tool function exposes adapter methods for framework conversion:
+
+| Method                | Returns                          | Framework           |
+| --------------------- | -------------------------------- | ------------------- |
+| `.as_openai_tool()`   | `FunctionTool` or `dict`         | OpenAI Agents SDK   |
+| `.as_langchain_tool()` | `langchain_core.tools.StructuredTool` | LangChain / LangGraph |
+| `.as_crewai_tool()`   | `CrewAI BaseTool`                | CrewAI              |
+| `.as_adk_tool()`      | `google.adk FunctionTool`        | Google ADK          |
+
+## Tool Results and Error Handling
+
+### Direct Python calls: the `ToolResult` envelope
+
+Calling a tool function directly always returns a structured `ToolResult` dict — errors (including missing credentials) never raise:
+
+```python
+from glean.agent_toolkit.tools import search
+
+result = search(query="quarterly results")
+# {
+#     "status": "ok" | "error",
+#     "result": <payload> | None,
+#     "error": <message> | None,
+#     "error_type": <classification> | None,
+#     "suggested_action": <hint> | None,
+# }
+if result["status"] == "ok":
+    payload = result["result"]
+else:
+    print(result["error_type"], result["error"])
+```
+
+### Through framework adapters: raw results
+
+Framework adapters (`get_tools()`, `.as_*_tool()`) unwrap the envelope before handing results to the framework, so the LLM sees clean payloads:
+
+- On success the adapter delivers the **raw `result` payload** (JSON-serialized where the framework expects a string — LangChain, OpenAI Agents SDK, CrewAI; as a plain object for ADK).
+- On failure the adapter delivers a compact error dict: `{"error": ..., "error_type": ..., "suggested_action": ...}`.
+
+Custom `@tool_spec` tools that do not return a `ToolResult` envelope pass through the adapters unchanged.
+
+### Error types
+
+| `error_type`   | Meaning                                                | `suggested_action`      |
+| -------------- | ------------------------------------------------------ | ----------------------- |
+| `"auth"`       | 401/403, or missing API token/credentials              | `"check_credentials"`   |
+| `"config"`     | Invalid `server_url`, unreachable or unresolvable host | `"check_configuration"` |
+| `"validation"` | Bad input (400/422, invalid arguments)                 | `"rephrase_query"`      |
+| `"not_found"`  | 404 — resource not found                               | `"rephrase_query"`      |
+| `"timeout"`    | Request timed out                                      | `"retry"`               |
+| `"rate_limit"` | 429 — too many requests                                | `"retry"`               |
+| `"api"`        | Other API/transport error                              | `"retry"`               |
+
+## Async Usage
+
+Built-in tools are natively async end to end: framework async invocation flows through the Glean SDK's async HTTP client with no thread-pool round-trip.
+
+```python snippet=readme/snippet-14.py
+import asyncio
+
+from glean.agent_toolkit import get_tools
+
+
+async def main() -> None:
+    """Run glean_search through LangChain's native async path."""
+    (search_tool,) = get_tools("langchain", include=["glean_search"])
+    output = await search_tool.ainvoke({"query": "quarterly results", "page_size": 5})
+    print(output)
+
+
+asyncio.run(main())
+```
+
+The OpenAI Agents SDK and Google ADK adapters are async-first automatically; CrewAI uses the sync path.
+
+For direct async calls, every decorated tool exposes an `async_function` on its spec:
+
+```python
+from glean.agent_toolkit.tools import search
+
+result = await search.tool_spec.async_function(query="roadmap")
+```
+
+### Async custom tools
+
+`@tool_spec` accepts `async def` functions; the coroutine becomes the native async path:
+
+```python
+from glean.agent_toolkit import tool_spec
+
+
+@tool_spec(name="fetch_status", description="Fetch service status")
+async def fetch_status(service: str) -> dict:
+    ...  # await your async client here
+```
+
+Caveat: calling an `async def` tool synchronously (e.g. `fetch_status.tool_spec.function(...)` or via a sync-only framework path) works outside an event loop via a sync bridge (`asyncio.run`), but raises a clear `RuntimeError` when invoked from *inside* a running event loop — use the async path (`await`, `ainvoke`, `run_async`) there instead.
+
+## Framework Examples
+
+### OpenAI Agents SDK
+
+```python snippet=readme/snippet-03.py
+import os
+
+from agents import Agent, Runner
+
+from glean.agent_toolkit.tools import search
+
+# Ensure environment variables are set
+assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
+assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
+assert os.getenv("OPENAI_API_KEY"), "OPENAI_API_KEY must be set"
+
+# Create an agent with the Glean search tool
+agent = Agent(
+    name="KnowledgeAssistant",
+    instructions="""You help users find information from the company knowledge base using
+    Glean search.""",
+    tools=[search.as_openai_tool()],  # Convert to an Agents SDK FunctionTool
+)
+
+# Run a search query
+result = Runner.run_sync(agent, "Find our Q4 planning documents")
+print(f"Search results: {result.final_output}")
+```
+
+### LangChain
+
+```python snippet=readme/snippet-04.py
+import os
+
+# NOTE: AgentExecutor requires the full `langchain` package (not just langchain-core).
+# Install with: pip install langchain
+from langchain.agents import AgentExecutor, create_react_agent
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_openai import ChatOpenAI
+
+from glean.agent_toolkit.tools import search
+
+# Ensure environment variables are set
+assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
+assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
+
+# Convert to LangChain tool format
+langchain_tool = search.as_langchain_tool()
+
+llm = ChatOpenAI(model="gpt-4", temperature=0)
+tools = [langchain_tool]
+
+prompt_template = """You are a helpful assistant with access to company knowledge.
+Use the search tool to find relevant information when users ask questions.
+
+Tools available:
+{tools}
+
+Use this format:
+Question: {input}
+Thought: I should search for information about this topic
+Action: {tool_names}
+Action Input: your search query
+Observation: the search results
+Thought: I can now provide a helpful response
+Final Answer: your response based on the search results
+
+Question: {input}
+{agent_scratchpad}"""
+
+prompt = ChatPromptTemplate.from_template(prompt_template)
+agent = create_react_agent(llm, tools, prompt)
+agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
+
+# Search for company information
+result = agent_executor.invoke({"input": "What is our vacation policy?"})
+print(result["output"])
+```
+
+### CrewAI
+
+```python snippet=readme/snippet-05.py
+import os
+
+from crewai import Agent, Crew, Task
+
+from glean.agent_toolkit.tools import search
+
+# Ensure environment variables are set
+assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
+assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
+
+# Convert to CrewAI tool format
+crewai_tool = search.as_crewai_tool()
+
+# Create a research agent
+researcher = Agent(
+    role="Corporate Knowledge Researcher",
+    goal="Find and summarize relevant company information",
+    backstory="""You are an expert at navigating company knowledge bases to find accurate,
+    up-to-date information.""",
+    tools=[crewai_tool],
+    verbose=True,
+)
+
+# Create a research task
+research_task = Task(
+    description="""Find information about our company's remote work policy and summarize the key
+    points.""",
+    expected_output="""A clear summary of the remote work policy including eligibility,
+    expectations, and guidelines.""",
+    agent=researcher,
+)
+
+# Execute the research
+crew = Crew(agents=[researcher], tasks=[research_task])
+result = crew.kickoff()
+print(result)
+```
+
+### Real-World Use Cases
+
+#### Employee Directory Search
+
+```python snippet=readme/snippet-06.py
+from glean.agent_toolkit.tools import employee_search
+
+# Find engineering team members
+engineering_team = employee_search.as_langchain_tool()
+
+# Example usage in an agent:
+# "Who are the senior engineers in the backend team?"
+# "Find Sarah Johnson's contact information"
+# "List all product managers in the San Francisco office"
+```
+
+#### Code Discovery
+
+```python snippet=readme/snippet-07.py
+from glean.agent_toolkit.tools import code_search
+
+# Search company codebases
+code_tool = code_search.as_langchain_tool()
+
+# Example queries:
+# "Find authentication middleware implementations"
+# "Show me recent changes to the payment processing module"
+# "Locate configuration files for the staging environment"
+```
+
+#### Email and Calendar Integration
+
+```python snippet=readme/snippet-08.py
+from glean.agent_toolkit.tools import calendar_search, gmail_search
+
+# Search emails and meetings
+gmail_tool = gmail_search.as_langchain_tool()
+calendar_tool = calendar_search.as_langchain_tool()
+
+# Example queries:
+# "Find emails about the product launch from last month"
+# "Show me my meetings with the design team this week"
+# "Search for messages containing budget discussions"
+```
+
+#### Web Research with Context
+
+```python snippet=readme/snippet-09.py
+from glean.agent_toolkit.tools import web_search
+
+# External information gathering
+web_tool = web_search.as_langchain_tool()
+
+# Example queries:
+# "Latest industry trends in machine learning"
+# "Current market analysis for SaaS companies"
+# "Recent news about our competitors"
+```
+
+## Walkthrough: Company Assistant with Google ADK
 
 Here's a complete example that demonstrates the power of the Glean Agent Toolkit. We'll build a "Company Assistant" using Google's Agent Development Kit (ADK) that can help employees find information, discover colleagues, and search company resources.
 
@@ -188,230 +554,6 @@ Once set up, your Company Assistant can handle requests like:
 
 This type of assistant can dramatically improve employee productivity by making company knowledge instantly accessible through natural conversation.
 
-## Available Tools
-
-| Tool name                | Import name         | Description                                    |
-| ------------------------ | ------------------- | ---------------------------------------------- |
-| `glean_search`           | `search`            | Search internal documents and knowledge bases  |
-| `glean_chat`             | `glean_chat`        | Conversational Q&A with Glean Assistant        |
-| `glean_read_document`    | `read_document`     | Read full document content by ID or URL        |
-| `glean_web_search`       | `web_search`        | Search the public web for external information |
-| `glean_calendar_search`  | `calendar_search`   | Find meetings and calendar events              |
-| `glean_employee_search`  | `employee_search`   | Search employees by name, team, or department  |
-| `glean_code_search`      | `code_search`       | Search source code repositories                |
-| `glean_gmail_search`     | `gmail_search`      | Search Gmail messages and conversations        |
-| `glean_outlook_search`   | `outlook_search`    | Search Outlook mail and calendar items         |
-
-### Explicit imports
-
-```python
-from glean.agent_toolkit.tools import search, glean_chat, read_document
-from glean.agent_toolkit.tools import web_search, calendar_search
-from glean.agent_toolkit.tools import employee_search, code_search
-from glean.agent_toolkit.tools import gmail_search, outlook_search
-```
-
-### Adapter methods
-
-Each tool function exposes adapter methods for framework conversion:
-
-| Method                | Returns                          | Framework           |
-| --------------------- | -------------------------------- | ------------------- |
-| `.as_openai_tool()`   | `FunctionTool` or `dict`         | OpenAI Agents SDK   |
-| `.as_langchain_tool()` | `langchain_core.tools.StructuredTool` | LangChain / LangGraph |
-| `.as_crewai_tool()`   | `CrewAI BaseTool`                | CrewAI              |
-| `.as_adk_tool()`      | `google.adk FunctionTool`        | Google ADK          |
-
-You can also use `get_tools()` to get all tools adapted for a framework at once:
-
-```python
-from glean.agent_toolkit import get_tools
-
-langchain_tools = get_tools("langchain")
-openai_tools = get_tools("openai", include=["glean_search", "glean_chat"])
-```
-
-### Web Research with Context
-
-```python snippet=readme/snippet-09.py
-from glean.agent_toolkit.tools import web_search
-
-# External information gathering
-web_tool = web_search.as_langchain_tool()
-
-# Example queries:
-# "Latest industry trends in machine learning"
-# "Current market analysis for SaaS companies"
-# "Recent news about our competitors"
-```
-
-## Quick Start Examples
-
-### Using `search` with Different Frameworks
-
-#### OpenAI Agents SDK
-
-```python snippet=readme/snippet-03.py
-import os
-
-from agents import Agent, Runner
-
-from glean.agent_toolkit.tools import search
-
-# Ensure environment variables are set
-assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
-assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
-assert os.getenv("OPENAI_API_KEY"), "OPENAI_API_KEY must be set"
-
-# Create an agent with the Glean search tool
-agent = Agent(
-    name="KnowledgeAssistant",
-    instructions="""You help users find information from the company knowledge base using
-    Glean search.""",
-    tools=[search.as_openai_tool()],  # Convert to an Agents SDK FunctionTool
-)
-
-# Run a search query
-result = Runner.run_sync(agent, "Find our Q4 planning documents")
-print(f"Search results: {result.final_output}")
-```
-
-#### LangChain
-
-```python snippet=readme/snippet-04.py
-import os
-
-# NOTE: AgentExecutor requires the full `langchain` package (not just langchain-core).
-# Install with: pip install langchain
-from langchain.agents import AgentExecutor, create_react_agent
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_openai import ChatOpenAI
-
-from glean.agent_toolkit.tools import search
-
-# Ensure environment variables are set
-assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
-assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
-
-# Convert to LangChain tool format
-langchain_tool = search.as_langchain_tool()
-
-llm = ChatOpenAI(model="gpt-4", temperature=0)
-tools = [langchain_tool]
-
-prompt_template = """You are a helpful assistant with access to company knowledge.
-Use the search tool to find relevant information when users ask questions.
-
-Tools available:
-{tools}
-
-Use this format:
-Question: {input}
-Thought: I should search for information about this topic
-Action: {tool_names}
-Action Input: your search query
-Observation: the search results
-Thought: I can now provide a helpful response
-Final Answer: your response based on the search results
-
-Question: {input}
-{agent_scratchpad}"""
-
-prompt = ChatPromptTemplate.from_template(prompt_template)
-agent = create_react_agent(llm, tools, prompt)
-agent_executor = AgentExecutor(agent=agent, tools=tools, verbose=True)
-
-# Search for company information
-result = agent_executor.invoke({"input": "What is our vacation policy?"})
-print(result["output"])
-```
-
-#### CrewAI
-
-```python snippet=readme/snippet-05.py
-import os
-
-from crewai import Agent, Crew, Task
-
-from glean.agent_toolkit.tools import search
-
-# Ensure environment variables are set
-assert os.getenv("GLEAN_API_TOKEN"), "GLEAN_API_TOKEN must be set"
-assert os.getenv("GLEAN_SERVER_URL"), "GLEAN_SERVER_URL must be set"
-
-# Convert to CrewAI tool format
-crewai_tool = search.as_crewai_tool()
-
-# Create a research agent
-researcher = Agent(
-    role="Corporate Knowledge Researcher",
-    goal="Find and summarize relevant company information",
-    backstory="""You are an expert at navigating company knowledge bases to find accurate,
-    up-to-date information.""",
-    tools=[crewai_tool],
-    verbose=True,
-)
-
-# Create a research task
-research_task = Task(
-    description="""Find information about our company's remote work policy and summarize the key
-    points.""",
-    expected_output="""A clear summary of the remote work policy including eligibility,
-    expectations, and guidelines.""",
-    agent=researcher,
-)
-
-# Execute the research
-crew = Crew(agents=[researcher], tasks=[research_task])
-result = crew.kickoff()
-print(result)
-```
-
-### Real-World Use Cases
-
-#### Employee Directory Search
-
-```python snippet=readme/snippet-06.py
-from glean.agent_toolkit.tools import employee_search
-
-# Find engineering team members
-engineering_team = employee_search.as_langchain_tool()
-
-# Example usage in an agent:
-# "Who are the senior engineers in the backend team?"
-# "Find Sarah Johnson's contact information"
-# "List all product managers in the San Francisco office"
-```
-
-#### Code Discovery
-
-```python snippet=readme/snippet-07.py
-from glean.agent_toolkit.tools import code_search
-
-# Search company codebases
-code_tool = code_search.as_langchain_tool()
-
-# Example queries:
-# "Find authentication middleware implementations"
-# "Show me recent changes to the payment processing module"
-# "Locate configuration files for the staging environment"
-```
-
-#### Email and Calendar Integration
-
-```python snippet=readme/snippet-08.py
-from glean.agent_toolkit.tools import calendar_search, gmail_search
-
-# Search emails and meetings
-gmail_tool = gmail_search.as_langchain_tool()
-calendar_tool = calendar_search.as_langchain_tool()
-
-# Example queries:
-# "Find emails about the product launch from last month"
-# "Show me my meetings with the design team this week"
-# "Search for messages containing budget discussions"
-```
-
 ## Creating Custom Tools with `@tool_spec`
 
 Define your own tools that work across all supported frameworks:
@@ -457,6 +599,23 @@ langchain_weather = get_weather.as_langchain_tool()
 crewai_weather = get_weather.as_crewai_tool()
 ```
 
+Custom tools are not included in `get_tools()` output by default — opt in with `get_tools(framework, builtin=None)`, `builtin=False`, or `include=["get_current_weather"]`. `async def` implementations are supported too (see "Async custom tools" above).
+
+## Advanced: Client Lifecycle with `GleanContext`
+
+Most users never need `GleanContext` — environment variables or `configure()` cover the common cases. Reach for it when you need explicit control over the underlying HTTP client's lifecycle (e.g. deterministic cleanup in a service, or multiple Glean instances in one process):
+
+```python
+from glean.agent_toolkit import GleanContext
+from glean.agent_toolkit.tools import search
+
+with GleanContext(api_token="...", server_url="https://your-company-be.glean.com") as ctx:
+    result = search(ctx, query="quarterly results")
+# The underlying HTTP client is closed on exit.
+```
+
+`GleanContext` creates its `glean.api_client.Glean` client lazily, caches it, and shares it across tool calls; `close()` (or the context manager) releases the HTTP resources. Every tool function accepts an optional `GleanContext` as its first argument, and adapters bind it automatically so LLM frameworks never see it. Note that `ctx.get_client()` raises `ValueError` for missing/invalid configuration — only tool calls wrap errors into `ToolResult`s.
+
 ## Agent Skills
 
 The `skills/` directory contains [Agent Skills](https://agentskills.io) — structured instructions that teach AI coding agents how to use the Glean Agent Toolkit effectively. Skills are supported by Claude Code, Cursor, GitHub Copilot, VS Code, Gemini CLI, OpenAI Codex, Goose, Amp, Roo Code, Junie, and [many others](https://agentskills.io).
@@ -480,7 +639,7 @@ npx skills add https://github.com/gleanwork/glean-agent-toolkit/tree/main/skills
 
 | Skill | Description |
 | --- | --- |
-| `glean-agent-toolkit-guide` | How to use the SDK: `get_tools()`, `GleanContext`, adapters, error handling, async |
+| `glean-agent-toolkit-guide` | How to use the SDK: `get_tools()`, `configure()`, adapters, error handling, async |
 | `glean-agent-toolkit-builder` | How to create custom tools with `@tool_spec` |
 
 ## Contributing

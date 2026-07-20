@@ -11,6 +11,7 @@ langchain-core package, mocking the network at the Glean client layer.
 from __future__ import annotations
 
 import importlib
+import json
 from typing import Any
 
 import pytest
@@ -43,6 +44,7 @@ def patched_run_tool(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         arguments: dict[str, Any],
         *,
         client: Any = None,
+        ctx: Any = None,
     ) -> ToolResult:
         captured["tool_name"] = tool_name
         captured["arguments"] = dict(arguments)
@@ -53,6 +55,7 @@ def patched_run_tool(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
         arguments: dict[str, Any],
         *,
         client: Any = None,
+        ctx: Any = None,
     ) -> ToolResult:
         return fake_execute_tool(tool_name, arguments, client=client)
 
@@ -80,7 +83,8 @@ def test_invoke_multi_arg_through_langchain(patched_run_tool: dict[str, Any]) ->
     result = tool.invoke({"query": "test", "page_size": 5})
 
     assert isinstance(result, str)
-    assert CANNED_PAYLOAD in result
+    # The adapter unwraps the ToolResult envelope: raw payload only.
+    assert json.loads(result) == {"marker": CANNED_PAYLOAD}
     assert patched_run_tool["tool_name"] == "glean_search"
     assert patched_run_tool["arguments"]["query"] == "test"
     assert patched_run_tool["arguments"]["page_size"] == 5
@@ -92,7 +96,7 @@ async def test_ainvoke_multi_arg_through_langchain(patched_run_tool: dict[str, A
     result = await tool.ainvoke({"query": "async test", "page_size": 5})
 
     assert isinstance(result, str)
-    assert CANNED_PAYLOAD in result
+    assert json.loads(result) == {"marker": CANNED_PAYLOAD}
     assert patched_run_tool["arguments"]["query"] == "async test"
     assert patched_run_tool["arguments"]["page_size"] == 5
 

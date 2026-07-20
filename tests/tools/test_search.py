@@ -204,3 +204,37 @@ def test_shape_search_response_handles_empty_response() -> None:
     shaped = _shape_search_response(models.SearchResponse())
 
     assert shaped == {"results": [], "result_count": 0, "has_more_results": False}
+
+
+def test_search_missing_credentials_returns_tool_result_not_raise() -> None:
+    """A2: credential errors surface as a structured ToolResult, never raise."""
+    import os
+    from unittest.mock import patch
+
+    with patch.dict(os.environ, {}, clear=True):
+        result = search(query="anything")
+
+    assert result["status"] == "error"
+    assert result["error_type"] == "auth"
+    assert result["suggested_action"] == "check_credentials"
+    assert result["error"] is not None
+    assert "GLEAN_API_TOKEN" in result["error"]
+    assert "configure()" in result["error"]
+
+
+def test_search_invalid_server_url_returns_config_error() -> None:
+    """A1: a scheme-less server URL fails fast with a config classification."""
+    import os
+    from unittest.mock import patch
+
+    with patch.dict(
+        os.environ,
+        {"GLEAN_API_TOKEN": "tok", "GLEAN_SERVER_URL": "my-company-be.glean.com"},
+        clear=True,
+    ):
+        result = search(query="anything")
+
+    assert result["status"] == "error"
+    assert result["error_type"] == "config"
+    assert result["suggested_action"] == "check_configuration"
+    assert result["error"] is not None and "http" in result["error"]

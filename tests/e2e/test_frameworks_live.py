@@ -1,8 +1,12 @@
 """Live framework-path e2e tests: glean_search through each real framework layer.
 
 Drives the converted glean_search tool through every supported framework's
-native invocation path against the live Glean API. No LLM API keys are
-required -- these invoke the tool layer directly through framework plumbing:
+native invocation path against the live Glean API and asserts the adapter
+result contract: the RAW result payload on success (the ToolResult envelope
+is unwrapped at the adapter layer), or a compact
+{"error", "error_type", "suggested_action"} dict on failure. No LLM API keys
+are required -- these invoke the tool layer directly through framework
+plumbing:
 
 - LangChain: ``tool.invoke`` and ``tool.ainvoke``
 - OpenAI Agents SDK: ``tool.on_invoke_tool``
@@ -19,7 +23,7 @@ from typing import Any
 import pytest
 
 from glean.agent_toolkit import get_tools
-from tests.e2e._live import unwrap_ok_or_skip
+from tests.e2e._live import unwrap_adapter_payload_or_skip
 
 try:
     from glean.agent_toolkit.adapters.langchain import HAS_LANGCHAIN
@@ -53,8 +57,9 @@ def _get_search_tool(framework: str) -> Any:
     return tools[0]
 
 
-def _assert_live_search_result(tool_result: Any, framework_path: str) -> None:
-    payload = unwrap_ok_or_skip(tool_result, f"glean_search via {framework_path}")
+def _assert_live_search_result(raw_payload: Any, framework_path: str) -> None:
+    """Assert the NEW adapter contract: the raw result payload, no envelope."""
+    payload = unwrap_adapter_payload_or_skip(raw_payload, f"glean_search via {framework_path}")
     assert isinstance(payload, dict)
     assert set(payload) == SEARCH_PAYLOAD_KEYS
     assert isinstance(payload["results"], list)

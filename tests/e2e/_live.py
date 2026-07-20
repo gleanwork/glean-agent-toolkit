@@ -45,16 +45,36 @@ def unwrap_ok_or_skip(result: Any, tool_name: str) -> Any:
     - ``error_type`` in validation/not_found: SKIP with the server's reason
       (tool or feature not configured on this instance).
     - ``error_type == "rate_limit"``: SKIP (transient, not a regression).
-    - anything else (api/timeout): FAIL (real server or transport problem).
+    - anything else (api/timeout/config): FAIL (real server, transport, or
+      configuration problem).
     """
     assert_tool_result_envelope(result)
 
     if result["status"] == "ok":
         return result["result"]
 
-    error_type = result["error_type"]
-    error = result["error"]
+    _skip_or_fail_for_error(result["error_type"], result["error"], tool_name)
+    raise AssertionError("unreachable")  # pragma: no cover
 
+
+COMPACT_ERROR_KEYS = frozenset({"error", "error_type", "suggested_action"})
+
+
+def unwrap_adapter_payload_or_skip(payload: Any, tool_name: str) -> Any:
+    """Return a framework-path payload, or skip/fail on the compact error dict.
+
+    Framework adapters deliver the RAW result payload on success and a
+    compact ``{"error", "error_type", "suggested_action"}`` dict on failure
+    (the ``ToolResult`` envelope is unwrapped at the adapter layer). Apply
+    the same skip/fail policy as :func:`unwrap_ok_or_skip`.
+    """
+    if isinstance(payload, dict) and set(payload) == COMPACT_ERROR_KEYS:
+        _skip_or_fail_for_error(payload["error_type"], payload["error"], tool_name)
+    return payload
+
+
+def _skip_or_fail_for_error(error_type: Any, error: Any, tool_name: str) -> None:
+    """Shared skip/fail policy for live error classifications."""
     if error_type == "auth":
         pytest.fail(
             f"{tool_name}: authentication failure against live instance "

@@ -244,7 +244,8 @@ class ToolSpecFunction(Protocol):
 
         Args:
             ctx: Optional context bound into tool invocations. When omitted,
-                configuration falls back to environment variables.
+                configuration falls back to ``configure()`` defaults or
+                environment variables.
 
         Returns:
             OpenAI tool specification
@@ -256,7 +257,8 @@ class ToolSpecFunction(Protocol):
 
         Args:
             ctx: Optional context bound into tool invocations. When omitted,
-                configuration falls back to environment variables.
+                configuration falls back to ``configure()`` defaults or
+                environment variables.
 
         Returns:
             Google ADK tool
@@ -268,7 +270,8 @@ class ToolSpecFunction(Protocol):
 
         Args:
             ctx: Optional context bound into tool invocations. When omitted,
-                configuration falls back to environment variables.
+                configuration falls back to ``configure()`` defaults or
+                environment variables.
 
         Returns:
             LangChain tool
@@ -280,7 +283,8 @@ class ToolSpecFunction(Protocol):
 
         Args:
             ctx: Optional context bound into tool invocations. When omitted,
-                configuration falls back to environment variables.
+                configuration falls back to ``configure()`` defaults or
+                environment variables.
 
         Returns:
             CrewAI tool

@@ -1,4 +1,8 @@
-"""Chat tool for conversational Q&A with Glean Assistant."""
+"""Chat tool for conversational Q&A with Glean Assistant.
+
+Lives in a private module (``_chat``) so that ``glean.agent_toolkit.tools.chat``
+resolves to the tool *callable* rather than being shadowed by a submodule.
+"""
 
 from __future__ import annotations
 
@@ -120,7 +124,7 @@ register_backend(
     ),
     output_model=ChatResult,
 )
-def glean_chat(
+def chat(
     ctx: GleanContext | None = None,
     *,
     message: Annotated[
@@ -140,11 +144,7 @@ def glean_chat(
         ctx: Optional Glean context for client injection.
         message: The question to ask Glean Assistant.
     """
-    from glean.agent_toolkit.context import GleanContext
-
-    ctx = ctx or GleanContext()
-    client = ctx.get_client()
-    return execute_tool("glean_chat", {"message": message}, client=client)
+    return execute_tool("glean_chat", {"message": message}, ctx=ctx)
 
 
-glean_chat.native_async(make_async_tool("glean_chat"))
+chat.native_async(make_async_tool("glean_chat"))

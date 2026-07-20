@@ -220,10 +220,6 @@ def search(
         filters: Optional structured filters ``[{field, values, exclude?}]``.
         page_size: Number of results per page (default 10).
     """
-    from glean.agent_toolkit.context import GleanContext
-
-    ctx = ctx or GleanContext()
-    client = ctx.get_client()
     return execute_tool(
         "glean_search",
         {
@@ -232,7 +228,7 @@ def search(
             "filters": filters,
             "page_size": page_size,
         },
-        client=client,
+        ctx=ctx,
     )
 
 

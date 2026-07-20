@@ -7,7 +7,7 @@ import types
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias, Union, get_args, get_origin
 
-from glean.agent_toolkit.adapters.base import BaseAdapter
+from glean.agent_toolkit.adapters.base import BaseAdapter, unwrap_tool_result
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
@@ -227,13 +227,13 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
         if async_func is not None:
 
             async def _async_wrapper(*args: Any, **kwargs: Any) -> Any:
-                return await async_func(**_to_kwargs(args, kwargs))
+                return unwrap_tool_result(await async_func(**_to_kwargs(args, kwargs)))
 
             wrapper = _async_wrapper
         else:
 
             def _sync_wrapper(*args: Any, **kwargs: Any) -> Any:
-                return sync_func(**_to_kwargs(args, kwargs))
+                return unwrap_tool_result(sync_func(**_to_kwargs(args, kwargs)))
 
             wrapper = _sync_wrapper
 

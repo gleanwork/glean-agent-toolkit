@@ -122,8 +122,73 @@ def test_classify_error_validation() -> None:
     assert action == "rephrase_query"
 
 
-def test_classify_error_connection() -> None:
+def test_classify_error_connection_is_config() -> None:
     error_type, action = _classify_error(ConnectionError("DNS failure"))
+    assert error_type == "config"
+    assert action == "check_configuration"
+
+
+def test_classify_error_httpx_connect_error_is_config() -> None:
+    error_type, action = _classify_error(
+        httpx.ConnectError("[Errno 8] nodename nor servname provided, or not known")
+    )
+    assert error_type == "config"
+    assert action == "check_configuration"
+
+
+def test_classify_error_dns_gaierror_is_config() -> None:
+    import socket
+
+    error_type, action = _classify_error(
+        socket.gaierror(8, "nodename nor servname provided, or not known")
+    )
+    assert error_type == "config"
+    assert action == "check_configuration"
+
+
+def test_classify_error_credentials_is_auth() -> None:
+    from glean.agent_toolkit.context import GleanCredentialsError
+
+    error_type, action = _classify_error(GleanCredentialsError("no token"))
+    assert error_type == "auth"
+    assert action == "check_credentials"
+
+
+def test_classify_error_configuration_is_config() -> None:
+    from glean.agent_toolkit.context import GleanConfigurationError
+
+    error_type, action = _classify_error(GleanConfigurationError("bad server_url"))
+    assert error_type == "config"
+    assert action == "check_configuration"
+
+
+def test_error_result_from_exception_appends_connection_hint() -> None:
+    from glean.agent_toolkit.tools._common import (
+        CONNECTION_ERROR_HINT,
+        error_result_from_exception,
+    )
+
+    result = error_result_from_exception(httpx.ConnectError("Failed to resolve host"))
+
+    assert result["status"] == "error"
+    assert result["error_type"] == "config"
+    assert result["suggested_action"] == "check_configuration"
+    assert result["error"] is not None and result["error"].endswith(CONNECTION_ERROR_HINT)
+
+
+def test_error_result_from_exception_no_hint_for_non_connection_config() -> None:
+    from glean.agent_toolkit.context import GleanConfigurationError
+    from glean.agent_toolkit.tools._common import error_result_from_exception
+
+    result = error_result_from_exception(GleanConfigurationError("Invalid server_url"))
+
+    assert result["error"] == "Invalid server_url"
+    assert result["error_type"] == "config"
+
+
+def test_classify_error_read_error_stays_api() -> None:
+    """Mid-request network blips are transient: still api/retry."""
+    error_type, action = _classify_error(httpx.ReadError("read failed"))
     assert error_type == "api"
     assert action == "retry"
 
