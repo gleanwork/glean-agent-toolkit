@@ -1,3 +1,10 @@
+## 0.8.0 (2026-07-20)
+
+### Feat
+
+- raw adapter results, fail-fast config errors, configure(), builtin-only get_tools (#90)
+- adopt native async SDK calls and remove global thread pools (#89)
+
 ## 0.7.0 (2026-07-19)
 
 ### Feat
