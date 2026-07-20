@@ -97,8 +97,9 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
         super().__init__(tool_spec, ctx)
         if not HAS_OPENAI:
             raise ImportError(
-                "OpenAI package is required for OpenAI adapter. "
-                "Install it with `pip install glean-agent-toolkit[openai]`."
+                "The OpenAI adapter requires the `openai` and `openai-agents` "
+                "packages. Install both with the `[openai]` extra: "
+                "`pip install 'glean-agent-toolkit[openai]'`."
             )
 
     def to_tool(self) -> Any:

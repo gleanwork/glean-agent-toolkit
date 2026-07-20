@@ -21,14 +21,25 @@ def _parse_retry_env_float(name: str, default: float) -> float:
 
 
 def _build_retry_config() -> RetryConfig:
+    """Build a :class:`RetryConfig` from ``GLEAN_RETRY_*`` environment variables.
+
+    The environment variables are expressed in **seconds** (e.g.
+    ``GLEAN_RETRY_INITIAL=0.5`` means half a second), while the underlying
+    Speakeasy-generated :class:`BackoffStrategy` expects integer
+    **milliseconds** for ``initial_interval``, ``max_interval`` and
+    ``max_elapsed_time`` (its retry loop divides the intervals by 1000
+    before sleeping and compares elapsed wall-clock milliseconds against
+    ``max_elapsed_time``). Values are converted here.
+    """
     initial = _parse_retry_env_float("GLEAN_RETRY_INITIAL", 1.0)
     maximum = _parse_retry_env_float("GLEAN_RETRY_MAX", 50.0)
     exponent = _parse_retry_env_float("GLEAN_RETRY_MULTIPLIER", 1.1)
     max_elapsed = _parse_retry_env_float("GLEAN_RETRY_MAX_ELAPSED", 60.0)
 
-    initial_interval = round(initial)
-    max_interval = round(maximum)
-    max_elapsed_time = round(max_elapsed)
+    # Convert seconds (env var semantics) to integer milliseconds (SDK units).
+    initial_interval = round(initial * 1000)
+    max_interval = round(maximum * 1000)
+    max_elapsed_time = round(max_elapsed * 1000)
 
     return RetryConfig(
         strategy="backoff",
