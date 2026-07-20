@@ -12,14 +12,13 @@ license = { text = "MIT" }
 requires-python = ">=3.10,<4.0"
 dependencies = [
   "pydantic>=2.7,<3.0",
-  "glean-api-client>=0.6.0,<1.0",
+  "glean-api-client>=0.15.3,<1.0",
 ]
 
 [project.optional-dependencies]
 dev = [
   "commitizen>=4.4.1,<5.0",
   "pip-audit>=2.6.0,<3.0",
-  "vcrpy>=6.0.2,<7.0",
   "pre-commit>=3.6.0,<4.0",
 ]
 test = [
@@ -27,7 +26,6 @@ test = [
   "pytest-asyncio>=0.23.2,<1.0",
   "pytest-cov>=4.1.0,<6.0",
   "pytest-httpx>=0.35.0,<1.0",
-  "vcrpy>=6.0.2,<7.0",
   # Optional dependencies for testing adapters
   "openai>=1.0.0,<2.0",
   "openai-agents>=0.3,<1.0",
@@ -99,7 +97,10 @@ quote-style = "double"
 indent-style = "space"
 
 [tool.coverage.run]
-omit = ["tests/*"]
+# The SDK installs into the same `glean` namespace package (glean.api_client),
+# so `--cov=glean` would otherwise measure the vendored SDK and the coverage
+# gate would swing with SDK size across releases. Only measure the toolkit.
+omit = ["tests/*", "*/glean/api_client/*"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -107,14 +108,9 @@ addopts = "-ra -q --strict-markers"
 testpaths = ["tests"]
 python_files = "test_*.py"
 asyncio_mode = "auto"
-markers = [
-  "load_json: Load JSON fixture data from tests/fixtures directory",
-  "vcr_record_with_real_auth: Record VCR cassettes using real Glean API credentials",
-]
 
 [dependency-groups]
 dev = [
     "commitizen>=4.6.0",
     "pre-commit>=3.8.0",
-    "vcrpy>=5.1.0",
 ]
