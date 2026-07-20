@@ -17,7 +17,7 @@ def mock_glean_env_vars() -> Generator[None, None, None]:
     layer is mocked (e.g. via pytest-httpx) in transport-level tests.
     """
     with patch.dict(os.environ, {
-        "GLEAN_API_TOKEN": "fake_token_for_vcr_testing",
+        "GLEAN_API_TOKEN": "fake_token_for_testing",
         "GLEAN_SERVER_URL": "https://test-instance-be.glean.com",
     }):
         yield
