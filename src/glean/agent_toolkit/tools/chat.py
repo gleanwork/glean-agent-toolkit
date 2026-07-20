@@ -9,7 +9,6 @@ from pydantic import BaseModel, Field
 from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import (
     ToolResult,
-    make_error,
     run_with_error_handling,
     serialize_tool_result,
 )
@@ -32,12 +31,30 @@ def _extract_answer(response: Any) -> str:
     for msg in messages:
         author = getattr(msg, "author", None)
         if author == "GLEAN_AI":
-            fragments.append(getattr(msg, "message_text", "") or "")
             for frag in getattr(msg, "fragments", []) or []:
                 text = getattr(frag, "text", None)
                 if text:
                     fragments.append(text)
     return "\n".join(f for f in fragments if f).strip()
+
+
+def _iter_citations(msg: Any) -> list[Any]:
+    """Collect citations from a message, tolerating old and new SDK shapes.
+
+    glean-api-client >= 0.15 attaches a ``citation`` to each
+    ``ChatMessageFragment``; the message-level ``ChatMessage.citations`` list
+    is deprecated (removal scheduled for 2026-10-15). Older SDKs only expose
+    the message-level list. Prefer fragment-level citations and fall back to
+    the legacy list when the fragments carry none.
+    """
+    citations = [
+        citation
+        for frag in getattr(msg, "fragments", None) or []
+        if (citation := getattr(frag, "citation", None)) is not None
+    ]
+    if citations:
+        return citations
+    return list(getattr(msg, "citations", None) or [])
 
 
 def _extract_sources(response: Any) -> list[dict[str, Any]]:
@@ -46,7 +63,7 @@ def _extract_sources(response: Any) -> list[dict[str, Any]]:
     seen: set[str] = set()
     sources: list[dict[str, Any]] = []
     for msg in messages:
-        for citation in getattr(msg, "citations", []) or []:
+        for citation in _iter_citations(msg):
             doc = getattr(citation, "source_document", None)
             if doc is None:
                 continue
