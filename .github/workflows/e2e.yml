@@ -1,0 +1,61 @@
+name: E2E
+
+# Live end-to-end tests against a real Glean instance.
+#
+# Never triggered by pushes or pull requests: only manual dispatch and a
+# weekly cron. If the credential secrets (GLEAN_API_TOKEN plus
+# GLEAN_SERVER_URL or GLEAN_INSTANCE) are not configured, the job emits a
+# notice and exits green (no-op) instead of failing. See tests/e2e/README.md
+# for setup instructions.
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Weekly, Monday 06:17 UTC (off-minute to avoid top-of-hour load spikes).
+    - cron: "17 6 * * 1"
+
+permissions:
+  contents: read
+
+jobs:
+  e2e:
+    name: Live E2E
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for Glean credentials
+        id: creds
+        env:
+          GLEAN_API_TOKEN: ${{ secrets.GLEAN_API_TOKEN }}
+          GLEAN_SERVER_URL: ${{ secrets.GLEAN_SERVER_URL }}
+          GLEAN_INSTANCE: ${{ secrets.GLEAN_INSTANCE }}
+        run: |
+          if [ -z "$GLEAN_API_TOKEN" ] || { [ -z "$GLEAN_SERVER_URL" ] && [ -z "$GLEAN_INSTANCE" ]; }; then
+            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Glean credential secrets are not configured (need GLEAN_API_TOKEN plus GLEAN_SERVER_URL or GLEAN_INSTANCE); skipping the live E2E run. See tests/e2e/README.md for setup (gh secret set ...)."
+          else
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.creds.outputs.available == 'true'
+
+      - name: Set up mise
+        if: steps.creds.outputs.available == 'true'
+        uses: jdx/mise-action@v2
+        with:
+          cache: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Setup development environment
+        if: steps.creds.outputs.available == 'true'
+        run: mise run setup
+
+      - name: Run live e2e tests
+        if: steps.creds.outputs.available == 'true'
+        env:
+          GLEAN_E2E: "1"
+          GLEAN_API_TOKEN: ${{ secrets.GLEAN_API_TOKEN }}
+          GLEAN_SERVER_URL: ${{ secrets.GLEAN_SERVER_URL }}
+          GLEAN_INSTANCE: ${{ secrets.GLEAN_INSTANCE }}
+        run: mise run test:e2e

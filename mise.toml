@@ -23,8 +23,12 @@ run = [
 ]
 
 [tasks.test]
-description = "Run unit tests"
-run = "uv run pytest -v --tb=auto -rA --durations=10 -p no:logging tests/"
+description = "Run unit tests (excludes live e2e tests; see test:e2e)"
+run = "uv run pytest -v --tb=auto -rA --durations=10 -p no:logging --ignore=tests/e2e tests/"
+
+[tasks."test:e2e"]
+description = "Run live end-to-end tests against a real Glean instance. Requires GLEAN_E2E=1 (explicit opt-in) plus GLEAN_API_TOKEN and GLEAN_SERVER_URL (or GLEAN_INSTANCE); tests skip with a reason otherwise. See tests/e2e/README.md"
+run = "uv run pytest -v --tb=auto -rA -p no:logging tests/e2e/"
 
 [tasks."test:watch"]
 description = "Run tests in watch mode"
