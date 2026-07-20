@@ -18,16 +18,16 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 | Variable                  | Default | Description                                              | Example |
 | ------------------------- | ------- | -------------------------------------------------------- | ------- |
-| `GLEAN_RETRY_INITIAL`     | `1`     | Initial backoff interval in seconds                      | `2`     |
-| `GLEAN_RETRY_MAX`         | `50`    | Maximum backoff interval in seconds                      | `8`     |
+| `GLEAN_RETRY_INITIAL`     | `1.0`   | Initial backoff interval in seconds                      | `0.5`   |
+| `GLEAN_RETRY_MAX`         | `50.0`  | Maximum backoff interval in seconds                      | `8`     |
 | `GLEAN_RETRY_MULTIPLIER`  | `1.1`   | Backoff multiplier/exponent                              | `2.0`   |
-| `GLEAN_RETRY_MAX_ELAPSED` | `60`    | Total time limit in seconds before giving up on retries  | `30`    |
+| `GLEAN_RETRY_MAX_ELAPSED` | `60.0`  | Total time limit in seconds before giving up on retries  | `30`    |
 
-Intervals are expressed in seconds; the multiplier is a unitless exponent. Retries cover transient failures such as HTTP 429/5xx and connection timeouts. Set these before constructing any Glean client usage.
+Intervals are expressed in seconds and may be fractional (e.g. `0.5`); the multiplier is a unitless exponent. Retries cover transient failures such as HTTP 429/5xx and connection timeouts. Set these before constructing any Glean client usage.
 
 ```bash
-# Example: bounded retries
-export GLEAN_RETRY_INITIAL=1
+# Example: low-latency, bounded retries
+export GLEAN_RETRY_INITIAL=0.5
 export GLEAN_RETRY_MAX=8
 export GLEAN_RETRY_MULTIPLIER=2.0
 export GLEAN_RETRY_MAX_ELAPSED=30
