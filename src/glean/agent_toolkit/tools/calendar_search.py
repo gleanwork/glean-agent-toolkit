@@ -11,6 +11,7 @@ from glean.agent_toolkit.tools._common import ToolResult
 from glean.agent_toolkit.tools._transport import (
     ToolsCallBackend,
     execute_tool,
+    make_async_tool,
     register_backend,
 )
 
@@ -64,3 +65,6 @@ def calendar_search(
     ctx = ctx or GleanContext()
     client = ctx.get_client()
     return execute_tool("glean_calendar_search", {"query": query}, client=client)
+
+
+calendar_search.native_async(make_async_tool("glean_calendar_search"))

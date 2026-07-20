@@ -83,11 +83,11 @@ async def test_run_async_delivers_arguments_to_search() -> None:
     """run_async must forward LLM-provided args to the underlying function."""
     from glean.agent_toolkit import get_tools
 
-    search_mod = importlib.import_module("glean.agent_toolkit.tools.search")
+    transport_mod = importlib.import_module("glean.agent_toolkit.tools._transport")
 
     captured: dict[str, Any] = {}
 
-    def fake_execute_tool(
+    async def fake_execute_tool_async(
         tool_name: str,
         arguments: dict[str, Any],
         *,
@@ -97,7 +97,9 @@ async def test_run_async_delivers_arguments_to_search() -> None:
         captured["arguments"] = dict(arguments)
         return {"status": "success", "result": "canned-result"}
 
-    with mock.patch.object(search_mod, "execute_tool", fake_execute_tool):
+    # ADK's run_async awaits the tool's native async path, which flows
+    # through the transport seam's execute_tool_async.
+    with mock.patch.object(transport_mod, "execute_tool_async", fake_execute_tool_async):
         (tool,) = get_tools("adk", include=["glean_search"], client=_mock_client())
         result = await tool.run_async(
             args={"query": "test", "page_size": 5},

@@ -248,6 +248,9 @@ def test_execute_tool_dispatches_to_backend(scratch_registry: dict[str, Any]) ->
             seen["arguments"] = dict(arguments)
             return {"payload": 1}
 
+        async def execute_async(self, client: Any, arguments: Any) -> Any:
+            return self.execute(client, arguments)
+
     register_backend("fake_tool", FakeBackend())
 
     result = execute_tool("fake_tool", {"a": 1}, client=client)
@@ -270,6 +273,9 @@ def test_execute_tool_creates_default_client(scratch_registry: dict[str, Any]) -
             seen["client"] = client
             return "ok"
 
+        async def execute_async(self, client: Any, arguments: Any) -> Any:
+            return self.execute(client, arguments)
+
     register_backend("fake_tool", FakeBackend())
 
     result = execute_tool("fake_tool", {})
@@ -282,6 +288,9 @@ def test_execute_tool_classifies_backend_errors(scratch_registry: dict[str, Any]
     class FailingBackend:
         def execute(self, client: Any, arguments: Any) -> Any:
             raise ValueError("bad input")
+
+        async def execute_async(self, client: Any, arguments: Any) -> Any:
+            return self.execute(client, arguments)
 
     register_backend("failing_tool", FailingBackend())
 

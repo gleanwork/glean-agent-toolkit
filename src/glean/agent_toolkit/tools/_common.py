@@ -2,16 +2,11 @@
 
 from __future__ import annotations
 
-import asyncio
-import concurrent.futures
-import functools
 from typing import Any, Literal, TypedDict
 
 from pydantic import BaseModel
 
 from glean.api_client import Glean, models
-
-_EXECUTOR = concurrent.futures.ThreadPoolExecutor(max_workers=10)
 
 ErrorType = Literal["auth", "validation", "api", "timeout", "not_found", "rate_limit"]
 SuggestedAction = Literal["retry", "check_credentials", "rephrase_query"]
@@ -221,8 +216,9 @@ async def arun_tool(
 ) -> ToolResult:
     """Async version of :func:`run_tool`.
 
-    Delegates to ``asyncio.to_thread`` because the Glean API client
-    has no native async support yet.
+    Legacy entry point retained for backward compatibility; execution is
+    delegated to the transport seam's ``ToolsCallBackend.call_raw_async``,
+    which uses the Glean API client's native async support.
 
     Args:
         tool_display_name: Display name for the tool
@@ -232,10 +228,19 @@ async def arun_tool(
     Returns:
         Structured ``ToolResult`` with status, result/error, and classification.
     """
-    loop = asyncio.get_running_loop()
-    return await loop.run_in_executor(
-        _EXECUTOR, functools.partial(run_tool, tool_display_name, parameters, client=client)
-    )
+    try:
+        if client is None:
+            from glean.agent_toolkit.context import GleanContext
+
+            client = GleanContext().get_client()
+
+        from glean.agent_toolkit.tools._transport import ToolsCallBackend
+
+        backend = ToolsCallBackend(tool_display_name)
+        return make_ok(await backend.call_raw_async(client, parameters))
+    except Exception as e:
+        error_type, suggested_action = _classify_error(e)
+        return make_error(str(e), error_type, suggested_action)
 
 
 def serialize_tool_result(value: Any) -> Any:

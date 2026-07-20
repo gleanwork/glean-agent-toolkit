@@ -95,15 +95,17 @@ async def test_on_invoke_tool_framework_path(monkeypatch: pytest.MonkeyPatch) ->
     canned = make_ok({"documents": [{"title": "canned-doc"}]})
     captured: dict[str, Any] = {}
 
-    def fake_execute_tool(tool_name: str, arguments: Any, *, client: Any = None) -> Any:
+    async def fake_execute_tool_async(tool_name: str, arguments: Any, *, client: Any = None) -> Any:
         captured["tool_name"] = tool_name
         captured["arguments"] = dict(arguments)
         return canned
 
     import importlib
 
-    search_module = importlib.import_module("glean.agent_toolkit.tools.search")
-    monkeypatch.setattr(search_module, "execute_tool", fake_execute_tool)
+    # on_invoke_tool awaits the tool's native async path, which flows
+    # through the transport seam's execute_tool_async.
+    transport_module = importlib.import_module("glean.agent_toolkit.tools._transport")
+    monkeypatch.setattr(transport_module, "execute_tool_async", fake_execute_tool_async)
 
     tools = get_tools("openai", include=["glean_search"], client=_mock_client())
     assert len(tools) == 1

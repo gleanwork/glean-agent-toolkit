@@ -296,6 +296,10 @@ class FrameworkDriver:
     framework: str
     # (converted_tool, args) -> parsed ToolResult dict.
     invoke: Callable[[Any, dict[str, Any]], Awaitable[dict[str, Any]]]
+    # Whether the driver exercises the tool's async path. Async cells also
+    # assert the NATIVE async chain: asyncio.to_thread is poisoned, so any
+    # hidden sync-in-a-thread round-trip fails the cell.
+    is_async: bool = False
 
 
 async def _invoke_langchain(tool: Any, args: dict[str, Any]) -> dict[str, Any]:
@@ -336,12 +340,12 @@ FRAMEWORK_DRIVERS = [
         marks=pytest.mark.skipif(not HAS_LANGCHAIN, reason="LangChain not installed"),
     ),
     pytest.param(
-        FrameworkDriver("langchain", _invoke_langchain_async),
+        FrameworkDriver("langchain", _invoke_langchain_async, is_async=True),
         id="langchain-ainvoke",
         marks=pytest.mark.skipif(not HAS_LANGCHAIN, reason="LangChain not installed"),
     ),
     pytest.param(
-        FrameworkDriver("openai", _invoke_openai),
+        FrameworkDriver("openai", _invoke_openai, is_async=True),
         id="openai-on_invoke_tool",
         marks=pytest.mark.skipif(not HAS_OPENAI, reason="OpenAI Agents SDK not installed"),
     ),
@@ -351,7 +355,7 @@ FRAMEWORK_DRIVERS = [
         marks=pytest.mark.skipif(not HAS_CREWAI, reason="CrewAI not installed"),
     ),
     pytest.param(
-        FrameworkDriver("adk", _invoke_adk),
+        FrameworkDriver("adk", _invoke_adk, is_async=True),
         id="adk-run_async",
         marks=pytest.mark.skipif(not HAS_ADK, reason="Google ADK not installed"),
     ),
@@ -369,9 +373,18 @@ async def test_invocation_matrix(
     driver: FrameworkDriver,
     case: ToolCase,
     httpx_mock: HTTPXMock,
+    request: pytest.FixtureRequest,
 ) -> None:
     """Every built-in tool must be invocable through every framework."""
     httpx_mock.add_response(method="POST", url=case.url, json=case.response_json)
+
+    if driver.is_async:
+        # Built-in tools promise a NATIVE async chain: framework async
+        # invocation -> tool async twin -> execute_tool_async -> the SDK's
+        # *_async methods. The fixture poisons asyncio.to_thread and the
+        # sync HTTP client, so this cell fails if the async path secretly
+        # runs the sync client in a worker thread.
+        request.getfixturevalue("no_thread_roundtrip")
 
     tools = get_tools(driver.framework, include=[case.tool_name])
     assert len(tools) == 1, f"{case.tool_name} missing from get_tools({driver.framework!r})"
@@ -391,8 +404,8 @@ async def test_invocation_matrix(
     # (b) The invocation arguments arrived in the outbound HTTP request body.
     requests = httpx_mock.get_requests()
     assert len(requests) == 1
-    request = requests[0]
-    assert request.method == "POST"
-    assert str(request.url) == case.url
-    assert request.headers["authorization"].startswith("Bearer ")
-    case.check_request(json.loads(request.content))
+    http_request = requests[0]
+    assert http_request.method == "POST"
+    assert str(http_request.url) == case.url
+    assert http_request.headers["authorization"].startswith("Bearer ")
+    case.check_request(json.loads(http_request.content))
