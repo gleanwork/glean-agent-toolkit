@@ -89,7 +89,8 @@ def test_crewai_glean_search_run_with_mocked_glean_layer(
     assert calls[0]["name"] == "glean_search"
     assert calls[0]["arguments"]["query"] == "test"
 
-    assert json.loads(output) == canned
+    # The adapter unwraps the ToolResult envelope: raw payload only.
+    assert json.loads(output) == {"results": ["doc1"]}
 
 
 def test_crewai_custom_tool_run_returns_result() -> None:

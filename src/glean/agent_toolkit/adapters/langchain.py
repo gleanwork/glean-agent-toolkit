@@ -8,7 +8,7 @@ from typing import TYPE_CHECKING, Any, TypeAlias, cast
 
 from pydantic import BaseModel
 
-from glean.agent_toolkit.adapters.base import BaseAdapter, get_field_type
+from glean.agent_toolkit.adapters.base import BaseAdapter, get_field_type, unwrap_tool_result
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
@@ -95,10 +95,12 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
         (the legacy single-input ``Tool`` rejects dict inputs with more
         than one key and calls its func positionally).
 
-        LangChain's tool contract expects string returns.  The wrapper
-        JSON-serializes whatever the underlying function produces.
-        When an async_function is available, passes it as ``coroutine``
-        so LangChain can ``await`` it natively.
+        LangChain's tool contract expects string returns. On a ``ToolResult``
+        envelope the wrapper delivers the raw ``result`` payload on success
+        (or a compact error dict on failure) and JSON-serializes it; other
+        return values are JSON-serialized as-is. When an async_function is
+        available, passes it as ``coroutine`` so LangChain can ``await`` it
+        natively.
 
         Returns:
             LangChain StructuredTool instance
@@ -111,13 +113,13 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
                 async_func = functools.partial(async_func, self.ctx)
 
         def _string_wrapper(**kwargs: Any) -> str:
-            result = original_func(**kwargs)
+            result = unwrap_tool_result(original_func(**kwargs))
             if isinstance(result, str):
                 return result
             return json.dumps(result, default=str)
 
         async def _async_string_wrapper(**kwargs: Any) -> str:
-            result = await async_func(**kwargs)  # type: ignore[misc]
+            result = unwrap_tool_result(await async_func(**kwargs))  # type: ignore[misc]
             if isinstance(result, str):
                 return result
             return json.dumps(result, default=str)

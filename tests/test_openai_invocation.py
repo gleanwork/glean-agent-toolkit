@@ -95,7 +95,9 @@ async def test_on_invoke_tool_framework_path(monkeypatch: pytest.MonkeyPatch) ->
     canned = make_ok({"documents": [{"title": "canned-doc"}]})
     captured: dict[str, Any] = {}
 
-    async def fake_execute_tool_async(tool_name: str, arguments: Any, *, client: Any = None) -> Any:
+    async def fake_execute_tool_async(
+        tool_name: str, arguments: Any, *, client: Any = None, ctx: Any = None
+    ) -> Any:
         captured["tool_name"] = tool_name
         captured["arguments"] = dict(arguments)
         return canned
@@ -114,9 +116,9 @@ async def test_on_invoke_tool_framework_path(monkeypatch: pytest.MonkeyPatch) ->
     ctx_stub = MagicMock()  # the adapter ignores the SDK run context
     result_str = await tool.on_invoke_tool(ctx_stub, '{"query": "test"}')
 
+    # The adapter unwraps the ToolResult envelope: raw payload only.
     result = json.loads(result_str)
-    assert result["status"] == "ok"
-    assert result["result"] == {"documents": [{"title": "canned-doc"}]}
+    assert result == {"documents": [{"title": "canned-doc"}]}
     assert captured["tool_name"] == "glean_search"
 
 

@@ -210,6 +210,8 @@ return make_ok({"documents": [...]})
 # → {"status": "ok", "result": {...}, "error": None, "error_type": None, "suggested_action": None}
 ```
 
+Note: when a tool that returns a `ToolResult` envelope is converted through a framework adapter (`get_tools()`, `.as_*_tool()`), the adapter unwraps the envelope before handing it to the framework — the raw `result` payload on success, or a compact `{"error", "error_type", "suggested_action"}` dict on failure. Direct Python callers always see the full envelope. Custom tools are also not returned by `get_tools()` by default; opt in with `builtin=False`, `builtin=None`, or `include=`.
+
 ### `make_error(message, error_type, suggested_action)` — Build an error ToolResult
 
 ```python

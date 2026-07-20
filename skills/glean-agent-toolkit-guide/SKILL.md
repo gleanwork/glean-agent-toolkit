@@ -1,6 +1,6 @@
 ---
 name: glean-agent-toolkit-guide
-description: "How to use the Glean Agent Toolkit SDK. Use when building agents that integrate Glean enterprise search via the glean-agent-toolkit Python package. Triggers on: 'glean-agent-toolkit', 'glean agent toolkit', 'GleanContext', 'get_tools', 'as_openai_tool', 'as_langchain_tool', 'as_crewai_tool', 'as_adk_tool', '@tool_spec'."
+description: "How to use the Glean Agent Toolkit SDK. Use when building agents that integrate Glean enterprise search via the glean-agent-toolkit Python package. Triggers on: 'glean-agent-toolkit', 'glean agent toolkit', 'GleanContext', 'configure', 'get_tools', 'as_openai_tool', 'as_langchain_tool', 'as_crewai_tool', 'as_adk_tool', '@tool_spec'."
 ---
 
 # Glean Agent Toolkit — Usage Guide
@@ -30,17 +30,19 @@ pip install "glean-agent-toolkit[all]"
 
 ## Quick Start with `get_tools()`
 
-`get_tools()` is the primary API. It returns all Glean tools converted to a specific framework's format.
+`get_tools()` is the primary API. It returns the nine built-in Glean tools converted to a specific framework's format.
 
 ```python
 from glean.agent_toolkit import get_tools
 
-# Get all tools for a framework
+# The built-in Glean tools for a framework
 tools = get_tools("openai")       # list of OpenAI FunctionTool objects
-tools = get_tools("langchain")    # list of LangChain Tool objects
+tools = get_tools("langchain")    # list of LangChain StructuredTool objects
 tools = get_tools("crewai")       # list of CrewAI BaseTool objects
 tools = get_tools("adk")          # list of Google ADK FunctionTool objects
 ```
+
+By default only the built-in `glean_*` tools are returned. Custom `@tool_spec` tools require explicit opt-in: `builtin=False` (custom only), `builtin=None` (everything), or list them in `include=`.
 
 ### Filtering tools
 
@@ -58,22 +60,30 @@ tools = get_tools("langchain", exclude=["glean_outlook_search"])
 tools = get_tools(
     "openai",
     api_token="your-glean-api-token",
-    server_url="https://your-company-be.glean.com",
+    server_url="https://your-company-be.glean.com",  # full URL incl. https://
 )
 ```
 
-Or pass a pre-configured client:
+`server_url` must include the `http(s)://` scheme; a bare hostname fails fast with a clear error.
+
+### `configure()` — process-wide defaults
 
 ```python
-from glean.agent_toolkit import GleanContext
+import glean.agent_toolkit
 
-ctx = GleanContext(api_token="...", server_url="...")
-tools = get_tools("openai", client=ctx.get_client())
+glean.agent_toolkit.configure(
+    api_token="your-glean-api-token",
+    server_url="https://your-company-be.glean.com",  # or instance="your-company"
+)
+
+tools = glean.agent_toolkit.get_tools("langchain")  # uses the configured defaults
 ```
 
-## `GleanContext` — Dependency Injection
+`configure()` sets a process default used whenever no explicit context/client/credentials are supplied (tools, adapters, and `get_tools()` all honor it, sharing one HTTP client). It is idempotent and overridable per call.
 
-`GleanContext` is the dependency injection object that provides Glean API client access to every tool. It is the first parameter of every tool function, but adapters bind it automatically so LLM frameworks never see it.
+## Advanced: `GleanContext` — Client Lifecycle
+
+`GleanContext` is the dependency injection object that provides Glean API client access to every tool. It is the first parameter of every tool function, but adapters bind it automatically so LLM frameworks never see it. Most users only need env vars or `configure()`; use `GleanContext` for explicit client lifecycle control (`close()`/context manager) or multiple Glean instances in one process.
 
 ```python
 from glean.agent_toolkit.context import GleanContext
@@ -103,7 +113,7 @@ All tools are registered under the `glean.agent_toolkit.tools` package. Each too
 | Tool name (`spec.name`)  | Import name         | Description                                    |
 | ------------------------ | ------------------- | ---------------------------------------------- |
 | `glean_search`           | `search`            | Search internal documents and knowledge bases  |
-| `glean_chat`             | `glean_chat`        | Conversational Q&A with Glean Assistant        |
+| `glean_chat`             | `chat`              | Conversational Q&A with Glean Assistant        |
 | `glean_read_document`    | `read_document`     | Read full document content by ID or URL        |
 | `glean_web_search`       | `web_search`        | Search the public web                          |
 | `glean_calendar_search`  | `calendar_search`   | Find meetings and calendar events              |
@@ -117,7 +127,7 @@ All tools are registered under the `glean.agent_toolkit.tools` package. Each too
 ```python
 from glean.agent_toolkit.tools import (
     search,
-    glean_chat,
+    chat,
     read_document,
     web_search,
     calendar_search,
@@ -127,6 +137,8 @@ from glean.agent_toolkit.tools import (
     outlook_search,
 )
 ```
+
+The old `glean_chat` import name still works but is deprecated (emits `DeprecationWarning`); the tool ID stays `glean_chat`.
 
 ## Per-Tool Direct Usage
 
@@ -155,9 +167,9 @@ crewai_tool   = search.as_crewai_tool()     # CrewAI BaseTool
 adk_tool      = search.as_adk_tool()        # Google ADK FunctionTool
 ```
 
-## Error Handling
+## Results and Error Handling
 
-Every tool returns a `ToolResult` TypedDict:
+Direct Python calls to a tool function return a `ToolResult` TypedDict, and never raise (missing credentials included):
 
 ```python
 from glean.agent_toolkit.tools._common import ToolResult
@@ -172,11 +184,14 @@ from glean.agent_toolkit.tools._common import ToolResult
 }
 ```
 
+Framework adapters (`get_tools()`, `.as_*_tool()`) unwrap this envelope before handing results to the framework: on success they deliver the raw `result` payload (JSON-serialized where the framework expects strings); on failure a compact `{"error", "error_type", "suggested_action"}` dict. Custom tools that return non-envelope values pass through unchanged.
+
 ### Error types
 
 | `error_type`   | Meaning                        | `suggested_action` |
 | -------------- | ------------------------------ | ------------------ |
-| `"auth"`       | 401/403 — bad or expired token | `"check_credentials"` |
+| `"auth"`       | 401/403, or missing API token/credentials | `"check_credentials"` |
+| `"config"`     | Invalid server URL, unreachable/unresolvable host | `"check_configuration"` |
 | `"validation"` | Bad input / ValueError         | `"rephrase_query"` |
 | `"api"`        | Generic API error              | `"retry"`          |
 | `"timeout"`    | Request timed out              | `"retry"`          |
@@ -253,23 +268,17 @@ root_agent = Agent(
 
 ## Async Support
 
-Every `ToolSpec` has an `async_function` that wraps the sync implementation via `asyncio.run_in_executor`. The `_common.py` module also provides `arun_tool` for async tool execution.
-
-```python
-from glean.agent_toolkit.tools._common import arun_tool
-
-# Async version of run_tool — same signature
-result = await arun_tool("Glean Search", parameters, client=client)
-```
+Built-in tools are natively async end to end: framework async invocation (`await tool.ainvoke(...)` in LangChain, `on_invoke_tool` in the OpenAI Agents SDK, `run_async` in ADK) flows through the Glean SDK's async HTTP client with no thread-pool round-trip.
 
 For direct async use of a tool spec:
 
 ```python
 from glean.agent_toolkit.tools import search
 
-spec = search.tool_spec
-result = await spec.async_function(ctx, query="roadmap")
+result = await search.tool_spec.async_function(query="roadmap")
 ```
+
+Custom `@tool_spec` tools may be `async def`; the coroutine becomes the native async path. Custom sync tools get an `asyncio.to_thread` async wrapper automatically. Caveat: calling an `async def` tool synchronously works outside an event loop (sync bridge via `asyncio.run`) but raises a clear `RuntimeError` inside a running event loop — use the async path there.
 
 ## Environment Variables
 

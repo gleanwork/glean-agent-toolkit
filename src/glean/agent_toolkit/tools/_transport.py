@@ -22,7 +22,7 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 from glean.agent_toolkit.tools._common import (
     ToolResult,
-    _classify_error,
+    error_result_from_exception,
     make_error,
     make_ok,
     serialize_tool_result,
@@ -229,18 +229,23 @@ def execute_tool(
     arguments: Mapping[str, Any],
     *,
     client: Glean | None = None,
+    ctx: GleanContext | None = None,
 ) -> ToolResult:
     """Execute the registered backend for *tool_name* and wrap the outcome.
 
     This is the single execution seam for all built-in tools: client
     resolution, backend dispatch, ``ToolResult`` wrapping, and error
-    classification happen here.
+    classification happen here. Client resolution runs *inside* the error
+    boundary, so missing or invalid credentials come back as a structured
+    error ``ToolResult`` instead of raising.
 
     Args:
         tool_name: The registered tool name (e.g. ``"glean_search"``).
         arguments: The tool's high-level arguments.
-        client: Optional pre-configured Glean client. When ``None``, a
-            default client is created via ``GleanContext``.
+        client: Optional pre-configured Glean client. Wins over *ctx*.
+        ctx: Optional :class:`GleanContext` to resolve the client from.
+            When both *client* and *ctx* are ``None``, the process-default
+            context (see :func:`glean.agent_toolkit.configure`) is used.
 
     Returns:
         Structured ``ToolResult`` with status, result/error, and
@@ -256,14 +261,11 @@ def execute_tool(
 
     try:
         if client is None:
-            from glean.agent_toolkit.context import GleanContext
-
-            client = GleanContext().get_client()
+            client = _resolve_client(ctx)
 
         return make_ok(backend.execute(client, arguments))
     except Exception as e:
-        error_type, suggested_action = _classify_error(e)
-        return make_error(str(e), error_type, suggested_action)
+        return error_result_from_exception(e)
 
 
 async def execute_tool_async(
@@ -271,6 +273,7 @@ async def execute_tool_async(
     arguments: Mapping[str, Any],
     *,
     client: Glean | None = None,
+    ctx: GleanContext | None = None,
 ) -> ToolResult:
     """Async twin of :func:`execute_tool`.
 
@@ -281,8 +284,10 @@ async def execute_tool_async(
     Args:
         tool_name: The registered tool name (e.g. ``"glean_search"``).
         arguments: The tool's high-level arguments.
-        client: Optional pre-configured Glean client. When ``None``, a
-            default client is created via ``GleanContext``.
+        client: Optional pre-configured Glean client. Wins over *ctx*.
+        ctx: Optional :class:`GleanContext` to resolve the client from.
+            When both *client* and *ctx* are ``None``, the process-default
+            context (see :func:`glean.agent_toolkit.configure`) is used.
 
     Returns:
         Structured ``ToolResult`` with status, result/error, and
@@ -298,14 +303,20 @@ async def execute_tool_async(
 
     try:
         if client is None:
-            from glean.agent_toolkit.context import GleanContext
-
-            client = GleanContext().get_client()
+            client = _resolve_client(ctx)
 
         return make_ok(await backend.execute_async(client, arguments))
     except Exception as e:
-        error_type, suggested_action = _classify_error(e)
-        return make_error(str(e), error_type, suggested_action)
+        return error_result_from_exception(e)
+
+
+def _resolve_client(ctx: GleanContext | None) -> Glean:
+    """Resolve the Glean client from *ctx* or the process-default context."""
+    if ctx is None:
+        from glean.agent_toolkit.context import get_default_context
+
+        ctx = get_default_context()
+    return ctx.get_client()
 
 
 def make_async_tool(
@@ -328,10 +339,7 @@ def make_async_tool(
     """
 
     async def _async_tool(ctx: GleanContext | None = None, **arguments: Any) -> ToolResult:
-        from glean.agent_toolkit.context import GleanContext
-
-        ctx = ctx or GleanContext()
-        return await execute_tool_async(tool_name, arguments, client=ctx.get_client())
+        return await execute_tool_async(tool_name, arguments, ctx=ctx)
 
     _async_tool.__name__ = f"{tool_name}_async"
     _async_tool.__qualname__ = f"{tool_name}_async"

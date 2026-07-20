@@ -14,9 +14,9 @@ import pytest
 
 from glean.agent_toolkit.tools import (
     calendar_search,
+    chat,
     code_search,
     employee_search,
-    glean_chat,
     gmail_search,
     outlook_search,
     read_document,
@@ -58,7 +58,7 @@ E2E_SENTINEL = "gat-e2e-ci"
 
 
 def test_chat_live() -> None:
-    result = glean_chat(message=f"{E2E_SENTINEL}: In one short sentence, what is Glean used for?")
+    result = chat(message=f"{E2E_SENTINEL}: In one short sentence, what is Glean used for?")
     payload = unwrap_ok_or_skip(result, "glean_chat")
 
     assert isinstance(payload, dict)

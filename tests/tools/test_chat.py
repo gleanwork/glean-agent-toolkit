@@ -5,7 +5,7 @@ from typing import Any
 from unittest.mock import MagicMock
 
 from glean.agent_toolkit.context import GleanContext
-from glean.agent_toolkit.tools.chat import ChatResult, glean_chat
+from glean.agent_toolkit.tools._chat import ChatResult, chat
 from glean.api_client import models
 
 # Feature detection mirroring the version-tolerant extraction in chat.py:
@@ -96,7 +96,7 @@ def _make_ctx(
 def test_glean_chat_success() -> None:
     ctx = _make_ctx()
 
-    result = glean_chat(ctx, message="What is our vacation policy?")
+    result = chat(ctx, message="What is our vacation policy?")
 
     assert result["status"] == "ok"
     assert result["error"] is None
@@ -109,7 +109,7 @@ def test_glean_chat_success() -> None:
 def test_glean_chat_api_error() -> None:
     ctx = _make_ctx(chat_side_effect=Exception("Chat API Error"))
 
-    result = glean_chat(ctx, message="anything")
+    result = chat(ctx, message="anything")
 
     assert result["status"] == "error"
     assert result["error"] == "Chat API Error"
@@ -130,7 +130,7 @@ def test_glean_chat_deduplicates_sources() -> None:
     )
     ctx = _make_ctx(chat_return=response)
 
-    result = glean_chat(ctx, message="test")
+    result = chat(ctx, message="test")
 
     assert result["status"] == "ok"
     assert len(result["result"]["sources"]) == 1
@@ -140,7 +140,7 @@ def test_glean_chat_empty_response() -> None:
     response = SimpleNamespace(messages=[])
     ctx = _make_ctx(chat_return=response)
 
-    result = glean_chat(ctx, message="test")
+    result = chat(ctx, message="test")
 
     assert result["status"] == "ok"
     assert result["result"]["answer"] == ""
@@ -157,7 +157,7 @@ def test_glean_chat_extracts_fragments() -> None:
     response = SimpleNamespace(messages=[msg])
     ctx = _make_ctx(chat_return=response)
 
-    result = glean_chat(ctx, message="test")
+    result = chat(ctx, message="test")
 
     assert result["status"] == "ok"
     assert "fragment text" in result["result"]["answer"]
@@ -175,7 +175,7 @@ def test_glean_chat_fragment_level_citations() -> None:
     msg = _make_fragment_citation_message("fragment answer", urls)
     ctx = _make_ctx(chat_return=SimpleNamespace(messages=[msg]))
 
-    result = glean_chat(ctx, message="test")
+    result = chat(ctx, message="test")
 
     assert result["status"] == "ok"
     assert result["result"]["answer"] == "fragment answer"
@@ -188,7 +188,7 @@ def test_glean_chat_message_level_citations_legacy() -> None:
     msg = _make_message_citation_message("legacy answer", urls)
     ctx = _make_ctx(chat_return=SimpleNamespace(messages=[msg]))
 
-    result = glean_chat(ctx, message="test")
+    result = chat(ctx, message="test")
 
     assert result["status"] == "ok"
     assert result["result"]["answer"] == "legacy answer"
@@ -202,10 +202,10 @@ def test_citation_shapes_produce_identical_sources() -> None:
     new_msg = _make_fragment_citation_message("same answer", urls)
     old_msg = _make_message_citation_message("same answer", urls)
 
-    new_result = glean_chat(
+    new_result = chat(
         _make_ctx(chat_return=SimpleNamespace(messages=[new_msg])), message="q"
     )
-    old_result = glean_chat(
+    old_result = chat(
         _make_ctx(chat_return=SimpleNamespace(messages=[old_msg])), message="q"
     )
 
@@ -242,7 +242,38 @@ def test_glean_chat_prefers_fragment_citations_over_message_citations() -> None:
         )
     ctx = _make_ctx(chat_return=SimpleNamespace(messages=[msg]))
 
-    result = glean_chat(ctx, message="test")
+    result = chat(ctx, message="test")
 
     assert result["status"] == "ok"
     assert [s["url"] for s in result["result"]["sources"]] == [fragment_url]
+
+
+def test_chat_import_name_is_the_tool_callable() -> None:
+    """B2: `from glean.agent_toolkit.tools import chat` yields the tool."""
+    from glean.agent_toolkit.tools import chat as imported_chat
+
+    assert callable(imported_chat)
+    assert imported_chat.tool_spec.name == "glean_chat"
+
+
+def test_glean_chat_alias_emits_deprecation_warning() -> None:
+    """The legacy `glean_chat` import keeps working but warns."""
+    import warnings
+
+    import glean.agent_toolkit.tools as tools_pkg
+
+    with warnings.catch_warnings(record=True) as caught:
+        warnings.simplefilter("always")
+        alias = tools_pkg.glean_chat
+
+    assert alias is tools_pkg.chat
+    assert any(issubclass(w.category, DeprecationWarning) for w in caught)
+
+
+def test_tools_package_unknown_attribute_raises() -> None:
+    import pytest
+
+    import glean.agent_toolkit.tools as tools_pkg
+
+    with pytest.raises(AttributeError):
+        tools_pkg.not_a_real_tool

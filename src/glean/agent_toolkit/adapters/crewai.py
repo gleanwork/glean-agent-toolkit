@@ -9,7 +9,7 @@ from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel
 
-from glean.agent_toolkit.adapters.base import BaseAdapter, get_field_type
+from glean.agent_toolkit.adapters.base import BaseAdapter, get_field_type, unwrap_tool_result
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
@@ -109,7 +109,9 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
     def _run(self, **kwargs: Any) -> str:
         """Run the tool with the given arguments.
 
-        CrewAI expects string returns from tools.
+        CrewAI expects string returns from tools. ``ToolResult`` envelopes
+        are unwrapped to the raw ``result`` payload on success or a compact
+        error dict on failure; other return values pass through as-is.
 
         Args:
             **kwargs: The arguments to pass to the function
@@ -117,7 +119,7 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
         Returns:
             JSON-serialized string result
         """
-        result = self._function(**kwargs)
+        result = unwrap_tool_result(self._function(**kwargs))
         if isinstance(result, str):
             return result
         return json.dumps(result, default=str)

@@ -57,6 +57,33 @@ class TestGleanContext:
             with pytest.raises(ValueError, match="GLEAN_SERVER_URL or GLEAN_INSTANCE"):
                 ctx.get_client()
 
+    def test_invalid_server_url_scheme_fails_fast_in_constructor(self) -> None:
+        from glean.agent_toolkit.context import GleanConfigurationError
+
+        with pytest.raises(GleanConfigurationError, match="http"):
+            GleanContext(api_token="tok", server_url="my-company-be.glean.com")
+
+    def test_invalid_server_url_scheme_from_env_fails_fast(self) -> None:
+        from glean.agent_toolkit.context import GleanConfigurationError
+
+        with patch.dict(os.environ, {
+            "GLEAN_API_TOKEN": "tok",
+            "GLEAN_SERVER_URL": "my-company-be.glean.com",
+        }, clear=True):
+            ctx = GleanContext()
+            with pytest.raises(GleanConfigurationError, match="https://your-company-be"):
+                ctx.get_client()
+
+    def test_missing_credential_errors_are_value_errors(self) -> None:
+        """The documented get_client() contract (raises ValueError) holds."""
+        from glean.agent_toolkit.context import (
+            GleanConfigurationError,
+            GleanCredentialsError,
+        )
+
+        assert issubclass(GleanCredentialsError, GleanConfigurationError)
+        assert issubclass(GleanConfigurationError, ValueError)
+
     def test_instance_fallback(self) -> None:
         with patch.dict(os.environ, {
             "GLEAN_API_TOKEN": "tok",
@@ -119,7 +146,8 @@ class TestRunTool:
         assert result["error_type"] == "api"
         assert result["suggested_action"] == "retry"
 
-    def test_run_tool_connection_error(self) -> None:
+    def test_run_tool_connection_error_is_config(self) -> None:
+        """Connection-level failures classify as config with an actionable hint."""
         parameters = {
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
@@ -128,9 +156,10 @@ class TestRunTool:
         result = run_tool("Test Tool", parameters, client=client)
 
         assert result["status"] == "error"
-        assert result["error"] == "Network error"
-        assert result["error_type"] == "api"
-        assert result["suggested_action"] == "retry"
+        assert result["error"] is not None and result["error"].startswith("Network error")
+        assert "GLEAN_RETRY_MAX_ELAPSED" in result["error"]
+        assert result["error_type"] == "config"
+        assert result["suggested_action"] == "check_configuration"
 
     def test_run_tool_empty_parameters(self) -> None:
         mock_result = {"status": "success"}
@@ -169,8 +198,8 @@ class TestRunTool:
         assert result["error_type"] == "timeout"
         assert result["suggested_action"] == "retry"
 
-    def test_run_tool_client_creation_error(self) -> None:
-        """Test that run_tool without client falls back to GleanContext."""
+    def test_run_tool_missing_credentials_is_auth_error(self) -> None:
+        """Missing credentials come back as a structured auth error, not a raise."""
         parameters = {
             "query": models.ToolsCallParameter(name="query", value="test query")
         }
@@ -180,4 +209,6 @@ class TestRunTool:
 
         assert result["status"] == "error"
         assert result["error"] is not None and "GLEAN_API_TOKEN" in result["error"]
-        assert result["error_type"] == "validation"
+        assert "configure()" in result["error"]
+        assert result["error_type"] == "auth"
+        assert result["suggested_action"] == "check_credentials"

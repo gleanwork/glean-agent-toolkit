@@ -26,6 +26,15 @@ def mock_glean_env_vars() -> Generator[None, None, None]:
         yield
 
 
+@pytest.fixture(autouse=True)
+def reset_default_context() -> Generator[None, None, None]:
+    """Reset the process-default context set via configure() between tests."""
+    import glean.agent_toolkit.context as context_module
+
+    yield
+    context_module._default_context = None
+
+
 @pytest.fixture
 def no_thread_roundtrip(monkeypatch: pytest.MonkeyPatch) -> None:
     """Fail the test if an async invocation round-trips through a thread.

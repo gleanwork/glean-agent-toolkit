@@ -14,6 +14,33 @@ if TYPE_CHECKING:
 
 T = TypeVar("T")
 
+_TOOL_RESULT_KEYS = frozenset({"status", "result", "error", "error_type", "suggested_action"})
+
+
+def unwrap_tool_result(value: Any) -> Any:
+    """Unwrap a ``ToolResult`` envelope into the framework-facing payload.
+
+    Adapters deliver the raw ``result`` payload to the framework on
+    success, and a compact ``{"error", "error_type", "suggested_action"}``
+    dict on failure, instead of the full five-key envelope. Values that are
+    not a ``ToolResult`` envelope (e.g. returns from custom ``@tool_spec``
+    tools) pass through unchanged. Direct Python callers of the tool
+    functions still receive the full envelope.
+    """
+    if (
+        isinstance(value, dict)
+        and set(value) == _TOOL_RESULT_KEYS
+        and value.get("status") in ("ok", "error")
+    ):
+        if value["status"] == "ok":
+            return value["result"]
+        return {
+            "error": value["error"],
+            "error_type": value["error_type"],
+            "suggested_action": value["suggested_action"],
+        }
+    return value
+
 
 def get_field_type(schema: dict[str, Any], *, use_date_types: bool = False) -> Any:
     """Determine the Python type from a JSON schema property.

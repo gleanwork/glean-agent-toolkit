@@ -92,10 +92,17 @@ async def test_run_async_delivers_arguments_to_search() -> None:
         arguments: dict[str, Any],
         *,
         client: Any = None,
+        ctx: Any = None,
     ) -> dict[str, Any]:
         captured["tool_name"] = tool_name
         captured["arguments"] = dict(arguments)
-        return {"status": "success", "result": "canned-result"}
+        return {
+            "status": "ok",
+            "result": {"answer": "canned-result"},
+            "error": None,
+            "error_type": None,
+            "suggested_action": None,
+        }
 
     # ADK's run_async awaits the tool's native async path, which flows
     # through the transport seam's execute_tool_async.
@@ -106,7 +113,8 @@ async def test_run_async_delivers_arguments_to_search() -> None:
             tool_context=None,
         )
 
-    assert result == {"status": "success", "result": "canned-result"}
+    # The adapter unwraps the ToolResult envelope: raw payload only.
+    assert result == {"answer": "canned-result"}
     assert captured["tool_name"] == "glean_search"
     # Previously the (*args, **kwargs) wrapper signature made ADK drop every
     # argument, so the query never reached the tool implementation.

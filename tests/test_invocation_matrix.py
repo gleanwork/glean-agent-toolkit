@@ -13,8 +13,10 @@ Each matrix cell asserts three contracts:
    ``tool.run`` for CrewAI).
 2. The caller's arguments arrive in the outbound HTTP request body,
    mapped to the correct wire format for the endpoint the tool hits.
-3. A structured ``ToolResult``-shaped payload comes back through the
-   framework layer with the response payload intact.
+3. The adapter delivers the RAW result payload to the framework (the
+   ``ToolResult`` envelope is unwrapped at the adapter layer; on error a
+   compact ``{"error", "error_type", "suggested_action"}`` dict comes
+   back instead).
 
 The per-fix regression tests (test_langchain_invocation.py and friends)
 mock at the ``run_tool`` seam; this matrix goes one layer deeper and
@@ -62,6 +64,7 @@ CHAT_URL = f"{BASE_URL}/rest/api/v1/chat"
 GET_DOCUMENTS_URL = f"{BASE_URL}/rest/api/v1/getdocuments"
 
 TOOL_RESULT_KEYS = {"status", "result", "error", "error_type", "suggested_action"}
+COMPACT_ERROR_KEYS = {"error", "error_type", "suggested_action"}
 
 
 # ---------------------------------------------------------------------------
@@ -294,7 +297,7 @@ class FrameworkDriver:
     """One column of the matrix: a framework plus its native invocation path."""
 
     framework: str
-    # (converted_tool, args) -> parsed ToolResult dict.
+    # (converted_tool, args) -> parsed framework-facing payload dict.
     invoke: Callable[[Any, dict[str, Any]], Awaitable[dict[str, Any]]]
     # Whether the driver exercises the tool's async path. Async cells also
     # assert the NATIVE async chain: asyncio.to_thread is poisoned, so any
@@ -391,15 +394,11 @@ async def test_invocation_matrix(
     tool = tools[0]
 
     # (a) Invocation succeeds through the framework's native path.
-    tool_result = await driver.invoke(tool, case.args)
+    payload = await driver.invoke(tool, case.args)
 
-    # (c) A structured ToolResult-shaped payload returns.
-    assert set(tool_result) == TOOL_RESULT_KEYS
-    assert tool_result["status"] == "ok", tool_result
-    assert tool_result["error"] is None
-    assert tool_result["error_type"] is None
-    assert tool_result["suggested_action"] is None
-    case.check_result(tool_result["result"])
+    # (c) The adapter delivers the RAW result payload, not the envelope.
+    assert set(payload) != TOOL_RESULT_KEYS, f"envelope leaked through adapter: {payload}"
+    case.check_result(payload)
 
     # (b) The invocation arguments arrived in the outbound HTTP request body.
     requests = httpx_mock.get_requests()
@@ -409,3 +408,27 @@ async def test_invocation_matrix(
     assert str(http_request.url) == case.url
     assert http_request.headers["authorization"].startswith("Bearer ")
     case.check_request(json.loads(http_request.content))
+
+
+@pytest.mark.parametrize("driver", FRAMEWORK_DRIVERS)
+async def test_invocation_matrix_error_contract(
+    driver: FrameworkDriver,
+    httpx_mock: HTTPXMock,
+) -> None:
+    """Tool failures surface as a compact error dict through every framework."""
+    httpx_mock.add_response(
+        method="POST",
+        url=SEARCH_URL,
+        status_code=401,
+        json={"error": "Invalid token"},
+    )
+
+    tools = get_tools(driver.framework, include=["glean_search"])
+    assert len(tools) == 1
+
+    payload = await driver.invoke(tools[0], {"query": "anything"})
+
+    assert set(payload) == COMPACT_ERROR_KEYS, payload
+    assert payload["error_type"] == "auth"
+    assert payload["suggested_action"] == "check_credentials"
+    assert payload["error"]
