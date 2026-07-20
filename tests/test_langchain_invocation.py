@@ -27,7 +27,7 @@ CANNED_PAYLOAD = "CANNED_LANGCHAIN_PAYLOAD"
 def patched_run_tool(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
     """Replace the Glean network call with a canned ToolResult.
 
-    ``search`` binds ``run_tool`` into its module namespace at import
+    ``search`` binds ``execute_tool`` into its module namespace at import
     time, so patch it there. Env vars are set so the (unused) client
     construction inside the tool does not fail.
     """
@@ -36,20 +36,20 @@ def patched_run_tool(monkeypatch: pytest.MonkeyPatch) -> dict[str, Any]:
 
     captured: dict[str, Any] = {}
 
-    def fake_run_tool(
-        tool_display_name: str,
-        parameters: dict[str, Any],
+    def fake_execute_tool(
+        tool_name: str,
+        arguments: dict[str, Any],
         *,
         client: Any = None,
     ) -> ToolResult:
-        captured["tool_display_name"] = tool_display_name
-        captured["parameters"] = {name: param.value for name, param in parameters.items()}
+        captured["tool_name"] = tool_name
+        captured["arguments"] = dict(arguments)
         return make_ok({"marker": CANNED_PAYLOAD})
 
     # The tools package re-exports the `search` function under the same
     # name as its module, so resolve the module object explicitly.
     search_module = importlib.import_module("glean.agent_toolkit.tools.search")
-    monkeypatch.setattr(search_module, "run_tool", fake_run_tool)
+    monkeypatch.setattr(search_module, "execute_tool", fake_execute_tool)
     return captured
 
 
@@ -68,9 +68,9 @@ def test_invoke_multi_arg_through_langchain(patched_run_tool: dict[str, Any]) ->
 
     assert isinstance(result, str)
     assert CANNED_PAYLOAD in result
-    assert patched_run_tool["tool_display_name"] == "Glean Search"
-    assert patched_run_tool["parameters"]["query"] == "test"
-    assert patched_run_tool["parameters"]["pageSize"] == "5"
+    assert patched_run_tool["tool_name"] == "glean_search"
+    assert patched_run_tool["arguments"]["query"] == "test"
+    assert patched_run_tool["arguments"]["page_size"] == 5
 
 
 async def test_ainvoke_multi_arg_through_langchain(patched_run_tool: dict[str, Any]) -> None:
@@ -80,8 +80,8 @@ async def test_ainvoke_multi_arg_through_langchain(patched_run_tool: dict[str, A
 
     assert isinstance(result, str)
     assert CANNED_PAYLOAD in result
-    assert patched_run_tool["parameters"]["query"] == "async test"
-    assert patched_run_tool["parameters"]["pageSize"] == "5"
+    assert patched_run_tool["arguments"]["query"] == "async test"
+    assert patched_run_tool["arguments"]["page_size"] == 5
 
 
 def test_custom_multi_arg_tool_invocable() -> None:

@@ -7,10 +7,17 @@ from typing import TYPE_CHECKING, Annotated
 from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import ToolResult, convert_to_tool_params, run_tool
+from glean.agent_toolkit.tools._common import ToolResult
+from glean.agent_toolkit.tools._transport import (
+    ToolsCallBackend,
+    execute_tool,
+    register_backend,
+)
 
 if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
+
+register_backend("glean_web_search", ToolsCallBackend("Gemini Web Search"))
 
 
 @tool_spec(
@@ -54,5 +61,4 @@ def web_search(
 
     ctx = ctx or GleanContext()
     client = ctx.get_client()
-    parameters = convert_to_tool_params(query=query)
-    return run_tool("Gemini Web Search", parameters, client=client)
+    return execute_tool("glean_web_search", {"query": query}, client=client)

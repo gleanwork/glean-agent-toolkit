@@ -2,45 +2,118 @@
 
 from __future__ import annotations
 
-import json
 from typing import TYPE_CHECKING, Annotated, Any
 
 from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import ToolResult, convert_to_tool_params, run_tool
+from glean.agent_toolkit.tools._common import ToolResult
+from glean.agent_toolkit.tools._transport import TypedBackend, execute_tool, register_backend
+from glean.api_client import Glean, models
 
 if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
 
+_SNIPPET_MAX_CHARS = 500
 
-def _build_search_params(
+
+def _to_facet_filters(filters: list[dict[str, Any]] | None) -> list[models.FacetFilter]:
+    """Map structured ``[{field, values, exclude?}]`` filters to facet filters.
+
+    Each filter dict becomes a ``FacetFilter`` on ``field``; every value
+    becomes a ``FacetFilterValue`` whose ``relationType`` is ``EQUALS``, or
+    ``NOT_EQUALS`` when ``exclude`` is true. Filters within a values list
+    are OR-ed and separate ``FacetFilter`` entries are AND-ed by the API.
+
+    Raises:
+        ValueError: If a filter dict is missing ``field`` or ``values``.
+    """
+    facet_filters: list[models.FacetFilter] = []
+    for spec in filters or []:
+        field = spec.get("field")
+        values = spec.get("values")
+        if not field or not values:
+            raise ValueError(
+                f"Each filter must include a non-empty 'field' and 'values'; got: {spec!r}"
+            )
+        relation_type = (
+            models.RelationType.NOT_EQUALS if spec.get("exclude") else models.RelationType.EQUALS
+        )
+        facet_filters.append(
+            models.FacetFilter(
+                field_name=str(field),
+                values=[
+                    models.FacetFilterValue(value=str(value), relation_type=relation_type)
+                    for value in values
+                ],
+            )
+        )
+    return facet_filters
+
+
+def _query_search(
+    client: Glean,
+    *,
     query: str,
     datasources: list[str] | None = None,
     filters: list[dict[str, Any]] | None = None,
     page_size: int = 10,
-) -> dict[str, Any]:
-    """Map high-level search parameters to ToolsCallParameter format.
+) -> models.SearchResponse:
+    """Perform a typed ``POST /rest/api/v1/search`` call.
 
-    Args:
-        query: The search query string.
-        datasources: Optional list of datasource names to restrict results.
-        filters: Optional structured filters ``[{field, values, exclude?}]``.
-        page_size: Number of results per page.
-
-    Returns:
-        Kwargs suitable for :func:`convert_to_tool_params`.
+    ``datasources`` maps to ``requestOptions.datasourcesFilter`` and
+    structured ``filters`` map to ``requestOptions.facetFilters``.
     """
-    # TODO: Replace with POST /api/search when available — this mapping can be deleted.
-    params: dict[str, Any] = {"query": query, "pageSize": str(page_size)}
+    facet_filters = _to_facet_filters(filters)
 
-    if datasources:
-        params["datasources"] = json.dumps(datasources)
+    request_options: models.SearchRequestOptions | None = None
+    if datasources or facet_filters:
+        request_options = models.SearchRequestOptions(
+            facet_bucket_size=0,
+            datasources_filter=list(datasources) if datasources else None,
+            facet_filters=facet_filters or None,
+        )
 
-    if filters:
-        params["filters"] = json.dumps(filters)
+    return client.client.search.query(
+        query=query,
+        page_size=page_size,
+        request_options=request_options,
+    )
 
-    return params
+
+def _shape_search_response(response: Any) -> dict[str, Any]:
+    """Shape a ``SearchResponse`` into a compact, LLM-friendly payload."""
+    shaped_results: list[dict[str, Any]] = []
+    for result in getattr(response, "results", None) or []:
+        document = getattr(result, "document", None)
+        snippets: list[str] = []
+        for snippet in getattr(result, "snippets", None) or []:
+            text = getattr(snippet, "text", None) or getattr(snippet, "snippet", None)
+            if not text:
+                continue
+            text = text.strip()
+            if len(text) > _SNIPPET_MAX_CHARS:
+                text = text[:_SNIPPET_MAX_CHARS] + "..."
+            snippets.append(text)
+
+        shaped_results.append(
+            {
+                "title": getattr(result, "title", None) or getattr(document, "title", None),
+                "url": getattr(result, "url", None) or getattr(document, "url", None),
+                "snippets": snippets,
+                "datasource": getattr(document, "datasource", None),
+                "document_id": getattr(document, "id", None),
+            }
+        )
+
+    return {
+        "results": shaped_results,
+        "result_count": len(shaped_results),
+        "has_more_results": bool(getattr(response, "has_more_results", None)),
+    }
+
+
+register_backend("glean_search", TypedBackend(_query_search, _shape_search_response))
 
 
 @tool_spec(
@@ -52,7 +125,10 @@ def _build_search_params(
         "INSTRUCTIONS:\n"
         "- Primary tool for all internal company knowledge.\n"
         "- Returns top relevant results, not exhaustive.\n"
-        '- For count queries ("how many..."), use the "statistics" field in the output.'
+        '- Output is {"results": [{title, url, snippets, datasource, document_id}], '
+        '"result_count", "has_more_results"}.\n'
+        '- "result_count" is the number of returned results, not a total corpus '
+        'count; "has_more_results" indicates more matches exist.'
     ),
 )
 def search(
@@ -101,6 +177,13 @@ def search(
 ) -> ToolResult:
     """Search Glean for relevant documents using the query.
 
+    Uses the typed Search API (``POST /rest/api/v1/search``). ``datasources``
+    map to the request's ``datasourcesFilter``; each structured filter maps
+    to a facet filter whose values carry ``relationType`` ``EQUALS`` (or
+    ``NOT_EQUALS`` when ``exclude`` is true). The success payload contains
+    ``results`` (each with title, url, snippets, datasource, document_id),
+    ``result_count``, and ``has_more_results``.
+
     Args:
         ctx: Optional Glean context for client injection.
         query: Search query with optional filters - API will validate filter syntax.
@@ -112,6 +195,13 @@ def search(
 
     ctx = ctx or GleanContext()
     client = ctx.get_client()
-    raw_params = _build_search_params(query, datasources, filters, page_size)
-    parameters = convert_to_tool_params(**raw_params)
-    return run_tool("Glean Search", parameters, client=client)
+    return execute_tool(
+        "glean_search",
+        {
+            "query": query,
+            "datasources": datasources,
+            "filters": filters,
+            "page_size": page_size,
+        },
+        client=client,
+    )

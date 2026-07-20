@@ -2,6 +2,8 @@
 
 from unittest.mock import MagicMock
 
+import httpx
+import pytest
 from pydantic import BaseModel, ConfigDict, Field
 
 from glean.agent_toolkit.context import GleanContext
@@ -13,6 +15,7 @@ from glean.agent_toolkit.tools._common import (
     run_tool,
     serialize_tool_result,
 )
+from glean.api_client import errors as sdk_errors
 
 
 class _Item(BaseModel):
@@ -128,4 +131,84 @@ def test_classify_error_connection() -> None:
 def test_classify_error_generic() -> None:
     error_type, action = _classify_error(RuntimeError("unknown"))
     assert error_type == "api"
+    assert action == "retry"
+
+
+def _sdk_error(status_code: int) -> sdk_errors.GleanError:
+    """Build a real SDK error instance carrying *status_code*."""
+    response = httpx.Response(
+        status_code=status_code,
+        request=httpx.Request("POST", "https://test-instance-be.glean.com/rest/api/v1/search"),
+        text="upstream failure",
+    )
+    return sdk_errors.GleanError("API error occurred", response, "upstream failure")
+
+
+@pytest.mark.parametrize(
+    ("status_code", "expected_type", "expected_action"),
+    [
+        (400, "validation", "rephrase_query"),
+        (401, "auth", "check_credentials"),
+        (403, "auth", "check_credentials"),
+        (404, "not_found", "rephrase_query"),
+        (408, "timeout", "retry"),
+        (418, "api", "retry"),  # unmapped 4xx falls back to api/retry
+        (422, "validation", "rephrase_query"),
+        (429, "rate_limit", "retry"),
+        (500, "api", "retry"),
+        (502, "api", "retry"),
+        (503, "api", "retry"),
+    ],
+)
+def test_classify_error_sdk_status_codes(
+    status_code: int, expected_type: str, expected_action: str
+) -> None:
+    """Real SDK error instances are classified by their status code."""
+    error_type, action = _classify_error(_sdk_error(status_code))
+    assert error_type == expected_type
+    assert action == expected_action
+
+
+def test_classify_error_sdk_status_beats_message_heuristics() -> None:
+    """The status code wins even when the body mentions other keywords."""
+    response = httpx.Response(
+        status_code=403,
+        request=httpx.Request("POST", "https://example.com"),
+        text="deadline timed out while checking rate limit",
+    )
+    error = sdk_errors.GleanError("API error occurred", response)
+
+    error_type, action = _classify_error(error)
+
+    assert error_type == "auth"
+    assert action == "check_credentials"
+
+
+def test_classify_error_glean_data_error_uses_status_code() -> None:
+    """Subclasses of the SDK base error are classified the same way."""
+    response = httpx.Response(
+        status_code=422,
+        request=httpx.Request("POST", "https://example.com"),
+        text="{}",
+    )
+    data = sdk_errors.GleanDataErrorData()
+    error = sdk_errors.GleanDataError(data, response)
+
+    error_type, action = _classify_error(error)
+
+    assert error_type == "validation"
+    assert action == "rephrase_query"
+
+
+@pytest.mark.parametrize(
+    "exc",
+    [
+        httpx.ConnectTimeout("connect exceeded deadline"),
+        httpx.ReadTimeout("read exceeded deadline"),
+        httpx.PoolTimeout("pool exceeded deadline"),
+    ],
+)
+def test_classify_error_httpx_timeout_classes(exc: Exception) -> None:
+    error_type, action = _classify_error(exc)
+    assert error_type == "timeout"
     assert action == "retry"

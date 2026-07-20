@@ -87,17 +87,17 @@ async def test_run_async_delivers_arguments_to_search() -> None:
 
     captured: dict[str, Any] = {}
 
-    def fake_run_tool(
-        tool_display_name: str,
-        parameters: dict[str, Any],
+    def fake_execute_tool(
+        tool_name: str,
+        arguments: dict[str, Any],
         *,
         client: Any = None,
     ) -> dict[str, Any]:
-        captured["tool_display_name"] = tool_display_name
-        captured["parameters"] = {key: value.value for key, value in parameters.items()}
+        captured["tool_name"] = tool_name
+        captured["arguments"] = dict(arguments)
         return {"status": "success", "result": "canned-result"}
 
-    with mock.patch.object(search_mod, "run_tool", fake_run_tool):
+    with mock.patch.object(search_mod, "execute_tool", fake_execute_tool):
         (tool,) = get_tools("adk", include=["glean_search"], client=_mock_client())
         result = await tool.run_async(
             args={"query": "test", "page_size": 5},
@@ -105,11 +105,11 @@ async def test_run_async_delivers_arguments_to_search() -> None:
         )
 
     assert result == {"status": "success", "result": "canned-result"}
-    assert captured["tool_display_name"] == "Glean Search"
+    assert captured["tool_name"] == "glean_search"
     # Previously the (*args, **kwargs) wrapper signature made ADK drop every
     # argument, so the query never reached the tool implementation.
-    assert captured["parameters"]["query"] == "test"
-    assert captured["parameters"]["pageSize"] == "5"
+    assert captured["arguments"]["query"] == "test"
+    assert captured["arguments"]["page_size"] == 5
 
 
 async def test_custom_multi_arg_tool_via_adk(unregister_tools: list[str]) -> None:
