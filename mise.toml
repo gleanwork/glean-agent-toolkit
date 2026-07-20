@@ -54,23 +54,6 @@ VIRTUAL_ENV="$VENV_ROOT/venv" uv pip install -e ".[test]"
 "$VENV_ROOT/venv/bin/python" -m pytest -v --tb=auto -rA tests/
 """
 
-[tasks."test:vcr:regenerate"]
-description = "Regenerate all VCR cassettes by re-recording HTTP interactions"
-run = [
-  "bash -lc '[ -n \"$GLEAN_API_TOKEN\" ] || { echo \"GLEAN_API_TOKEN environment variable is required for recording\"; exit 1; }'",
-  "bash -lc '[ -n \"$GLEAN_SERVER_URL\" ] || [ -n \"$GLEAN_INSTANCE\" ] || { echo \"GLEAN_SERVER_URL (or deprecated GLEAN_INSTANCE) environment variable is required for recording\"; exit 1; }'",
-  "uv run pytest -v tests/ --tb=auto -rA",
-]
-[tasks."test:vcr:regenerate".env]
-VCR_REGENERATE = "true"
-
-[tasks."test:vcr:clean"]
-description = "Delete all VCR cassettes to force regeneration on next test run"
-run = [
-  "rm -rf tests/cassettes/*",
-  "echo Deleted all VCR cassettes",
-]
-
 [tasks.lint]
 description = "Run all linters"
 run = [
