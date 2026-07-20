@@ -9,7 +9,7 @@ This project contains the **Glean Agent Toolkit**, a Python package used to inte
    - [mise](https://mise.jdx.dev/)
  2. Run `mise run setup` to create the `.venv` and install all development, test, lint and typing dependencies via `uv`.
 
-Environment variables `GLEAN_API_TOKEN` and `GLEAN_SERVER_URL` (or deprecated `GLEAN_INSTANCE`) must be set to interact with Glean or regenerate VCR cassettes.
+Environment variables `GLEAN_API_TOKEN` and `GLEAN_SERVER_URL` (or deprecated `GLEAN_INSTANCE`) must be set to interact with a real Glean instance. The test suite does **not** require them — tests run fully offline.
 
 ## Development Tasks
 
@@ -30,10 +30,9 @@ The repository uses **mise**. Key commands include:
 | `mise run build` | Build the package |
 | `mise run release` | Bump version and generate the changelog |
 
-Special tasks exist to manage VCR cassettes used in tests:
+## Testing Notes
 
-- `mise run test:vcr:regenerate` – Re-record all HTTP interactions (requires `GLEAN_API_TOKEN` and `GLEAN_SERVER_URL`; deprecated `GLEAN_INSTANCE` is still accepted as fallback).
-- `mise run test:vcr:clean` – Delete cassettes so the next test run regenerates them.
+Tests never hit the network. HTTP interactions are mocked at the transport level with `pytest-httpx` (see `tests/test_transport_contracts.py`), and adapter behavior is exercised end-to-end through a cross-framework invocation matrix (`tests/test_invocation_matrix.py` plus the per-framework `tests/test_*_invocation.py` suites). Run everything with `mise run test`.
 
 ## Coding Guidelines
 

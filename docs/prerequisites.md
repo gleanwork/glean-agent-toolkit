@@ -47,14 +47,8 @@ This guide summarizes requirements for your organization's Glean instance to use
 
 ### `web_search`
 
-- No connector required — searches the public web via Glean's web search capability
-- Admin toggles: Web search enabled for Client API
-
-## Verification checklist
-
-- Confirm Client API access with a simple `search` call
-- Verify each connector is authorized and indexed in Admin
-- Test per-user scoping by running a tool with a least-privilege account
+- No content connector required — invokes Glean's built-in `Gemini Web Search` tool to search the public web
+- Admin toggles: the `Gemini Web Search` tool enabled and available to the Client API
 
 ### `read_document`
 
@@ -62,6 +56,12 @@ This guide summarizes requirements for your organization's Glean instance to use
   - `queryapi.getDocuments.enabled`
   - `queryapi.getDocuments.content.enabled`
   - These enable the `documents.read_document` API to return full content
+
+## Verification checklist
+
+- Confirm Client API access with a simple `search` call
+- Verify each connector is authorized and indexed in Admin
+- Test per-user scoping by running a tool with a least-privilege account
 
 ## Troubleshooting
 

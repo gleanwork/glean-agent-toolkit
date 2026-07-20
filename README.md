@@ -18,19 +18,19 @@ The Glean Agent Toolkit makes it easy to integrate Glean's powerful search and k
 
 | Variable                  | Default | Description                                              | Example |
 | ------------------------- | ------- | -------------------------------------------------------- | ------- |
-| `GLEAN_RETRY_INITIAL`     | `1.0`   | Initial backoff interval in seconds                      | `0.5`   |
-| `GLEAN_RETRY_MAX`         | `50.0`  | Maximum backoff interval in seconds                      | `8`     |
+| `GLEAN_RETRY_INITIAL`     | `1`     | Initial backoff interval in seconds                      | `2`     |
+| `GLEAN_RETRY_MAX`         | `50`    | Maximum backoff interval in seconds                      | `8`     |
 | `GLEAN_RETRY_MULTIPLIER`  | `1.1`   | Backoff multiplier/exponent                              | `2.0`   |
-| `GLEAN_RETRY_MAX_ELAPSED` | `60.0`  | Total time limit in seconds before giving up on retries  | `30.0`  |
+| `GLEAN_RETRY_MAX_ELAPSED` | `60`    | Total time limit in seconds before giving up on retries  | `30`    |
 
-Retries cover transient failures such as HTTP 429/5xx and connection timeouts. Set these before constructing any Glean client usage.
+Intervals are expressed in seconds; the multiplier is a unitless exponent. Retries cover transient failures such as HTTP 429/5xx and connection timeouts. Set these before constructing any Glean client usage.
 
 ```bash
-# Example: low-latency, bounded retries
-export GLEAN_RETRY_INITIAL=0.5
+# Example: bounded retries
+export GLEAN_RETRY_INITIAL=1
 export GLEAN_RETRY_MAX=8
 export GLEAN_RETRY_MULTIPLIER=2.0
-export GLEAN_RETRY_MAX_ELAPSED=30.0
+export GLEAN_RETRY_MAX_ELAPSED=30
 ```
 
 ## Installation
@@ -64,7 +64,7 @@ pip install glean-agent-toolkit[langchain]
 pip install glean-agent-toolkit[crewai]
 ```
 
-Note: The `[openai]` extra installs the standard `openai` Python library, used for direct API interactions like Chat Completions or the Assistants API. The example below for the "OpenAI Agents SDK" uses a separate library, `openai-agents`, which you'll need to install independently: `pip install openai-agents`.
+Note: The `[openai]` extra installs both the standard `openai` Python library (for direct API interactions like Chat Completions) and the `openai-agents` library used by the "OpenAI Agents SDK" example below — no separate install is needed.
 
 ## Prerequisites
 
@@ -218,7 +218,7 @@ Each tool function exposes adapter methods for framework conversion:
 | Method                | Returns                          | Framework           |
 | --------------------- | -------------------------------- | ------------------- |
 | `.as_openai_tool()`   | `FunctionTool` or `dict`         | OpenAI Agents SDK   |
-| `.as_langchain_tool()` | `langchain_core.tools.Tool`     | LangChain / LangGraph |
+| `.as_langchain_tool()` | `langchain_core.tools.StructuredTool` | LangChain / LangGraph |
 | `.as_crewai_tool()`   | `CrewAI BaseTool`                | CrewAI              |
 | `.as_adk_tool()`      | `google.adk FunctionTool`        | Google ADK          |
 
@@ -268,7 +268,7 @@ agent = Agent(
     name="KnowledgeAssistant",
     instructions="""You help users find information from the company knowledge base using
     Glean search.""",
-    tools=[search],  # Use the tool function directly
+    tools=[search.as_openai_tool()],  # Convert to an Agents SDK FunctionTool
 )
 
 # Run a search query

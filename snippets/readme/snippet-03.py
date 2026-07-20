@@ -14,7 +14,7 @@ agent = Agent(
     name="KnowledgeAssistant",
     instructions="""You help users find information from the company knowledge base using
     Glean search.""",
-    tools=[search],  # Use the tool function directly
+    tools=[search.as_openai_tool()],  # Convert to an Agents SDK FunctionTool
 )
 
 # Run a search query

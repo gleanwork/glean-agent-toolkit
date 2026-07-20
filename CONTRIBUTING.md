@@ -6,17 +6,18 @@ Thank you for your interest in contributing to the Glean Agent Toolkit! This gui
 
 ```sh
 src/
-├─ glean/
-│  ├─ __init__.py
-│  └─ agent_toolkit/     # exposes `glean.agent_toolkit`
-│     ├─ __init__.py
-│     ├─ decorators.py
-│     ├─ registry.py
-│     ├─ spec.py
-│     ├─ adapters/
-│     └─ tools/
-├─ tests/
-└─ docs/
+└─ glean/
+   ├─ __init__.py
+   └─ agent_toolkit/     # exposes `glean.agent_toolkit`
+      ├─ __init__.py
+      ├─ context.py
+      ├─ decorators.py
+      ├─ registry.py
+      ├─ spec.py
+      ├─ adapters/
+      └─ tools/
+tests/
+docs/
 ```
 
 ## Development environment
@@ -51,12 +52,16 @@ The project uses `mise` to manage development tasks. Here are the available task
 
 ### Testing
 
-| Task                  | Description                  |
-| --------------------- | ---------------------------- |
-| `mise run test`       | Run unit tests               |
-| `mise run test:watch` | Run tests in watch mode      |
-| `mise run test:cov`   | Run tests with coverage      |
-| `mise run test:all`   | Run all tests and lint fixes |
+| Task                            | Description                                                             |
+| ------------------------------- | ----------------------------------------------------------------------- |
+| `mise run test`                 | Run unit tests                                                          |
+| `mise run test:watch`           | Run tests in watch mode                                                 |
+| `mise run test:cov`             | Run tests with coverage                                                 |
+| `mise run test:all`             | Run all tests and lint fixes                                            |
+| `mise run test:install-only`    | Verify tests pass with only the `[test]` extra installed                |
+| `mise run test:latest-frameworks` | Upgrade agent frameworks to latest and run the suite (mirrors nightly CI) |
+
+Tests run fully offline: HTTP interactions are mocked at the transport level with `pytest-httpx` (see `tests/test_transport_contracts.py`), and adapters are exercised end-to-end via the cross-framework invocation matrix (`tests/test_invocation_matrix.py` and the per-framework `tests/test_*_invocation.py` suites). No Glean credentials are required to run the tests.
 
 ### Linting and formatting
 
@@ -64,7 +69,6 @@ The project uses `mise` to manage development tasks. Here are the available task
 | ----------------------- | --------------------------------------- |
 | `mise run lint`         | Run Ruff, pyright and formatting checks |
 | `mise run lint:diff`    | Same as above but only on changed files |
-| `mise run lint:package` | Lint only `glean/toolkit`               |
 | `mise run lint:tests`   | Lint only `tests`                       |
 | `mise run lint:fix`     | Autofix style issues                    |
 | `mise run format`       | Apply Ruff formatter                    |
