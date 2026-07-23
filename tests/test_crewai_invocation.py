@@ -24,6 +24,20 @@ except ImportError:  # pragma: no cover
 pytestmark = pytest.mark.skipif(not HAS_CREWAI, reason="CrewAI not installed")
 
 
+def _llm_facing_text(tool: Any) -> str:
+    """Return the text CrewAI actually renders into the agent's prompt.
+
+    CrewAI 1.x introduced ``formatted_description`` (name + args_schema +
+    description) as the composite used by prompt rendering, and stopped
+    mutating ``description`` in place to include the argument list. Older
+    crewai releases only ever had ``description`` (already inclusive of
+    the args). Prefer the composite when present so this suite passes
+    across the supported version range.
+    """
+    formatted = getattr(tool, "formatted_description", None)
+    return formatted if formatted is not None else tool.description
+
+
 @pytest.fixture(autouse=True)
 def _glean_env(monkeypatch: pytest.MonkeyPatch) -> None:
     """Provide dummy Glean credentials so client construction never fails."""
@@ -40,14 +54,15 @@ def test_crewai_glean_search_description_names_real_parameters() -> None:
     from glean.agent_toolkit.tools import search
 
     tool = search.as_crewai_tool()
+    llm_text = _llm_facing_text(tool)
 
     # The generated description must name the actual parameters.
-    assert "query" in tool.description
-    assert "page_size" in tool.description
+    assert "query" in llm_text
+    assert "page_size" in llm_text
 
     # And must not fall back to the catch-all ``_run`` signature.
-    assert "kwargs" not in tool.description
-    assert "ForwardRef" not in tool.description
+    assert "kwargs" not in llm_text
+    assert "ForwardRef" not in llm_text
 
     # The args_schema itself must carry the real parameter names, with the
     # required ``query`` parameter typed as ``str``. (Optional parameter
@@ -102,10 +117,11 @@ def test_crewai_custom_tool_run_returns_result() -> None:
         return a + b
 
     tool = add.as_crewai_tool()
+    llm_text = _llm_facing_text(tool)
 
     # Description should name the real parameters, not ``kwargs``.
-    assert "'a'" in tool.description or '"a"' in tool.description
-    assert "kwargs" not in tool.description
+    assert "'a'" in llm_text or '"a"' in llm_text
+    assert "kwargs" not in llm_text
 
     result = tool.run(a=3, b=5)
     assert result == "8"

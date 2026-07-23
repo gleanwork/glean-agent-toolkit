@@ -35,11 +35,30 @@ def _mock_client() -> mock.MagicMock:
 
 
 def _declaration_properties(tool: Any) -> dict[str, Any]:
-    """Return the declared parameter properties for an ADK tool."""
+    """Return the declared parameter properties for an ADK tool.
+
+    ADK's ``JSON_SCHEMA_FOR_FUNC_DECL`` feature (default-on since
+    google-adk 2.x) moves the parameter schema from the legacy
+    ``FunctionDeclaration.parameters`` (a genai ``Schema``) to
+    ``parameters_json_schema`` (a raw JSON schema dict). Support both
+    shapes so this suite passes across the supported version range.
+    """
     declaration = tool._get_declaration()
     assert declaration is not None
-    assert declaration.parameters is not None
-    return declaration.parameters.properties or {}
+    if declaration.parameters is not None:
+        return declaration.parameters.properties or {}
+    assert declaration.parameters_json_schema is not None
+    return declaration.parameters_json_schema.get("properties") or {}
+
+
+def _declaration_required(tool: Any) -> set[str]:
+    """Return the set of required parameter names for an ADK tool."""
+    declaration = tool._get_declaration()
+    assert declaration is not None
+    if declaration.parameters is not None:
+        return set(declaration.parameters.required or [])
+    assert declaration.parameters_json_schema is not None
+    return set(declaration.parameters_json_schema.get("required") or [])
 
 
 @pytest.fixture
@@ -68,8 +87,7 @@ def test_get_tools_adk_declarations_expose_parameters() -> None:
     assert "query" in properties
     assert "page_size" in properties
 
-    declaration = by_name["glean_search"]._get_declaration()
-    assert declaration.parameters.required == ["query"]
+    assert _declaration_required(by_name["glean_search"]) == {"query"}
 
     # Every adapted tool must declare its schema parameters, not zero params.
     for name, tool in by_name.items():
@@ -136,7 +154,7 @@ async def test_custom_multi_arg_tool_via_adk(unregister_tools: list[str]) -> Non
 
     properties = _declaration_properties(tool)
     assert set(properties.keys()) == {"a", "b"}
-    assert set(tool._get_declaration().parameters.required) == {"a", "b"}
+    assert _declaration_required(tool) == {"a", "b"}
 
     result = await tool.run_async(args={"a": 3, "b": 5}, tool_context=None)
     assert result == 8
