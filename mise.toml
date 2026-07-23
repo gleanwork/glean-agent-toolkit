@@ -8,8 +8,7 @@ node = "22"
 [tasks.setup]
 description = "Set up local environment (install dependencies, etc.)"
 run = [
-  "uv venv .venv",
-  "uv pip install -e .[dev,test,lint,typing,codespell]",
+  "uv sync --extra dev --extra test --extra lint --extra typing --extra codespell",
   "uv run pre-commit install",
   "uv run pre-commit install --hook-type commit-msg",
 ]
