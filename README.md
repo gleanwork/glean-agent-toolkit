@@ -140,6 +140,10 @@ export GLEAN_RETRY_MAX_ELAPSED=30
 
 Note: connection errors (unreachable or unresolvable hosts) are also retried for up to `GLEAN_RETRY_MAX_ELAPSED` seconds before failing — if a misconfigured `server_url` seems to "hang", that is the retry budget. The resulting error is classified as `config` (see the error table below) and carries this hint.
 
+### Request timeouts
+
+When the Glean client has no timeout of its own, each built-in tool call uses a per-operation default: 30 s for search and document reads, 60 s for tools served by the Glean tools API, and 120 s for chat (chat answers routinely take tens of seconds). A timeout set on the client always wins — pass `client=Glean(..., timeout_ms=...)` to `configure()` or `get_tools()` to choose your own.
+
 See `docs/prerequisites.md` for server-level configuration and connector requirements. Requires Python 3.10+.
 
 ## Available Tools
@@ -601,6 +605,20 @@ crewai_weather = get_weather.as_crewai_tool()
 
 Custom tools are not included in `get_tools()` output by default — opt in with `get_tools(framework, builtin=None)`, `builtin=False`, or `include=["get_current_weather"]`. `async def` implementations are supported too (see "Async custom tools" above).
 
+The function's parameters define the tool's input schema, including defaults, enums, and `Annotated[..., Field(...)]` descriptions and constraints. In every framework, arguments are validated against that schema before your function runs: values are coerced to the declared types (a model sending `"3"` for an `int` parameter still delivers `3`) and constraints such as `ge`/`le` are enforced. Invalid arguments come back to the model as a `validation` error payload; LangChain validates natively and raises `ValidationError`, which LangGraph reports back to the model. An exception raised by your function becomes the compact error payload described in [Tool Results and Error Handling](#tool-results-and-error-handling).
+
+To call Glean from a custom tool, declare a parameter annotated with `GleanContext`, in any position. Adapters inject the context by name and keep it out of the schema the model sees; tools without such a parameter never receive one.
+
+```python
+from glean.agent_toolkit import GleanContext, tool_spec
+
+
+@tool_spec(name="count_results", description="Count Glean search results for a query")
+def count_results(query: str, glean: GleanContext | None = None) -> dict:
+    response = glean.get_client().client.search.query(query=query, page_size=10)
+    return {"query": query, "count": len(response.results or [])}
+```
+
 ## Advanced: Client Lifecycle with `GleanContext`
 
 Most users never need `GleanContext` — environment variables or `configure()` cover the common cases. Reach for it when you need explicit control over the underlying HTTP client's lifecycle (e.g. deterministic cleanup in a service, or multiple Glean instances in one process):
@@ -614,7 +632,7 @@ with GleanContext(api_token="...", server_url="https://your-company-be.glean.com
 # The underlying HTTP client is closed on exit.
 ```
 
-`GleanContext` creates its `glean.api_client.Glean` client lazily, caches it, and shares it across tool calls; `close()` (or the context manager) releases the HTTP resources. Every tool function accepts an optional `GleanContext` as its first argument, and adapters bind it automatically so LLM frameworks never see it. Note that `ctx.get_client()` raises `ValueError` for missing/invalid configuration — only tool calls wrap errors into `ToolResult`s.
+`GleanContext` creates its `glean.api_client.Glean` client lazily, caches it, and shares it across tool calls; `close()` (or the context manager) releases the HTTP resources. Every built-in tool function accepts an optional `GleanContext` as its first argument, and adapters bind it automatically so LLM frameworks never see it (custom tools opt in by declaring a `GleanContext` parameter; see above). Note that `ctx.get_client()` raises `ValueError` for missing/invalid configuration — only tool calls wrap errors into `ToolResult`s.
 
 ## Agent Skills
 
