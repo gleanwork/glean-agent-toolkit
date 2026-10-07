@@ -4,10 +4,37 @@ from __future__ import annotations
 
 import os
 import threading
+from importlib.metadata import PackageNotFoundError, version
 from types import TracebackType
 
 from glean.api_client import Glean
 from glean.api_client.utils import BackoffStrategy, RetryConfig
+
+
+def _toolkit_product_token() -> str:
+    """Return the ``glean-agent-toolkit/<version>`` User-Agent product token."""
+    try:
+        toolkit_version = version("glean-agent-toolkit")
+    except PackageNotFoundError:  # pragma: no cover - package not installed
+        toolkit_version = "0.0.0"
+    return f"glean-agent-toolkit/{toolkit_version}"
+
+
+_TOOLKIT_PRODUCT_TOKEN = _toolkit_product_token()
+
+
+def _tag_user_agent(client: Glean) -> Glean:
+    """Append the toolkit's product token to a client's User-Agent.
+
+    Applied only to clients the toolkit creates, so Glean can tell toolkit
+    traffic apart from direct ``glean-api-client`` usage. Clients supplied by
+    the caller are never modified.
+    """
+    configuration = getattr(client, "sdk_configuration", None)
+    user_agent = getattr(configuration, "user_agent", None)
+    if isinstance(user_agent, str) and _TOOLKIT_PRODUCT_TOKEN not in user_agent:
+        configuration.user_agent = f"{user_agent} {_TOOLKIT_PRODUCT_TOKEN}"  # type: ignore[union-attr]
+    return client
 
 
 class GleanConfigurationError(ValueError):
@@ -162,18 +189,22 @@ class GleanContext:
 
             if server_url:
                 _validate_server_url(server_url)
-                client = Glean(
-                    api_token=api_token,
-                    server_url=server_url,
-                    retry_config=_build_retry_config(),
+                client = _tag_user_agent(
+                    Glean(
+                        api_token=api_token,
+                        server_url=server_url,
+                        retry_config=_build_retry_config(),
+                    )
                 )
                 self._client = client
                 return client
             elif instance:
-                client = Glean(
-                    api_token=api_token,
-                    instance=instance,
-                    retry_config=_build_retry_config(),
+                client = _tag_user_agent(
+                    Glean(
+                        api_token=api_token,
+                        instance=instance,
+                        retry_config=_build_retry_config(),
+                    )
                 )
                 self._client = client
                 return client
