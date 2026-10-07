@@ -26,6 +26,7 @@ from glean.agent_toolkit.tools._common import (
     make_error,
     make_ok,
     serialize_tool_result,
+    timeout_kwargs,
 )
 from glean.api_client import Glean, models
 
@@ -147,7 +148,9 @@ class ToolsCallBackend:
         from glean.agent_toolkit.tools._compat import resolve_method
 
         run_fn = resolve_method(client.client.tools, "run", "execute")
-        result = run_fn(name=self.display_name, parameters=parameters)
+        result = run_fn(
+            name=self.display_name, parameters=parameters, **timeout_kwargs(client, "tools")
+        )
         return truncate_payload(serialize_tool_result(result))
 
     async def call_raw_async(
@@ -157,7 +160,9 @@ class ToolsCallBackend:
         from glean.agent_toolkit.tools._compat import resolve_method
 
         run_fn = resolve_method(client.client.tools, "run_async", "execute_async")
-        result = await run_fn(name=self.display_name, parameters=parameters)
+        result = await run_fn(
+            name=self.display_name, parameters=parameters, **timeout_kwargs(client, "tools")
+        )
         return truncate_payload(serialize_tool_result(result))
 
 

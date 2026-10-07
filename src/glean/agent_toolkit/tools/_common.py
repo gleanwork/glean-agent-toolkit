@@ -30,6 +30,32 @@ class ToolResult(TypedDict):
     suggested_action: SuggestedAction | None
 
 
+Operation = Literal["search", "chat", "documents", "tools"]
+
+# Per-operation request timeouts, applied only when the client has none
+# configured. Without them glean-api-client falls back to httpx's 5 s default,
+# which a typical chat answer (10-60 s) exceeds.
+DEFAULT_TIMEOUTS_MS: dict[Operation, int] = {
+    "search": 30_000,
+    "chat": 120_000,
+    "documents": 30_000,
+    "tools": 60_000,
+}
+
+
+def timeout_kwargs(client: Any, operation: Operation) -> dict[str, Any]:
+    """Return ``{"timeout_ms": ...}`` for *operation* unless *client* sets its own.
+
+    A timeout configured on the client (``Glean(timeout_ms=...)``) always wins.
+    Typed ``dict[str, Any]`` so it can be splatted into the SDK's typed
+    keyword-only signatures.
+    """
+    config = getattr(client, "sdk_configuration", None)
+    if config is None or getattr(config, "timeout_ms", None) is not None:
+        return {}
+    return {"timeout_ms": DEFAULT_TIMEOUTS_MS[operation]}
+
+
 def _sdk_error_status_code(exc: Exception) -> int | None:
     """Return the HTTP status code carried by a Glean SDK error, if any."""
     try:

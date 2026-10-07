@@ -8,7 +8,7 @@ from pydantic import Field
 
 import glean.agent_toolkit.tools._common as common
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import ToolResult, make_error
+from glean.agent_toolkit.tools._common import ToolResult, make_error, timeout_kwargs
 from glean.agent_toolkit.tools._transport import (
     TypedBackend,
     execute_tool,
@@ -56,7 +56,7 @@ def _retrieve_documents(
     # glean-api-client renamed the kwarg from `request` (<=0.6.x) to
     # `get_documents_request` (>=0.15.x).
     request_kwarg = resolve_kwarg(retrieve_fn, "get_documents_request", "request")
-    return retrieve_fn(**{request_kwarg: request})
+    return retrieve_fn(**{request_kwarg: request}, **timeout_kwargs(client, "documents"))
 
 
 async def _retrieve_documents_async(
@@ -73,7 +73,7 @@ async def _retrieve_documents_async(
 
     retrieve_fn = resolve_method(documents_client, "retrieve_async", "get_async")
     request_kwarg = resolve_kwarg(retrieve_fn, "get_documents_request", "request")
-    return await retrieve_fn(**{request_kwarg: request})
+    return await retrieve_fn(**{request_kwarg: request}, **timeout_kwargs(client, "documents"))
 
 
 register_backend(

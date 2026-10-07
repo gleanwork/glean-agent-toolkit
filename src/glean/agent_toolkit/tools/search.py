@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Annotated, Any
 from pydantic import Field
 
 from glean.agent_toolkit.decorators import tool_spec
-from glean.agent_toolkit.tools._common import ToolResult
+from glean.agent_toolkit.tools._common import ToolResult, timeout_kwargs
 from glean.agent_toolkit.tools._transport import (
     TypedBackend,
     execute_tool,
@@ -88,6 +88,7 @@ def _query_search(
         query=query,
         page_size=page_size,
         request_options=_search_request_options(datasources, filters),
+        **timeout_kwargs(client, "search"),
     )
 
 
@@ -104,6 +105,7 @@ async def _query_search_async(
         query=query,
         page_size=page_size,
         request_options=_search_request_options(datasources, filters),
+        **timeout_kwargs(client, "search"),
     )
 
 
