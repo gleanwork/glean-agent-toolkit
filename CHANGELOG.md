@@ -1,3 +1,14 @@
+## 0.9.0 (2026-10-06)
+
+### Feat
+
+- consistent custom tools across frameworks, default request timeouts, toolkit User-Agent (#91)
+
+### Fix
+
+- **ci**: make mise run setup use the lockfile, fix google-adk ceiling
+- **tests**: make crewai/adk invocation tests tolerant of upstream API shape changes
+
 ## 0.8.0 (2026-07-20)
 
 ### Feat

@@ -1176,7 +1176,7 @@ wheels = [
 
 [[package]]
 name = "glean-agent-toolkit"
-version = "0.8.0"
+version = "0.9.0"
 source = { editable = "." }
 dependencies = [
     { name = "glean-api-client" },
