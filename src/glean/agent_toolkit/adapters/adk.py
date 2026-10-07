@@ -7,7 +7,12 @@ import types
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias, Union, get_args, get_origin
 
-from glean.agent_toolkit.adapters.base import BaseAdapter, unwrap_tool_result
+from glean.agent_toolkit.adapters.base import (
+    BaseAdapter,
+    ainvoke_tool,
+    invoke_tool,
+    resolve_context_param,
+)
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
@@ -137,6 +142,9 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
         Returns:
             Ordered ``inspect.Parameter`` list (required parameters first).
         """
+        if self.tool_spec.input_model is not None:
+            return self._parameters_from_model()
+
         schema = self.tool_spec.input_schema or {}
         properties: dict[str, Any] = schema.get("properties") or {}
         required = set(schema.get("required") or ())
@@ -164,32 +172,45 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
         parameters.sort(key=lambda param: param.default is not inspect.Parameter.empty)
         return parameters
 
-    def _find_context_param_name(self) -> str | None:
-        """Find the name of the underlying function's context parameter.
+    def _parameters_from_model(self) -> list[inspect.Parameter]:
+        """Build signature parameters from the spec's pydantic input model.
 
-        The decorator excludes ``GleanContext`` parameters from the input
-        schema, so any signature parameter absent from the schema properties
-        is the context parameter.
+        ADK derives function declarations from the wrapper's annotations, so
+        the real annotations (``Literal`` enums, ``Field`` bounds) are used
+        instead of types reconstructed from JSON schema.
+        """
+        model = self.tool_spec.input_model
+        assert model is not None
+
+        parameters: list[inspect.Parameter] = []
+        for field_name, field in model.model_fields.items():
+            annotation = field.rebuild_annotation()
+            if field.is_required():
+                default: Any = inspect.Parameter.empty
+            else:
+                default = field.get_default(call_default_factory=True)
+                if default is None and not _is_optional_annotation(field.annotation):
+                    annotation = annotation | None
+            parameters.append(
+                inspect.Parameter(
+                    field_name,
+                    inspect.Parameter.POSITIONAL_OR_KEYWORD,
+                    default=default,
+                    annotation=annotation,
+                )
+            )
+
+        parameters.sort(key=lambda param: param.default is not inspect.Parameter.empty)
+        return parameters
+
+    def _find_context_param_name(self) -> str | None:
+        """Return the name of the underlying function's context parameter.
 
         Returns:
             The context parameter name, or ``None`` if the function does not
             accept a context.
         """
-        schema = self.tool_spec.input_schema or {}
-        properties: dict[str, Any] = schema.get("properties") or {}
-        try:
-            signature = inspect.signature(self.tool_spec.function)
-        except (TypeError, ValueError):  # pragma: no cover - defensive
-            return None
-        for param_name, param in signature.parameters.items():
-            if param.kind in (
-                inspect.Parameter.VAR_POSITIONAL,
-                inspect.Parameter.VAR_KEYWORD,
-            ):
-                continue
-            if param_name not in properties:
-                return param_name
-        return None
+        return resolve_context_param(self.tool_spec)
 
     def _build_adk_function(self) -> Callable[..., Any]:
         """Build a wrapper with a real, explicit signature for ADK.
@@ -207,33 +228,26 @@ class ADKAdapter(BaseAdapter["AdkFunctionTool"]):
         parameters = self._build_parameters()
         signature = inspect.Signature(parameters)
 
-        bound_kwargs: dict[str, Any] = {}
-        if self.ctx is not None:
-            ctx_param_name = self._find_context_param_name()
-            if ctx_param_name is not None:
-                bound_kwargs[ctx_param_name] = self.ctx
-
-        async_func = tool_spec.async_function
-        sync_func = tool_spec.function
+        ctx = self.ctx
 
         def _to_kwargs(args: tuple[Any, ...], kwargs: dict[str, Any]) -> dict[str, Any]:
-            call_kwargs = dict(bound_kwargs)
+            call_kwargs: dict[str, Any] = {}
             for value, parameter in zip(args, parameters, strict=False):
                 call_kwargs[parameter.name] = value
             call_kwargs.update(kwargs)
             return call_kwargs
 
         wrapper: Callable[..., Any]
-        if async_func is not None:
+        if tool_spec.async_function is not None:
 
             async def _async_wrapper(*args: Any, **kwargs: Any) -> Any:
-                return unwrap_tool_result(await async_func(**_to_kwargs(args, kwargs)))
+                return await ainvoke_tool(tool_spec, ctx, _to_kwargs(args, kwargs))
 
             wrapper = _async_wrapper
         else:
 
             def _sync_wrapper(*args: Any, **kwargs: Any) -> Any:
-                return unwrap_tool_result(sync_func(**_to_kwargs(args, kwargs)))
+                return invoke_tool(tool_spec, ctx, _to_kwargs(args, kwargs))
 
             wrapper = _sync_wrapper
 

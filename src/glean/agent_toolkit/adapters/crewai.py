@@ -2,14 +2,18 @@
 
 from __future__ import annotations
 
-import functools
-import json
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, cast
 
 from pydantic import BaseModel
 
-from glean.agent_toolkit.adapters.base import BaseAdapter, get_field_type, unwrap_tool_result
+from glean.agent_toolkit.adapters.base import (
+    BaseAdapter,
+    get_field_type,
+    invoke_tool,
+    payload_to_text,
+    unwrap_tool_result,
+)
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
@@ -119,10 +123,7 @@ class GleanCrewAITool(BaseTool):  # type: ignore[misc]
         Returns:
             JSON-serialized string result
         """
-        result = unwrap_tool_result(self._function(**kwargs))
-        if isinstance(result, str):
-            return result
-        return json.dumps(result, default=str)
+        return payload_to_text(unwrap_tool_result(self._function(**kwargs)))
 
 
 CrewAIToolType = CrewBaseTool | BaseTool  # type: ignore[valid-type]
@@ -152,12 +153,15 @@ class CrewAIAdapter(BaseAdapter[CrewAIToolType]):
         Returns:
             A CrewAI BaseTool instance
         """
-        # Create and configure the tool
-        created_args_schema = self._create_args_schema()
+        created_args_schema = self.tool_spec.input_model or self._create_args_schema()
+        if created_args_schema is not None and not created_args_schema.model_fields:
+            created_args_schema = None
 
-        func = self.tool_spec.function
-        if self.ctx is not None:
-            func = functools.partial(func, self.ctx)
+        tool_spec = self.tool_spec
+        ctx = self.ctx
+
+        def func(**kwargs: Any) -> Any:
+            return invoke_tool(tool_spec, ctx, kwargs)
 
         tool = GleanCrewAITool(
             name=self.tool_spec.name,
