@@ -2,13 +2,18 @@
 
 from __future__ import annotations
 
-import functools
-import json
 from typing import TYPE_CHECKING, Any, TypeAlias, cast
 
 from pydantic import BaseModel
 
-from glean.agent_toolkit.adapters.base import BaseAdapter, get_field_type, unwrap_tool_result
+from glean.agent_toolkit.adapters.base import (
+    BaseAdapter,
+    ainvoke_tool,
+    get_field_type,
+    invoke_tool,
+    is_error_payload,
+    payload_to_text,
+)
 from glean.agent_toolkit.spec import ToolSpec
 
 if TYPE_CHECKING:
@@ -49,17 +54,24 @@ def _fallback_pydantic_create_model(*args: Any, **kwargs: Any) -> Any:
     return None
 
 
+class _FallbackToolException(Exception):  # noqa: N818 - mirrors LangChain's name
+    """Fallback for langchain_core.tools.ToolException."""
+
+
 try:
     from langchain_core.tools import StructuredTool as _ActualStructuredToolImport  # type: ignore
+    from langchain_core.tools import ToolException as _ActualToolExceptionImport  # type: ignore
     from pydantic import Field as _ActualPydanticFieldImport  # type: ignore
     from pydantic import create_model as _actual_pydantic_create_model_import
 
     ToolClass = _ActualStructuredToolImport
+    ToolException: type[Exception] = _ActualToolExceptionImport
     Field = _ActualPydanticFieldImport
     create_model = _actual_pydantic_create_model_import
     HAS_LANGCHAIN = True
 except ImportError:  # pragma: no cover
     ToolClass = _FallbackStructuredTool  # type: ignore[assignment]
+    ToolException = _FallbackToolException
     Field = _fallback_pydantic_field
     create_model = _fallback_pydantic_create_model
     HAS_LANGCHAIN = False
@@ -102,29 +114,32 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
         available, passes it as ``coroutine`` so LangChain can ``await`` it
         natively.
 
+        Failures (an error ``ToolResult`` or an exception raised by the tool)
+        are raised as ``ToolException`` with ``handle_tool_error=True``: the
+        model still receives the same compact error JSON, and LangChain marks
+        the resulting ``ToolMessage`` with ``status="error"``.
+
         Returns:
             LangChain StructuredTool instance
         """
-        original_func = self.tool_spec.function
-        async_func = self.tool_spec.async_function
-        if self.ctx is not None:
-            original_func = functools.partial(original_func, self.ctx)
-            if async_func is not None:
-                async_func = functools.partial(async_func, self.ctx)
+        tool_spec = self.tool_spec
+        ctx = self.ctx
+
+        def _to_output(payload: Any) -> str:
+            text = payload_to_text(payload)
+            if is_error_payload(payload):
+                raise ToolException(text)
+            return text
 
         def _string_wrapper(**kwargs: Any) -> str:
-            result = unwrap_tool_result(original_func(**kwargs))
-            if isinstance(result, str):
-                return result
-            return json.dumps(result, default=str)
+            return _to_output(invoke_tool(tool_spec, ctx, kwargs))
 
         async def _async_string_wrapper(**kwargs: Any) -> str:
-            result = unwrap_tool_result(await async_func(**kwargs))  # type: ignore[misc]
-            if isinstance(result, str):
-                return result
-            return json.dumps(result, default=str)
+            return _to_output(await ainvoke_tool(tool_spec, ctx, kwargs))
 
-        args_schema = self._create_args_schema()
+        args_schema = self.tool_spec.input_model or self._create_args_schema()
+        if args_schema is not None and not args_schema.model_fields:
+            args_schema = None
         if args_schema is None:
             # StructuredTool requires an args_schema; use an empty model
             # for tools that take no arguments.
@@ -135,8 +150,9 @@ class LangChainAdapter(BaseAdapter[LangChainToolType]):
             "description": self.tool_spec.description,
             "func": _string_wrapper,
             "args_schema": args_schema,
+            "handle_tool_error": True,
         }
-        if async_func is not None:
+        if tool_spec.async_function is not None:
             tool_kwargs["coroutine"] = _async_string_wrapper
 
         return ToolClass(**tool_kwargs)

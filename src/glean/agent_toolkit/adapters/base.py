@@ -2,8 +2,11 @@
 
 from __future__ import annotations
 
+import inspect
+import json
 import operator
 from abc import ABC, abstractmethod
+from collections.abc import Mapping
 from functools import reduce
 from typing import TYPE_CHECKING, Any, Generic, TypeVar
 
@@ -15,6 +18,7 @@ if TYPE_CHECKING:
 T = TypeVar("T")
 
 _TOOL_RESULT_KEYS = frozenset({"status", "result", "error", "error_type", "suggested_action"})
+_COMPACT_ERROR_KEYS = frozenset({"error", "error_type", "suggested_action"})
 
 
 def unwrap_tool_result(value: Any) -> Any:
@@ -40,6 +44,130 @@ def unwrap_tool_result(value: Any) -> Any:
             "suggested_action": value["suggested_action"],
         }
     return value
+
+
+def resolve_context_param(tool_spec: ToolSpec) -> str | None:
+    """Return the name of the parameter that receives the ``GleanContext``.
+
+    Specs built by :func:`~glean.agent_toolkit.decorators.tool_spec` record
+    it in ``context_param``. For specs built by hand, a parameter annotated
+    as ``GleanContext`` wins; otherwise any named parameter missing from the
+    input schema is treated as the context parameter.
+
+    Returns:
+        The parameter name, or ``None`` if the function takes no context.
+    """
+    if tool_spec.context_param is not None:
+        return tool_spec.context_param
+    if tool_spec.input_model is not None:
+        # Built by the decorator, which found no context parameter.
+        return None
+
+    from glean.agent_toolkit.decorators import _is_context_param
+
+    try:
+        parameters = inspect.signature(tool_spec.function).parameters
+    except (TypeError, ValueError):  # pragma: no cover - defensive
+        return None
+
+    named = [
+        param
+        for param in parameters.values()
+        if param.kind not in (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+    ]
+    for param in named:
+        if _is_context_param(param, tool_spec.function):
+            return param.name
+    properties = (tool_spec.input_schema or {}).get("properties") or {}
+    for param in named:
+        if param.name not in properties:
+            return param.name
+    return None
+
+
+def _call_kwargs(
+    tool_spec: ToolSpec, ctx: GleanContext | None, arguments: Mapping[str, Any]
+) -> dict[str, Any]:
+    """Validate the LLM-supplied *arguments* and bind the context by name.
+
+    When the spec carries an input model, the supplied arguments are
+    validated against it first: values are coerced to the declared types
+    (models routinely send ``"3"`` for an integer) and constraints such as
+    ``ge``/``le`` are enforced in every framework, including those that drop
+    them from the schema. A ``ValidationError`` propagates to the caller,
+    which turns it into the compact ``validation`` error payload.
+    """
+    call_kwargs = dict(arguments)
+    model = tool_spec.input_model
+    if model is not None:
+        parsed = model.model_validate(call_kwargs)
+        call_kwargs = {
+            name: getattr(parsed, name) for name in call_kwargs if name in model.model_fields
+        }
+    if ctx is not None:
+        context_param = resolve_context_param(tool_spec)
+        if context_param is not None:
+            call_kwargs[context_param] = ctx
+    return call_kwargs
+
+
+def error_payload(exc: Exception) -> dict[str, Any]:
+    """Classify *exc* into the compact framework-facing error payload."""
+    from glean.agent_toolkit.tools._common import error_result_from_exception
+
+    return unwrap_tool_result(error_result_from_exception(exc))
+
+
+def is_error_payload(payload: Any) -> bool:
+    """Whether *payload* is the compact error payload produced on failure."""
+    return isinstance(payload, dict) and set(payload) == _COMPACT_ERROR_KEYS
+
+
+def invoke_tool(tool_spec: ToolSpec, ctx: GleanContext | None, arguments: Mapping[str, Any]) -> Any:
+    """Run a tool synchronously and return the framework-facing payload.
+
+    This is the single call path shared by every adapter: the context is
+    injected by parameter name, an exception becomes the compact error
+    payload (exactly as a built-in tool's error ``ToolResult`` does), and
+    ``ToolResult`` envelopes are unwrapped.
+
+    Args:
+        tool_spec: The tool to run.
+        ctx: Context to inject, or ``None`` to inject nothing.
+        arguments: The arguments supplied by the framework.
+
+    Returns:
+        The raw result payload, or the compact error payload on failure.
+    """
+    try:
+        result = tool_spec.function(**_call_kwargs(tool_spec, ctx, arguments))
+    except Exception as exc:
+        return error_payload(exc)
+    return unwrap_tool_result(result)
+
+
+async def ainvoke_tool(
+    tool_spec: ToolSpec, ctx: GleanContext | None, arguments: Mapping[str, Any]
+) -> Any:
+    """Async twin of :func:`invoke_tool`, using the tool's async function.
+
+    Falls back to the synchronous function when the spec has no async
+    function.
+    """
+    if tool_spec.async_function is None:
+        return invoke_tool(tool_spec, ctx, arguments)
+    try:
+        result = await tool_spec.async_function(**_call_kwargs(tool_spec, ctx, arguments))
+    except Exception as exc:
+        return error_payload(exc)
+    return unwrap_tool_result(result)
+
+
+def payload_to_text(payload: Any) -> str:
+    """Serialize a payload for frameworks that expect string tool output."""
+    if isinstance(payload, str):
+        return payload
+    return json.dumps(payload, default=str)
 
 
 def get_field_type(schema: dict[str, Any], *, use_date_types: bool = False) -> Any:

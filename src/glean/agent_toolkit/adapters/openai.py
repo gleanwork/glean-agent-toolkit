@@ -3,14 +3,17 @@
 from __future__ import annotations
 
 import copy
-import functools
 import json
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeAlias, TypedDict
 
-from glean.agent_toolkit.adapters.base import BaseAdapter, unwrap_tool_result
+from glean.agent_toolkit.adapters.base import (
+    BaseAdapter,
+    ainvoke_tool,
+    error_payload,
+    payload_to_text,
+)
 from glean.agent_toolkit.spec import ToolSpec
-from glean.agent_toolkit.tools._common import _classify_error
 
 if TYPE_CHECKING:
     from glean.agent_toolkit.context import GleanContext
@@ -143,11 +146,8 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
         Returns:
             An OpenAI Agents SDK FunctionTool
         """
-        async_func = self.tool_spec.async_function
-        sync_func = self.tool_spec.function
-        if self.ctx is not None:
-            async_func = functools.partial(async_func, self.ctx) if async_func else None
-            sync_func = functools.partial(sync_func, self.ctx)
+        tool_spec = self.tool_spec
+        bound_ctx = self.ctx
 
         async def on_invoke_tool(ctx: Any, input_str: str) -> str:
             """Function that invokes the tool with parameters.
@@ -160,23 +160,9 @@ class OpenAIAdapter(BaseAdapter[OpenAIToolType]):
             """
             try:
                 params = json.loads(input_str) if input_str else {}
-                if async_func is not None:
-                    result = await async_func(**params)
-                else:
-                    result = sync_func(**params)
-                result = unwrap_tool_result(result)
-                if isinstance(result, str):
-                    return result
-                return json.dumps(result, default=str)
-            except Exception as e:
-                error_type, suggested_action = _classify_error(e)
-                return json.dumps(
-                    {
-                        "error": str(e),
-                        "error_type": error_type,
-                        "suggested_action": suggested_action,
-                    }
-                )
+            except Exception as exc:
+                return payload_to_text(error_payload(exc))
+            return payload_to_text(await ainvoke_tool(tool_spec, bound_ctx, params))
 
         params_json_schema_dict = (
             self.tool_spec.input_schema

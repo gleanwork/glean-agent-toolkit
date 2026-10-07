@@ -115,10 +115,101 @@ def _extract_field_info(param_type: Any) -> tuple[Any, FieldInfo | None]:
     return param_type, None
 
 
+_SKIPPED_PARAM_KINDS = (inspect.Parameter.VAR_POSITIONAL, inspect.Parameter.VAR_KEYWORD)
+
+
+def _resolve_annotation(func: Callable | None, param: inspect.Parameter) -> Any:
+    """Resolve *param*'s annotation to a real type, keeping ``Annotated`` metadata.
+
+    String annotations (from ``from __future__ import annotations``) are
+    evaluated against the tool function's own module, so types imported
+    there (enums, ``Literal``, ``Field``) resolve correctly. Each parameter
+    is resolved independently: a name that only exists under
+    ``TYPE_CHECKING`` (commonly ``GleanContext``) must not stop the other
+    parameters from resolving. Unresolvable annotations are returned as-is.
+    """
+    annotation = param.annotation
+    if not isinstance(annotation, str) or func is None:
+        return annotation
+
+    from glean.agent_toolkit.context import GleanContext
+
+    target = inspect.unwrap(func)
+    holder = types.SimpleNamespace(__annotations__={param.name: annotation})
+    try:
+        hints = typing.get_type_hints(
+            holder,
+            globalns=getattr(target, "__globals__", {}),
+            localns={"GleanContext": GleanContext},
+            include_extras=True,
+        )
+    except Exception:
+        return annotation
+    return hints.get(param.name, annotation)
+
+
+def _build_input_model(
+    name: str, signature: inspect.Signature, func: Callable | None = None
+) -> tuple[type[BaseModel] | None, str | None]:
+    """Build the pydantic model for a tool's LLM-facing parameters.
+
+    The ``GleanContext`` parameter and ``*args``/``**kwargs`` are excluded.
+    Defaults always come from the Python signature, including for
+    ``Annotated[T, Field(...)] = default`` parameters.
+
+    Args:
+        name: Tool name, used to name the model.
+        signature: Function signature to analyze.
+        func: The original function, used for annotation resolution.
+
+    Returns:
+        ``(model, context_param)``. ``model`` is ``None`` when pydantic
+        cannot build a model from the annotations; ``context_param`` is the
+        name of the ``GleanContext`` parameter, if any.
+    """
+    fields: dict[str, Any] = {}
+    context_param: str | None = None
+
+    for param_name, param in signature.parameters.items():
+        if _is_context_param(param, func):
+            context_param = context_param or param_name
+            continue
+        if param.kind in _SKIPPED_PARAM_KINDS:
+            continue
+        if param.annotation is inspect.Parameter.empty:
+            annotation: Any = str
+        else:
+            annotation = _resolve_annotation(func, param)
+        default = ... if param.default is inspect.Parameter.empty else param.default
+        fields[param_name] = (annotation, default)
+
+    try:
+        model = create_model("DynamicInputModel", **fields)
+        # create_model defers unresolvable forward references instead of
+        # raising; building the schema surfaces them here.
+        model.model_json_schema()
+    except Exception:
+        return None, context_param
+    model.__doc__ = f"Arguments for the {name!r} tool."
+    return model, context_param
+
+
+def _schema_from_model(model: type[BaseModel]) -> dict[str, Any]:
+    """Return the JSON schema for *model*, normalized to an object schema."""
+    schema = model.model_json_schema()
+    # The docstring is set for the model's own sake; keep it out of the
+    # LLM-facing schema to match what the decorator always emitted.
+    schema.pop("description", None)
+    schema.setdefault("type", "object")
+    schema.setdefault("properties", {})
+    schema.setdefault("required", [])
+    return schema
+
+
 def _create_pydantic_input_schema(
     signature: inspect.Signature, func: Callable | None = None
 ) -> dict[str, Any]:
-    """Create a JSON schema using Pydantic's TypeAdapter for all parameters.
+    """Create a JSON schema for the tool's LLM-facing parameters.
 
     Args:
         signature: Function signature to analyze
@@ -127,61 +218,30 @@ def _create_pydantic_input_schema(
     Returns:
         JSON schema dictionary
     """
-    fields = {}
+    model, _ = _build_input_model("tool", signature, func)
+    if model is not None:
+        return _schema_from_model(model)
+    return _fallback_input_schema(signature, func)
+
+
+def _fallback_input_schema(signature: inspect.Signature, func: Callable | None) -> dict[str, Any]:
+    """Best-effort per-parameter schema when no pydantic model can be built."""
+    properties: dict[str, Any] = {}
+    required: list[str] = []
 
     for param_name, param in signature.parameters.items():
-        if _is_context_param(param, func):
+        if _is_context_param(param, func) or param.kind in _SKIPPED_PARAM_KINDS:
             continue
-        if param.annotation == inspect.Parameter.empty:
-            fields[param_name] = (str, ...)
-        else:
-            param_type, field_info = _extract_field_info(param.annotation)
+        if param.default is param.empty:
+            required.append(param_name)
 
-            if param.default is param.empty:
-                if field_info:
-                    fields[param_name] = (param_type, field_info)
-                else:
-                    fields[param_name] = (param_type, ...)
-            else:
-                if field_info:
-                    fields[param_name] = (param_type, field_info)
-                else:
-                    fields[param_name] = (param_type, param.default)
+        try:
+            param_type, _ = _extract_field_info(_resolve_annotation(func, param))
+            properties[param_name] = TypeAdapter(param_type).json_schema()
+        except Exception:
+            properties[param_name] = {"type": "string"}
 
-    if not fields:
-        return {"type": "object", "properties": {}, "required": []}
-
-    try:
-        dynamic_model = create_model("DynamicInputModel", **fields)
-        schema = dynamic_model.model_json_schema()
-
-        if "type" not in schema:
-            schema["type"] = "object"
-        if "properties" not in schema:
-            schema["properties"] = {}
-        if "required" not in schema:
-            schema["required"] = []
-
-        return schema
-    except Exception:
-        properties = {}
-        required = []
-
-        for param_name, param in signature.parameters.items():
-            if _is_context_param(param, func):
-                continue
-            if param.default is param.empty:
-                required.append(param_name)
-
-            try:
-                param_type, _ = _extract_field_info(param.annotation)
-                adapter = TypeAdapter(param_type)
-                param_schema = adapter.json_schema()
-                properties[param_name] = param_schema
-            except Exception:
-                properties[param_name] = {"type": "string"}
-
-        return {"type": "object", "properties": properties, "required": required}
+    return {"type": "object", "properties": properties, "required": required}
 
 
 CallableT = Callable[..., Any]
@@ -335,8 +395,13 @@ def tool_spec(
         """
         sig = inspect.signature(func)
 
-        # Use Pydantic's schema generation instead of manual creation
-        input_schema_dict = _create_pydantic_input_schema(sig, func)
+        # Build the input model once; the JSON schema is derived from it and
+        # adapters reuse the model itself, so nothing is lost in translation.
+        input_model, context_param = _build_input_model(name, sig, func)
+        if input_model is not None:
+            input_schema_dict = _schema_from_model(input_model)
+        else:
+            input_schema_dict = _fallback_input_schema(sig, func)
         input_schema = cast(InputSchema, input_schema_dict)
 
         # Generate output schema using Pydantic when possible
@@ -396,6 +461,8 @@ def tool_spec(
                 else None
             ),
             async_function=async_function,
+            input_model=input_model,
+            context_param=context_param,
         )
 
         get_registry().register(tool_spec_obj)

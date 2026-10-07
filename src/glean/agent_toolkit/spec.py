@@ -31,6 +31,15 @@ class ToolSpec:
         output_schema: JSON schema for the output value (advisory; see note above)
         version: Optional version string
         output_model: Optional pydantic model for the output (advisory; see note above)
+        input_model: Pydantic model of the input parameters that ``input_schema``
+            was generated from. Adapters hand it to frameworks that accept a
+            model directly so enums, bounds, and defaults survive unchanged.
+            ``None`` for specs built by hand; adapters then fall back to
+            ``input_schema``.
+        context_param: Name of the function parameter that receives the
+            :class:`~glean.agent_toolkit.context.GleanContext`, or ``None``
+            if the function takes no context. Adapters inject the context by
+            this name, never positionally.
     """
 
     name: str
@@ -41,6 +50,8 @@ class ToolSpec:
     version: str | None = None
     output_model: type[BaseModel] | None = None
     async_function: Callable[..., Coroutine[Any, Any, Any]] | None = None
+    input_model: type[BaseModel] | None = None
+    context_param: str | None = None
     _adapters: dict[str, Any] = field(default_factory=dict)
 
     def get_adapter(self, name: str) -> Any | None:

@@ -13,6 +13,12 @@ import json
 from typing import Any, cast
 from unittest.mock import MagicMock
 
+import pytest
+
+from glean.agent_toolkit.adapters.adk import HAS_ADK
+from glean.agent_toolkit.adapters.crewai import HAS_CREWAI
+from glean.agent_toolkit.adapters.langchain import HAS_LANGCHAIN
+from glean.agent_toolkit.adapters.openai import HAS_OPENAI
 from glean.agent_toolkit.context import GleanContext
 from glean.agent_toolkit.decorators import ToolSpecFunction, tool_spec
 
@@ -33,6 +39,7 @@ def _make_probe(name: str) -> ToolSpecFunction:
     return cast(ToolSpecFunction, probe)
 
 
+@pytest.mark.skipif(not HAS_OPENAI, reason="OpenAI Agents SDK not installed")
 def test_as_openai_tool_binds_ctx() -> None:
     probe = _make_probe("ctx_probe_openai")
     ctx = _make_ctx("injected")
@@ -43,6 +50,7 @@ def test_as_openai_tool_binds_ctx() -> None:
     assert result == "injected:hi"
 
 
+@pytest.mark.skipif(not HAS_LANGCHAIN, reason="LangChain not installed")
 def test_as_langchain_tool_binds_ctx() -> None:
     probe = _make_probe("ctx_probe_langchain")
     ctx = _make_ctx("lc")
@@ -51,6 +59,7 @@ def test_as_langchain_tool_binds_ctx() -> None:
     assert tool.invoke({"text": "x"}) == "lc:x"
 
 
+@pytest.mark.skipif(not HAS_ADK, reason="Google ADK not installed")
 def test_as_adk_tool_binds_ctx() -> None:
     probe = _make_probe("ctx_probe_adk")
     ctx = _make_ctx("adk")
@@ -60,6 +69,7 @@ def test_as_adk_tool_binds_ctx() -> None:
     assert asyncio.run(tool.func(text="y")) == "adk:y"
 
 
+@pytest.mark.skipif(not HAS_CREWAI, reason="CrewAI not installed or not importable")
 def test_as_crewai_tool_binds_ctx() -> None:
     probe = _make_probe("ctx_probe_crewai")
     ctx = _make_ctx("crew")

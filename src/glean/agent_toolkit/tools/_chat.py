@@ -14,6 +14,7 @@ from glean.agent_toolkit.decorators import tool_spec
 from glean.agent_toolkit.tools._common import (
     ToolResult,
     serialize_tool_result,
+    timeout_kwargs,
 )
 from glean.agent_toolkit.tools._transport import (
     TypedBackend,
@@ -89,6 +90,7 @@ def _create_chat(client: Glean, *, message: str) -> Any:
     """Perform the typed ``POST /rest/api/v1/chat`` call."""
     return client.client.chat.create(
         messages=[{"fragments": [{"text": message}]}],
+        **timeout_kwargs(client, "chat"),
     )
 
 
@@ -96,6 +98,7 @@ async def _create_chat_async(client: Glean, *, message: str) -> Any:
     """Native async twin of :func:`_create_chat` (``chat.create_async``)."""
     return await client.client.chat.create_async(
         messages=[{"fragments": [{"text": message}]}],
+        **timeout_kwargs(client, "chat"),
     )
 
 
